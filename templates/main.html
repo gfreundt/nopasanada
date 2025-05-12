@@ -1,0 +1,110 @@
+{% extends "base_page.html" %}
+
+{% block title %}
+Pagina Principal
+{% endblock %}
+
+{% block content %}
+
+    <div class = "row">
+        <div class="col-sm">
+            <b>{{user[2]}}</b>
+        </div>
+        <div class="col-sm">
+            <b>DNI: {{user[4]}}</b>
+        </div>
+        <div class="col-sm">
+            <b>Correo: {{user[6]}}</b>
+        </div>
+    </div>
+    <div class = "row">
+        <div class="col-sm">
+            <b>Celular: {{user[5]}}</b>
+        </div>
+        <div class="col-sm">
+             <b>Placa1: {{user['placa1']}}</b><br>
+        </div>
+        <div class="col-sm">
+            <b>Placa2: {{user['placa2']}}</b><br>
+        </div>
+    </div>
+    <div class = "row">
+        <div class="col-sm">
+            <b>Placa3: {{user['placa3']}}</b><br>
+        </div>
+        <div class="col-sm">
+              <b>Login Anterior: {{user[9]}}</b><br>
+        </div>
+        <div class="col-sm">
+            <b>Pendiente</b>    
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class = "row">
+        <div class="col-md">
+                <table style="color: white; background:#618685; white-space:nowrap">
+        <tr>
+            <td colspan="2" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Licencia de Conducir
+            </td>
+        </tr>
+        {%if brevete%}
+        <tr>
+            <td style="text-align: right; column-width: 140px">Número</td>
+            <td style="text-align: center; column-width: 260px">{{brevete.numero}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Clase</td>
+            <td style="text-align: center">{{brevete.clase}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Formato</td>
+            <td style="text-align: center">{{brevete.formato}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            <td style="text-align: center">{{brevete.fecha_desde}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Vencimiento</td>
+            <td style="text-align: center;font-weight: bold;">{{brevete.fecha_hasta}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Restricciones</td>
+            <td style="text-align: center">{{brevete.restricciones}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Local de Emisión</td>
+            <td style="text-align: center">{{brevete.local}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Puntos en Licencia</td>
+            <td style="text-align: center">{{brevete.puntos}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">N° Récord del Conductor</td>
+            <td style="text-align: center">{{brevete.record}}</td>
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro de Licencia de Conducir</td>
+        </tr>
+        {%endif%}
+
+    </table>
+
+
+        </div>
+        <div class="col-md">
+            <b>Impuesto SAT {{user[4]}}</b>
+        </div>
+        <div class="col-md">
+            <b>Record del Conductor</b>
+            <img src = "{{ url_for('static', filename = '/images/')}}{{record}}" >
+        </div>
+    </div>
+    
+    {%endblock content%}

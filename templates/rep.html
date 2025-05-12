@@ -1,0 +1,654 @@
+{% extends "base_page.html" %}
+
+{% block title %}
+Pagina Principal
+{% endblock title%}
+
+{% block content %}
+
+    <form id="mainForm" method="POST">
+        <input type="hidden" id="selectedOption" name="selection">
+    </form>
+
+    <!-- Seccion de Dropdows para Elegir Reporte -->
+
+    <nav class="navbar navbar-expand-lg navbar-primary px-4 mt-4">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex flex-row gap-4">
+            <!-- Cond Category -->
+            <li class="nav-item dropdown">
+                <a class="fs-4 nav-link dropdown-toggle" href="#" role="button", style="margin-left: 20px;">Informacion sobre el Conductor</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="sendForm('brevet')">Licencia de Conducir (Brevete)</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="sendForm('impsat')">Impuestos SAT Lima</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="sendForm('recmtc')">Record MTC</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="sendForm('papmtc')">Papeletas MTC</a></li>
+                </ul>
+            </li>
+            <!-- Pers Category -->
+            <li class="nav-item dropdown">
+                <a class="fs-4 nav-link dropdown-toggle" href="#" role="button", style="margin-left: 30px;">Informacion sobre el Vehiculo</a>
+                <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="sendForm('soats')">Certificados SOAT</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('revtec')">Revisiones Tecnicas</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('sunarp')">Fichas SUNARP</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('mulsat')">Multas SAT Lima</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('mulsut')">Multas SUTRAN</a></li>
+                </ul>
+            </li>
+            <!-- Vehic Category -->
+            <li class="nav-item dropdown">
+                <a class="fs-4 nav-link dropdown-toggle" href="#" role="button", style="margin-left: 30px;">Informacion sobre la Persona</a>
+                <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="sendForm('muljne')">Multas JNE</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('osipte')">Lineas Telefonicas OSIPTEL</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('sunat')">RUC Persona Natural SUNAT</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sendForm('afijne')">Afiliacion Partido Politico JNE</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Seccion de Mostrar Informacion -->
+    <div class="col-6 p-3">
+        <div class="card mb-3">         
+
+            <!-- Brevete -->
+            {% if selection == "brevet" %}
+                <div class="card-header text-black text-center">
+                    <div class="h3 mb-0 ">
+                        Licencia de Conducir (Brevete)
+                    </div>
+                    <div class="card body p-3">
+
+                    {%if data.brevete%}
+                        <div class = "row mt-1">
+                            <div class = "col mx-auto">    
+                                <table class= "table table-md border-bottom border-3 border-primary">
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Número</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.numero}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Clase</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.clase}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Formato</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.formato}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Expedición</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.fecha_desde}}</td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td style="text-align: right; padding-right: 15px;font-weight: bold;">Vencimiento</td>
+                                        <td style="text-align: left; padding-left: 15px;font-weight: bold;">{{data.brevete.fecha_hasta}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Restricciones</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.restricciones}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Local de Emisión</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.local}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">Puntos en Licencia</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.puntos}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: right; padding-right: 15px;">N° Récord del Conductor</td>
+                                        <td style="text-align: left; padding-left: 15px;">{{data.brevete.record}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class = "row mt-3">
+                            <div class = "col mx-auto">
+                                <div class="fs-2 col text-black text-center fw-bold p-3">
+                                    Vigencia:
+                                    {% if data.brevete.vigencia == "Vencida" %}
+                                        <span class="text-danger">{{data.brevete.vigencia}}</span>
+                                    {% else %}
+                                        <span class="text-success">{{data.brevete.vigencia}}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>  
+
+                    {%else%}
+                        <tr>
+                            <td style="text-align: center">Sin registro de Licencia de Conducir</td>
+                        </tr>
+                    
+                    {%endif%}
+
+                {% endif %}
+
+    <!-- Impuesto SAT Lima -->
+    {% if selection == "impsat" %}
+
+        <div class="row mt-5">
+            <div class="col-md-6 mx-auto"> 
+                <div class="col text-black text-center fw-bold fs-2 p-3 border-top border-bottom border-3 border-primary">
+                    Impuestos Vehiculares SAT Lima
+                </div>
+            </div>
+        </div>
+        
+        {%if data.satimps%}
+            <div class="row mt-1">
+                <div class="col-md-6 mx-auto">
+                    <table id="big" class="table table-md border-bottom border-3 border-primary">
+                        <tr>
+                            <td style="text-align: right; column-width:140px">Código Tributario</td>
+                            {% for satimp in data.satimps %}
+                                <td style="text-align: center; padding-top: 17px; column-width:260px; border-left: 2px solid #dee2e6">{{satimp.codigo}}</td>
+                            {%endfor%}
+                        </tr>
+                        <tr style="color: white; background:#618685; white-space:nowrap; border: none;">
+                            <td style="text-align: right; vertical-align:top">Deudas</td>
+                            {%for satimp in data.satimps%}
+                                {%if satimp.deudas%}
+                                    <td style="border-left: 2px solid #dee2e6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td style="text-align: center; column-width:50px; font-weight:bold"> Año </td>
+                                            <td style="text-align: center; column-width:35px; font-weight:bold"> Trim. </td>
+                                            <td style="text-align: center; column-width:100px; font-weight:bold"> Documento </td>
+                                            <td style="text-align: center; column-width:55px; font-weight:bold"> S/</td>
+                                        </tr>
+                                    {% for deuda in satimp.deudas %}
+                                        <tr>
+                                            <td style="text-align: center">{{deuda.ano}}</td>
+                                            <td style="text-align: center">{{deuda.periodo}}</td>
+                                            <td style="text-align: center">{{deuda.doc_num}}</td>
+                                            <td style="text-align: center">{{deuda.total_a_pagar}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </table>
+                                {%else%}
+                                    <td style="text-align: center; column-width: 140px; vertical-align: top; font-weight: bold; border-left: 2px solid #dee2e6">
+                                        Sin deudas registradas.
+                                    </td>
+                                {%endif%}
+                            {%endfor%}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        {%else%}
+            <tr>
+                <td style="text-align: center; column-width: 140px">Sin deudas tributarias SAT registradas.</td>
+            </tr>
+        {%endif%}
+        </table>
+    {% endif %}
+
+    <!-- Record MTC -->
+    {% if selection == "recmtc" %}
+        <div class="row mt-3">
+            <div class="col-md-8 mx-auto">
+                <img class= "border border-primary rounded", src = "{{ url_for('static', filename = '/images/')}}{{record}}" >
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Multas SAT Lima-->
+    {% if selection == "mulsat" %}
+        <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Multas SAT Lima
+            </td>
+        </tr>
+        {%if data.satmuls%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Placa</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center; column-width:260px">
+                {{satmul.placa}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; column-width:140px">Licencia</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center; column-width:260px">
+                {{satmul.licencia}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;column-width:140px">Falta</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center">
+                {{satmul.falta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Documento</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center">
+                {{satmul.documento}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center">
+                {{satmul.fecha_emision}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Deuda</td>
+            {% for satmul in data.satmuls %}
+            <td style="text-align: center">
+                S/ {{satmul.deuda}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin multas registradas.</td>
+        </tr>
+        {% endif %}
+    </table>
+    {% endif %}
+
+    <!-- Multas SUTRAN -->
+    {% if selection == "mulsut" %}
+        <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+            <tr>
+                <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                    Multas SUTRAN
+                </td>
+            </tr>
+            {%if data.sutrans%}
+            <tr>
+                <td style="text-align: right; column-width:140px">Placa</td>
+                {% for sutran in data.sutrans %}
+                <td style="text-align: center; column-width:260px">
+                    {{sutran.placa}}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="text-align: right;column-width:140px">Documento</td>
+                {% for sutran in data.sutrans %}
+                <td style="text-align: center">
+                    {{sutran.documento}}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="text-align: right">Tipo</td>
+                {% for sutran in data.sutrans %}
+                <td style="text-align: center">
+                    {{sutran.tipo}}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="text-align: right">Expedición</td>
+                {% for sutran in data.sutrans %}
+                <td style="text-align: center">
+                    {{sutran.fecha_documento}}
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td style="text-align: right">Infracción</td>
+                {% for sutran in data.sutrans %}
+                <td style="text-align: center">
+                    {{sutran.infraccion}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% else %}
+            <tr>
+                <td style="text-align: center; column-width: 140px">Sin multas registradas.</td>
+            </tr>
+            {% endif %}
+        </table>
+    {% endif %}
+
+    <!-- Papeletas MTC  -->
+    {% if selection == "papmtc" %}
+        <div class="row mt-5">
+            <div class="col-md-6 mx-auto"> 
+                <div class="col text-black text-center fw-bold fs-2 p-3 border-top border-bottom border-3 border-primary">
+                    Papeletas Registradas en el MTC
+                </div>
+            </div>
+        </div>
+
+        {%if data.papeletas%}
+            <div class="row mt-1">
+                <div class="col-md-6 mx-auto">
+                    <table id="big" class="table table-md border-bottom border-3 border-primary">
+                        <tr>
+                            <td style="text-align: right; column-width:140px">Entidad</td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center; column-width:260px">
+                                    {{papeleta.entidad}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;column-width:140px">
+                                Número
+                            </td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center">
+                                    {{papeleta.numero}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Fecha
+                            </td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center">
+                                    {{papeleta.fecha}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Fecha Firme
+                            </td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center">
+                                    {{papeleta.fecha_firme}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Falta
+                            </td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center">
+                                    {{papeleta.falta}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">
+                                Estado de Deuda
+                            </td>
+                            {% for papeleta in data.papeletas %}
+                                <td style="text-align: center">
+                                    {% if papeleta.estado_deuda == "Pendiente de Pago" %}
+                                        <span class="text-danger">{{papeleta.estado_deuda}}</span>
+                                    {% else %}
+                                        <span class="text-success">{{papeleta.estado_deuda}}</span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        {%else%}
+            <div class="col text-success text-center mt-4 fw-bold fs-3 p-3">
+                    Sin Papeletas Registradas
+            </div>
+        {%endif%}        
+    {%endif%}    
+
+    <!-- Certificados SOAT  -->
+    {% if selection == "soats" %}
+        
+        <div class="row mt-5">
+            <div class="col-md-6 mx-auto">
+                <div class="col text-black text-center fw-bold fs-2 p-3 border-top border-bottom border-3 border-primary">
+                    Certificados SOAT
+                </div>
+            </div>
+        </div>
+
+        {%if data.soats%}
+            <div class = "row mt-1">
+                <div class = "col-md-6 mx-auto">    
+                    <table class= "table table-md border-bottom border-3 border-primary">
+                        <tr>
+                            <td style="text-align: right; column-width:140px">
+                                Placa
+                            </td>
+                            {% for soat in data.soats %}
+                                <td style="text-align: center; column-width:260px">
+                                    {{soat.placa}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Aseguradora</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.aseguradora}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Inicio</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.fecha_desde}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr class="table-info">
+                            <td style="text-align: right;font-weight: bold;">Vigencia</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center;font-weight: bold;">
+                                {{soat.fecha_hasta}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Uso</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center; word-wrap: break-word;">
+                                {{soat.uso}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; ">Clase</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.clase}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; ">Tipo</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.tipo}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; ">Certificado</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.certificado}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; ">Status</td>
+                            {% for soat in data.soats %}
+                            <td style="text-align: center">
+                                {{soat.vigencia}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        
+        {%else%}
+        
+            <div class="col text-danger text-center mt-4 fw-bold fs-3 p-3">
+                Sin registro de Certificado SOAT
+            </div>
+        
+        {%endif%}
+
+        
+
+    {% endif %}
+
+    <!-- Revision Tecnica -->
+    {% if selection == "revtec" %}
+
+        <div class="row mt-5">
+            <div class="col-md-6 mx-auto">
+                <div class="col text-black text-center fw-bold fs-2 p-3 border-top border-bottom border-3 border-primary">
+                    Revisiones Técnicas
+                </div>
+            </div>
+        </div>
+        {%if data.revtecs%}
+            <div class = "row mt-1">
+                <div class = "col-md-6 mx-auto">    
+                    <table class= "table table-md border-bottom border-3 border-primary">
+                        <tr>
+                            <td style="text-align: right; column-width:140px">
+                                Placa
+                            </td>
+                            {% for revtec in data.revtecs %}
+                                <td style="text-align: center; column-width:260px">
+                                    {{revtec.placa}}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Expedición</td>
+                            {% for revtec in data.revtecs %}
+                            <td style="text-align: center">
+                                {{revtec.fecha_desde}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr class="table-info">
+                            <td style="text-align: right;font-weight: bold;">Vigencia</td>
+                            {% for revtec in data.revtecs %}
+                            <td style="text-align: center;font-weight: bold;">
+                                {{revtec.fecha_hasta}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Resultado</td>
+                            {% for revtec in data.revtecs %}
+                            <td style="text-align: center">
+                                {{revtec.resultado}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right">Certificadora</td>
+                            {% for revtec in data.revtecs %}
+                            <td style="text-align: center; word-wrap: break-word;">
+                                {{revtec.certificadora}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; ">Certificado</td>
+                            {% for revtec in data.revtecs %}
+                            <td style="text-align: center">
+                                {{revtec.certificado}}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        {%else%}
+        <div class="col text-warning text-center mt-4 fw-bold fs-3 p-3">
+            Sin registro de Revisiones Tecnicas
+        </div>
+        {%endif%}
+    {% endif %}
+
+    <!-- Ficha SUNARP -->
+    {% if selection == "sunarp" %}
+        <div class="row mt-3 gx-2 gy-3">
+        {% for sunarp in data.sunarps %}
+            <div class="col-4 ml-2">
+                <img class="border border-primary rounded img-fluid" width="500" height="555" src = "{{ url_for('static', filename='images/' + sunarp) }}" >
+            </div>        
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Multas JNE -->
+    {% if selection == "muljne" %}
+        <div class="col-md ">
+            <img class= "border border-primary rounded mt-5", src = "{{ url_for('static', filename = '/puente_miraflores.png')}}" >
+        </div>
+        <p class="h1 text-center mt-4">Pagina en Construccion</p>
+    {% endif %}
+
+    <!-- Lineas OSIPTEL -->
+    {% if selection == "osipte" %}
+        <div class="col-md ">
+            <img class= "border border-primary rounded mt-5", src = "{{ url_for('static', filename = '/puente_miraflores.png')}}" >
+        </div>
+        <p class="h1 text-center mt-4">Pagina en Construccion</p>
+    {% endif %}
+
+    <!-- RUC Persona Natural SUNAT -->
+    {% if selection == "sunat" %}
+        <div class="col-md ">
+            <img class= "border border-primary rounded mt-5", src = "{{ url_for('static', filename = '/puente_miraflores.png')}}" >
+        </div>
+        <p class="h1 text-center mt-4">Pagina en Construccion</p>
+    {% endif %}
+
+    <!-- Afiliacion Partido Politico JNE -->
+    {% if selection == "afijne" %}
+        <div class="col-md ">
+            <img class= "border border-primary rounded mt-5", src = "{{ url_for('static', filename = '/puente_miraflores.png')}}" >
+        </div>
+        <p class="h1 text-center mt-4">Pagina en Construccion</p>
+    {% endif %}
+
+
+    <!-- Placeholder -->
+    {% if selection == "X" %}
+        <div class="col-md ">
+            <img class= "border border-primary rounded", src = "{{ url_for('static', filename = '/images/')}}{{record}}" >
+        </div>
+    {% endif %}
+
+    <div class="col text-primary text-center mt-4 fw-bold fs-5 p-3">
+        Ultima Actualizacion<br>
+        2025-01-10<br>
+        (hace 164 dias)
+        FIX!!!
+    </div>         
+
+<script>
+
+    function sendForm(option) {
+        document.getElementById("selectedOption").value = option;
+        document.getElementById("mainForm").submit();
+      
+    }
+
+</script>
+
+{% endblock content%}

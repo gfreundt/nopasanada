@@ -1,0 +1,23 @@
+.dropdown:hover .dropdown-menu {
+    display: block;
+  }
+.dropdown-menu {
+    margin-top: 0;
+  }
+.table-left-col {
+    text-align: right;
+    padding-right: 15px;
+    color:red
+}
+.doc-checkbox-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.disabled {
+    opacity: 0.7;
+    pointer-events: none;
+}
+.form-check-input:disabled {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}

@@ -1,0 +1,276 @@
+{% extends "base_page.html" %}
+
+{% set placa_style = "font-weight: bold; border-radius: 5px; border: 1px solid #dee2e6; margin-bottom: 15px" %}
+
+{% block title %}
+    Mi Cuenta
+{% endblock %}
+
+{% block content %}
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="">
+            <fieldset class="form-group">
+        
+        
+        <div class="row">
+
+            <!-- Seccion Mis Placas -->
+            <div class="col-4 p-4">
+                <div class="card mb-3">
+                    <div class="card-header text-white", style="background-color: #2196f3">
+                        <h2 class="h5 mb-0">
+                            Mis Placas
+                        </h2>
+                    </div>
+                    <div class="card body p-3">
+
+                        <!-- Campo de placa 1 -->
+                        <div class="form-group justify-content-between align-items-center form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.get('placa1') %} is-invalid {% endif %}"
+                                    id="placa1" name="placa1" value="{{ placas[0]}}" , placeholder="empty">
+                            <label for="placa1" class="form-label">
+                                Placa
+                            </label>
+                            <!-- Mensajes de error -->
+                            {% if errors.get("placa1") %}
+                                <div class="mt-2">
+                                {% for error in errors.placa1 %}
+                                    <small class="text-danger">
+                                        {{ error }}
+                                    </small>
+                                    <br>
+                                {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo de placa 2 -->
+                        <div class="form-group justify-content-between align-items-center form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.get('placa2') %} is-invalid {% endif %}"
+                                id="placa2" name="placa2" value="{{ placas[1] }}" , placeholder="empty">
+                            <label for="placa2" class="form-label">
+                                Placa
+                            </label>
+                            <!-- Mensajes de error -->
+                            {% if errors.get("placa2") %}
+                            <div class="mt-2">
+                                {% for error in errors.placa2 %}
+                                <small class="text-danger">
+                                    {{ error }}
+                                </small>
+                                <br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo de placa 3 -->
+                        <div class="form-group justify-content-between align-items-center form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.get('placa3') %} is-invalid {% endif %}"
+                                id="placa3" name="placa3" value="{{ placas[3] }}" , placeholder="empty">
+                            <label for="placa3" class="form-label">
+                                Placa
+                            </label>
+                            <!-- Mensajes de error -->
+                            {% if errors.get("placa3") %}
+                            <div class="mt-2">
+                                {% for error in errors.placa3 %}
+                                <small class="text-danger">
+                                    {{ error }}
+                                </small>
+                                <br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seccion Recibir Correos -->
+            <div class="col-4 p-4">
+                <div class="card mb-4">
+                    <div class="card-header text-white", style="background-color: #2196f3">
+                        <h2 class="h5 mb-0">
+                            Recibir Correos
+                        </h2>
+                    </div>
+                
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col">
+                                <h3 class="h6 section-title mb-3",
+                                    style="border-bottom: 2px solid #0d6efd; padding-bottom: 8px">
+                                    Mensajes
+                                </h3>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="emailPreference" checked style="background-color: #2196f3">
+                                    <label class="form-check-label" for="emailPreference">
+                                        Quiero Recibir Correos Mensuales de Resumen
+                                    </label>
+                                </div>
+                                <h3 class="h6 mb-3", style="margin-left: 40px; color: #2196f3">
+                                    Siguiente mensaje: {{ comm.siguiente_mensaje }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            
+            <!-- Seccion Recibir Alertas -->
+            <div class="col-4 p-4">
+                <div class="card mb-4">
+                    <div class="card-header text-white", style="background-color: #2196f3">
+                        <h2 class="h5 mb-0">Recibir Alertas</h2>
+                    </div>                    
+                    <div class="card-body">
+
+                        <!-- Sub Seccion Alertas Vencimiento -->
+                        <div class="row mb-4">
+                            <div class="col">
+                                <h3 class="h6 section-title",
+                                    style="border-bottom: 2px solid #0d6efd; padding-bottom: 8px; margin-bottom: 20px;">
+                                    Alertas de Vencimiento
+                                </h3>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="alertaPreference1" checked style="background-color: #2196f3">
+                                    <label class="form-check-label" for="alertaPreference1">
+                                        Quiero Recibir Alertas de Vencimiento
+                                    </label>
+                                </div>
+
+                                <div class="doc-options" style="margin-left: 30px">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input doc-option1" type="checkbox" id="soatCheck" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="soatCheck">
+                                            SOAT
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input doc-option1" type="checkbox" id="revisionCheck" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="revisionCheck">
+                                            Revisión Técnica
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input doc-option1" type="checkbox" id="breveteCheck" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="breveteCheck">
+                                            Brevete
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input doc-option1" type="checkbox" id="dniCheck" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="dniCheck">
+                                            DNI
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Seccion Alertas Multas -->
+                        <div class="row mb-2">
+                            <div class="col">
+                                <h3 class="h6 section-title mb-3",
+                                    style="border-bottom: 2px solid #0d6efd; padding-bottom: 8px;">
+                                    Alertas de Nuevas Multas
+                                </h3>    
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="alertaPreference2" checked style="background-color: #2196f3">
+                                    <label class="form-check-label mb-2" for="alertaPreference2">
+                                        Quiero Recibir Alertas de Multas
+                                    </label>
+                                </div>             
+
+                                <div class="doc-options" style="margin-left: 30px">
+                                    <div class="form-checkbox mb-1">
+                                        <input class="form-check-input doc-option2"  type="checkbox" id="newTicketsAlerts1" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="newTicketsAlerts1">
+                                            Multas SUTRAN
+                                        </label>
+                                    </div>
+                                     <div class="form-checkbox mb-1">
+                                        <input class="form-check-input doc-option2" type="checkbox" id="newTicketsAlerts2" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="newTicketsAlerts2">
+                                            Multas SAT Lima
+                                        </label>
+                                    </div>
+                                     <div class="form-checkbox mb-1">
+                                        <input class="form-check-input doc-option2" type="checkbox" id="newTicketsAlerts2" checked style="background-color: #2196f3">
+                                        <label class="form-check-label" for="newTicketsAlerts2">
+                                            Papeletas MTC
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- Boton Grabar Cambios -->
+        <div class = "row">
+            <div class="col p-4 text-center">
+                <button type="submit" class="btn text-white" style="background-color: #2196f3">Actualizar</button>
+            </div>
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Cambia el estado de los checkboxes a desactivado si "Quiero Recibir Alerta" se desactiva
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainSwitch1 = document.getElementById('alertaPreference1');
+        const docOptions1 = document.querySelectorAll('.doc-option1');
+        const docLabels1 = document.querySelectorAll('.doc-option1 + label');
+
+        const mainSwitch2 = document.getElementById('alertaPreference2');
+        const docOptions2 = document.querySelectorAll('.doc-option2');
+        const docLabels2 = document.querySelectorAll('.doc-option2 + label');
+
+        function updateCheckboxStates() {
+            const isEnabled1 = mainSwitch1.checked;
+            const isEnabled2 = mainSwitch2.checked;
+            
+            docOptions1.forEach(option => {
+                option.disabled = !isEnabled1;
+                option.parentElement.classList.toggle('disabled', !isEnabled1);
+            });
+            docOptions2.forEach(option => {
+                option.disabled = !isEnabled2;
+                option.parentElement.classList.toggle('disabled', !isEnabled2);
+            });
+            
+            docLabels1.forEach(label => {
+                label.classList.toggle('text-muted', !isEnabled1);
+            });
+
+            docLabels2.forEach(label => {
+                label.classList.toggle('text-muted', !isEnabled2);
+            });
+        }
+       
+        updateCheckboxStates();
+        
+        mainSwitch1.addEventListener('change', updateCheckboxStates);
+        mainSwitch2.addEventListener('change', updateCheckboxStates);
+    });
+
+</script>
+
+{% endblock content %}
