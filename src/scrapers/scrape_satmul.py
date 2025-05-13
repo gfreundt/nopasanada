@@ -3,12 +3,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import Select
 import time
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(placa):
 
-    TIMEOUT = 30
+    TIMEOUT = 60
 
     webdriver = ChromeUtils().init_driver(
         headless=False, verbose=False, maximized=True, incognito=False
@@ -105,7 +105,6 @@ def browser(placa):
         # image found, grab image and save in file,
         else:
             img_filename = os.path.join(
-                "..",
                 "data",
                 "images",
                 f"SATMUL_{placa.upper()}.png",

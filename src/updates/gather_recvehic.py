@@ -1,11 +1,7 @@
 from datetime import datetime as dt
 from src.scrapers import scrape_recvehic
 from ..utils import log_action_in_db
-import logging
 import easyocr
-
-# remove easyocr warnings in logger
-logging.getLogger("easyocr").setLevel(logging.ERROR)
 
 
 def gather(db_cursor, dash, update_data):
@@ -22,8 +18,7 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # remove easyocr warnings in logger and start reader
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
+    # start OCR
     ocr = easyocr.Reader(["es"], gpu=False)
 
     # iterate on all records that require updating and get scraper results
@@ -69,6 +64,13 @@ def gather(db_cursor, dash, update_data):
                 # insert record into database
                 db_cursor.execute(f"INSERT INTO recordConductores VALUES {_values}")
 
+                # update dashboard with progress and last update timestamp
+                dash.log(
+                    card=CARD,
+                    progress=int((counter / len(update_data)) * 100),
+                    lastUpdate=dt.now(),
+                )
+
                 # no errors - next member
                 break
 
@@ -79,17 +81,23 @@ def gather(db_cursor, dash, update_data):
                 retry_attempts += 1
                 dash.log(
                     card=CARD,
+                    status=2,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
                 )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
-        dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.")
+        # dash.log(
+        #     card=CARD,
+        #     status=2,
+        #     msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.",
+        # )
 
     # log last action
     dash.log(
         card=CARD,
         title="Record del Conductor",
-        status=0,
+        progress=100,
+        status=3,
         text="Inactivo",
         lastUpdate=dt.now(),
     )

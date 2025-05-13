@@ -1,8 +1,10 @@
 from datetime import datetime as dt
 from ..utils import log_action_in_db
 from src.scrapers import scrape_satimp
-import logging
 import easyocr
+import logging
+
+logging.basicConfig(level=logging.ERROR)
 
 
 def gather(db_cursor, dash, update_data):
@@ -19,9 +21,8 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # remove easyocr warnings in logger and start reader
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
-    ocr = easyocr.Reader(["es"], gpu=False)
+    # start OCR
+    ocr = easyocr.Reader(["es"], gpu=True)
 
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data, start=1):
@@ -110,6 +111,7 @@ def gather(db_cursor, dash, update_data):
                 retry_attempts += 1
                 dash.log(
                     card=CARD,
+                    status=2,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
                 )
 
@@ -120,7 +122,8 @@ def gather(db_cursor, dash, update_data):
     dash.log(
         card=CARD,
         title="Impuestos SAT",
-        status=0,
+        progress=100,
+        status=3,
         text="Inactivo",
         lastUpdate=dt.now(),
     )

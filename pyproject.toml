@@ -10,10 +10,13 @@ dependencies = [
     "easyocr>=1.7.2",
     "flask>=3.1.0",
     "img2pdf>=0.6.1",
+    "opencv-python>=4.11.0.86",
     "pillow>=11.2.1",
+    "pyaudio>=0.2.14",
     "pyautogui>=0.9.54",
     "pypdfium2>=4.30.1",
     "pywin32>=310",
+    "requests>=2.32.3",
     "selenium>=4.32.0",
     "speechrecognition>=3.14.2",
 ]

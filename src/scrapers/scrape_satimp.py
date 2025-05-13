@@ -25,11 +25,11 @@ def browser(ocr, doc_num, doc_tipo):
             By.XPATH,
             "/html/body/form/div[3]/section/div/div/div[2]/div[3]/div[5]/div/div[1]/div[2]/div/img",
         )
-        _captcha_img_url.screenshot(os.path.join("..", "other", "captcha_satimp.png"))
+        _captcha_img_url.screenshot(os.path.join("static", "captcha_satimp.png"))
 
         # apply OCR to temp file
         _captcha = ocr.readtext(
-            os.path.join("..", "other", "captcha_satimp.png"),
+            os.path.join("static", "captcha_satimp.png"),
             text_threshold=0.5,
         )
         captcha_txt = (

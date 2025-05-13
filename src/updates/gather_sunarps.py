@@ -1,7 +1,6 @@
 from datetime import datetime as dt
 from ..utils import log_action_in_db
 from src.scrapers import scrape_sunarp
-import logging
 import easyocr
 
 
@@ -19,8 +18,7 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # remove easyocr warnings in logger and start reader
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
+    # start OCR
     ocr = easyocr.Reader(["es"], gpu=False)
 
     # iterate on every placa and write to database
@@ -95,7 +93,8 @@ def gather(db_cursor, dash, update_data):
     dash.log(
         card=CARD,
         title="Fichas Sunarp",
-        status=0,
+        status=3,
+        progress=100,
         text="Inactivo",
         lastUpdate=dt.now(),
     )

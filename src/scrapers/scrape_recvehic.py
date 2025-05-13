@@ -5,7 +5,7 @@ import time
 import re
 import numpy as np
 from PIL import Image
-from gft_utils import ChromeUtils, PDFUtils
+from ..utils import ChromeUtils, PDFUtils
 
 
 def get_captcha(ocr):
@@ -48,7 +48,7 @@ def get_captcha(ocr):
     text = None
     max_cert = 0
     for depth in range(2, 7):
-        f = Image.open(os.path.join("..", "other", "RCItemp.png"))
+        f = Image.open(os.path.join("static", "captcha_recveh.png"))
         img = process(depth=depth, f=f)
         c = ocr.readtext(img, text_threshold=0.4)
         if c and valid(c[0][1]) and c[0][2] > max_cert:
@@ -83,7 +83,7 @@ def browser(doc_num, ocr):
                 time.sleep(2)
             # capture captcha image from webpage and store in variable
             try:
-                with open(os.path.join("..", "other", "RCItemp.png"), "wb") as file:
+                with open(os.path.join("static", "captcha_recveh.png"), "wb") as file:
                     file.write(
                         webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
                     )
@@ -141,7 +141,7 @@ def browser(doc_num, ocr):
     # take downloaded PDF, process image and save in data folder
     try:
         from_path = os.path.join(from_path)
-        to_path = os.path.join("..", "data", "images", f"RECORD_{doc_num.upper()}.png")
+        to_path = os.path.join("data", "images", f"RECORD_{doc_num.upper()}.png")
 
         img = pdf.pdf_to_png(from_path, scale=1.3)
 

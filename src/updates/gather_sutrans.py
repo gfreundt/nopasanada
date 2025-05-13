@@ -84,7 +84,8 @@ def gather(db_cursor, dash, update_data):
     dash.log(
         card=CARD,
         title="Sutran",
-        status=0,
+        progress=100,
+        status=3,
         text="Inactivo",
         lastUpdate=dt.now(),
     )

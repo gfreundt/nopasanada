@@ -1,24 +1,27 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 import time
-from gft_utils import ChromeUtils
+import os
+from ..utils import ChromeUtils
 
 
 class Soat:
 
     def __init__(self):
         self.webdriver = ChromeUtils().init_driver(
-            headless=True, maximized=True, verbose=False, incognito=True
+            headless=False, maximized=True, verbose=False, incognito=True
         )
 
     def get_captcha(self):
-        self.webdriver.get("https://www.apeseg.org.pe/consultas-soat/")
+        self.webdriver.get("https://www.dimequetienesseguro.com/consulta-soat/")
+        time.sleep(3)
         _img = self.webdriver.find_element(
             By.XPATH,
-            "/html/body/div/main/article/div/section[2]/div/div/div[1]/div/div[3]/div[1]/form/div[2]/img",
+            "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[2]/form/div[2]/img",
         )
+
         with open(
-            "D:\pythonCode\Automation\ServicioAlertas2\images\soat_captcha_temp.png",
+            os.path.join("static", "captcha_soat.png"),
             "wb+",
         ) as file:
             file.write(_img.screenshot_as_png)

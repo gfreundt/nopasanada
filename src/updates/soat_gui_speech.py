@@ -1,12 +1,11 @@
-from gft_utils import SpeechUtils
+from ..utils import SpeechUtils
 import cv2
+import os
 
 
 def get_captcha():
     # capture speech and return only if it matches criteria
-    img = cv2.imread(
-        "D:\pythonCode\Automation\ServicioAlertas2\images\soat_captcha_temp.png"
-    )
+    img = cv2.imread(os.path.join("static", "captcha_soat.png"))
     img = cv2.resize(img, (0, 0), fx=4, fy=4)
     cv2.imshow("captcha", img)
     cv2.waitKey(500)

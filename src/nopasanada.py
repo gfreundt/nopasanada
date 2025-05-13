@@ -41,7 +41,7 @@ def launcher(dash, db):
     # scrape information on necessary users and placas
     if any([i in sys.argv for i in ("UPDATE", "FULL")]):
         # gather data for all record types
-        gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
+        gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
 
     # craft messages, save them to outbound folder
     if "MSG" in sys.argv or "FULL" in sys.argv:
@@ -66,7 +66,8 @@ def launcher(dash, db):
         MAINT.soat_images()
         # MAINT.sunarp_images()
 
-        db.conn.commit()
+    # commit all changes before finishing code
+    db.conn.commit()
 
 
 def main(db):

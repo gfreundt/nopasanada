@@ -28,5 +28,5 @@ class Database:
 
 
 if __name__ == "__main__":
-    db = Database(dev=True)
+    db = Database(dev=False)
     main(db)

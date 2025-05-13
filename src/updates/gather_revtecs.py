@@ -1,8 +1,8 @@
 from datetime import datetime as dt
+import easyocr
+import logging
 from ..utils import date_to_db_format, log_action_in_db
 from src.scrapers import scrape_revtec
-import logging
-import easyocr
 
 
 def gather(db_cursor, dash, update_data):
@@ -19,7 +19,7 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # remove easyocr warnings in logger and start reader
+    # start OCR with no log to console
     logging.getLogger("easyocr").setLevel(logging.ERROR)
     ocr = easyocr.Reader(["es"], gpu=False)
 
@@ -92,7 +92,8 @@ def gather(db_cursor, dash, update_data):
     dash.log(
         card=CARD,
         title="Revisión Técnica",
-        status=0,
+        progress=100,
+        status=3,
         text="Inactivo",
         lastUpdate=dt.now(),
     )

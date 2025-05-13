@@ -64,8 +64,6 @@ def create_tables_need_messages(db_cursor):
             DROP TABLE IF EXISTS _necesitan_mensajes_usuarios;
             CREATE TABLE _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo);
 
-
-
             -- Incluir usuarios que han recibido ultimo mensaje regular o de bienvenida hace mas de un mes (mensaje regular)
             INSERT INTO _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo)
                 SELECT IdMember, DocTipo, DocNum, "R" from members 
@@ -93,7 +91,7 @@ def create_tables_need_messages(db_cursor):
 def get_records_brevete(db_cursor, threshold):
     # condition to update: will get email and (BREVETE expiring within threshold or no BREVETE in db) and only DNI as document and no attempt to update in last 48 hours
     db_cursor.execute(
-        f""" SELECT * FROM _necesitan_mensajes_usuarios
+        f""" SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE IdMember_FK
                     NOT IN 
 	                (SELECT IdMember_FK FROM brevetes
@@ -154,7 +152,7 @@ def get_records_revtecs(db_cursor, threshold):
 def get_records_satimps(db_cursor):
     # condition to update: will get email and no attempt to update in last 48 hours
     db_cursor.execute(
-        """ SELECT * FROM _necesitan_mensajes_usuarios
+        """ SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE
                     IdMember_FK
                     NOT IN
@@ -196,7 +194,7 @@ def get_records_sutrans(db_cursor):
 def get_records_recvehic(db_cursor):
     # condition to update: will get email and no attempt to update in last 48 hours
     db_cursor.execute(
-        """ SELECT * FROM _necesitan_mensajes_usuarios
+        """ SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE
                     IdMember_FK
                     NOT IN

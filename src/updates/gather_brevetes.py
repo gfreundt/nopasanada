@@ -1,8 +1,8 @@
 from datetime import datetime as dt
+import easyocr
+import logging
 from ..utils import date_to_db_format, log_action_in_db
 from src.scrapers import scrape_brevete
-import logging
-import easyocr
 
 
 def gather(db_cursor, dash, update_data):
@@ -19,8 +19,10 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # remove easyocr warnings in logger and start reader
+    # start OCR with no log to console
     logging.getLogger("easyocr").setLevel(logging.ERROR)
+    ocr = easyocr.Reader(["es"], gpu=False)
+
     ocr = easyocr.Reader(["es"], gpu=False)
 
     # iterate on all records that require updating and get scraper results
@@ -67,6 +69,7 @@ def gather(db_cursor, dash, update_data):
 
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO brevetes VALUES {tuple(_values)}")
+                dash.log(action=f"[ BREVETES ] {tuple(_values)}")
 
                 # process list of papeletas impagas and put them in different table
                 for papeleta in pimpagas_response:
