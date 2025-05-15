@@ -66,6 +66,7 @@ def gather(db_cursor, dash, update_data):
 
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO sunarps VALUES {tuple(_values)}")
+                dash.log(action=f"[ SUNARPS ] {"|".join([str(i) for i in _values])}")
 
                 # update placas table with last update information
                 db_cursor.execute(

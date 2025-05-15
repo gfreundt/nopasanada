@@ -2,7 +2,7 @@ import os
 from datetime import datetime as dt
 from PIL import Image, ImageDraw, ImageFont
 
-# from gft_utils import PDFUtils
+from ..utils import PDFUtils
 
 
 def generate(db_cursor, id_placa, data):
@@ -13,7 +13,7 @@ def generate(db_cursor, id_placa, data):
     font_large = ImageFont.truetype(os.path.join(_resources, "seguisym.ttf"), 45)
 
     # get list of available company logos
-    _templates_path = os.path.join("..", "templates")
+    _templates_path = os.path.join("static")
     cias = [i.split(".")[0] for i in os.listdir(_templates_path)]
 
     # open blank template image and prepare for edit
@@ -77,14 +77,14 @@ def generate(db_cursor, id_placa, data):
         )
 
     file_name = f"SOAT_{data[4].upper()}.pdf"
-    to_path = os.path.join("..", "data", "images", file_name)
+    to_path = os.path.join("data", "images", file_name)
 
     # delete image with same name (previous version) from destination folder if it exists
     if os.path.exists(to_path):
         os.remove(to_path)
 
     # save image to temporary folder
-    temp_path = os.path.join("..", "other", "temp_img.png")
+    temp_path = os.path.join("static", "temp_img.png")
     base_img.save(temp_path)
 
     # open image and transfrom to pdf

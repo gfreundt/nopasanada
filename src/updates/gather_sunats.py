@@ -3,7 +3,7 @@ from ..utils import date_to_db_format, log_action_in_db
 from src.scrapers import scrape_sunat
 
 
-def gather(db_cursor, monitor, update_data):
+def gather(db_cursor, dash, update_data):
 
     CARD = 8
 
@@ -43,6 +43,7 @@ def gather(db_cursor, monitor, update_data):
 
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
+                dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
                 # register action and skip to next record
                 log_action_in_db(db_cursor, table_name="sunats", idMember=id_member)

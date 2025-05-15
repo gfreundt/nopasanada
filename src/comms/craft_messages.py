@@ -14,7 +14,7 @@ def craft(db_cursor, dash):
     # dash()
 
     # load HTML templates
-    environment = Environment(loader=FileSystemLoader("../templates/"))
+    environment = Environment(loader=FileSystemLoader("templates/"))
     template_welcome = environment.get_template("bienvenida.html")
     template_regular = environment.get_template("regular.html")
 
@@ -52,9 +52,7 @@ def craft(db_cursor, dash):
 
     # save crafted messages as HTML in outbound folder
     for message in messages:
-        _file_path = os.path.join(
-            "..", "outbound", f"message_{str(uuid.uuid4())[-6:]}.html"
-        )
+        _file_path = os.path.join("outbound", f"message_{str(uuid.uuid4())[-6:]}.html")
         with open(_file_path, "w", encoding="utf-8") as file:
             file.write(message)
 

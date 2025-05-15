@@ -23,8 +23,6 @@ def gather(db_cursor, dash, update_data):
     logging.getLogger("easyocr").setLevel(logging.ERROR)
     ocr = easyocr.Reader(["es"], gpu=False)
 
-    ocr = easyocr.Reader(["es"], gpu=False)
-
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data):
 
@@ -52,6 +50,12 @@ def gather(db_cursor, dash, update_data):
 
                 # stop processing if blank response from scraper
                 if not brevete_response:
+                    dash.log(
+                        card=CARD,
+                        status=2,
+                        text="Scraper crash",
+                        lastUpdate=dt.now(),
+                    )
                     return
 
                 # adjust date to match db format (YYYY-MM-DD)
@@ -69,7 +73,7 @@ def gather(db_cursor, dash, update_data):
 
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO brevetes VALUES {tuple(_values)}")
-                dash.log(action=f"[ BREVETES ] {tuple(_values)}")
+                dash.log(action=f"[ BREVETES ] {"|".join([str(i) for i in _values])}")
 
                 # process list of papeletas impagas and put them in different table
                 for papeleta in pimpagas_response:

@@ -94,7 +94,6 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                         [id_placa] + list(new_record_dates_fixed) + [img_name] + [_now]
                     )
 
-                    print("outside func", _values)
                     # delete all old records from member
                     db_cursor.execute(
                         f"DELETE FROM soats WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE Placa = '{placa}')"
@@ -102,10 +101,11 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                     # insert gathered record of member
                     db_cursor.execute(f"INSERT INTO soats VALUES {tuple(_values)}")
+                    dash.log(action=f"[ SOATS ] {"|".join([str(i) for i in _values])}")
 
                     # update placas table with last update information
                     db_cursor.execute(
-                        f"UPDATE placas SET LastUpdateSOAT = '{_now}' WHERE Placa = '{placa}'"
+                        f"UPDATE placas SET LastUpdateSOAT = '{_now}' WHERE IdPlaca = '{id_placa}'"
                     )
 
                 # register action and skip to next record

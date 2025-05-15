@@ -63,6 +63,9 @@ def gather(db_cursor, dash, update_data):
 
                     # insert gathered record of member
                     db_cursor.execute(f"INSERT INTO sutrans VALUES {tuple(_values)}")
+                    dash.log(
+                        action=f"[ SUTRANS ] {"|".join([str(i) for i in _values])}"
+                    )
 
                 # no errors - next placa
                 break

@@ -78,6 +78,9 @@ def gather(db_cursor, dash, update_data):
                         db_cursor.execute(
                             f"INSERT INTO satimpDeudas VALUES {tuple(_values)}"
                         )
+                        dash.log(
+                            action=f"[ SATIMPS ] {"|".join([str(i) for i in _values])}"
+                        )
 
                         # register action and log
                         log_action_in_db(

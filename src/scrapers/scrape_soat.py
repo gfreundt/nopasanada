@@ -9,7 +9,7 @@ class Soat:
 
     def __init__(self):
         self.webdriver = ChromeUtils().init_driver(
-            headless=False, maximized=True, verbose=False, incognito=True
+            headless=True, maximized=True, verbose=False, incognito=True
         )
 
     def get_captcha(self):
@@ -28,27 +28,29 @@ class Soat:
 
     def browser(self, placa=None, captcha_txt=None):
 
-        a = self.webdriver.find_element(
+        # llenar campo de placa
+        self.webdriver.find_element(
             By.XPATH,
-            "/html/body/div/main/article/div/section[2]/div/div/div[1]/div/div[3]/div[1]/form/div[1]/input",
-        )
-        a.send_keys(placa)
+            "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[2]/form/div[1]/input",
+        ).send_keys(placa)
 
-        c = self.webdriver.find_element(
+        # llenar campo de captcha
+        self.webdriver.find_element(
             By.XPATH,
-            "/html/body/div/main/article/div/section[2]/div/div/div[1]/div/div[3]/div[1]/form/div[2]/input",
-        )
-        c.send_keys(captcha_txt)
+            "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[2]/form/div[2]/input",
+        ).send_keys(captcha_txt)
 
-        d = self.webdriver.find_element(
+        # apretar "Consultar"
+        self.webdriver.find_element(
             By.XPATH,
-            "/html/body/div/main/article/div/section[2]/div/div/div[1]/div/div[3]/div[1]/form/button",
-        )
-        d.click()
+            "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[2]/form/button",
+        ).click()
 
         time.sleep(1)
         _iframe = self.webdriver.find_element(By.CSS_SELECTOR, "iframe")
         self.webdriver.switch_to.frame(_iframe)
+
+        time.sleep(2)
 
         # Check if limit of scraping exceeded and wait
         limit_msg = self.webdriver.find_elements(By.XPATH, "/html/body")
@@ -71,6 +73,8 @@ class Soat:
             # self.webdriver.refresh()
             return {}
 
+        time.sleep(2)
+
         # No Error: proceed with data capture
         headers = (
             "aseguradora",
@@ -85,20 +89,27 @@ class Soat:
             "fecha_venta",
             "fecha_anulacion",
         )
+
+        # adapt to xpath change if one soat listed or more than one
+        single = "[1]"
+        if self.webdriver.find_elements(
+            By.XPATH, "/html/body/div[2]/div/div/div/div[2]/table/tbody/tr/td[1]"
+        ):
+            single = ""
+
         response = {
             i: self.webdriver.find_element(
                 By.XPATH,
-                f"/html/body/div[2]/div/div/div/div[2]/table/tbody/tr[1]/td[{j}]",
+                f"/html/body/div[2]/div/div/div/div[2]/table/tbody/tr{single}/td[{j}]",
             ).text.strip()
             for i, j in zip(headers, range(1, 11))
         }
 
         # get out of frame and click CERRAR
         self.webdriver.switch_to.default_content()
-        e = self.webdriver.find_element(
+        self.webdriver.find_element(
             By.XPATH,
-            "/html/body/div[1]/main/article/div/section[2]/div/div/div[1]/div/div[3]/div[2]/div/div/div[3]/button",
-        )
-        e.click()
+            "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[4]/div/div/div[3]/button",
+        ).click()
 
         return response

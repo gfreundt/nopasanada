@@ -1,0 +1,513 @@
+<meta name="to" content="{{to}}">
+<meta name="bcc" content="{{bcc}}">
+<meta name="subject" content="{{subject}}">
+<meta name="msgTypes" content="{{msg_types}}">
+<meta name="idMember" content="{{idMember}}">
+<meta name="timestamp" content="{{timestamp}}">
+<meta name="hashcode" content= "{{hashcode}}">
+{% for attachment_path in attachment_paths %}
+<meta name="attachment" content="{{attachment_path}}">
+{% endfor %}
+
+<head></head>
+
+<body style="color: black; font-family: Arial, Helvetica, sans-serif">
+    <p>Hola {{nombre_usuario}},</p>
+    <p>Este es tu correo mensual del Servicio de Alertas Perú. Placas registradas: <b>{{lista_placas}}</b>.</p>
+    <p><b style="color:blue">Desde hoy recibe mensualmente el estado de tu RUC en SUNAT. Revísalo al final del correo.</b></p>
+    <p style="color: black">En caso no quieras recibir más correos, responde a este correo con "ELIMINAR" en el asunto.</p>
+    <p>Gracias por confiar en nosotros.</p>
+    <h2>Alertas</h2>
+    <ul>
+        {% for alerta in alertas %}
+        {% if alerta=="Ninguna"%}
+        <li style="color: green">{{alerta}}</li>
+        {% else %}
+        <li style="color: red">{{alerta}}</li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    <h2>Documentos Adjuntos</h2>
+    <ul>
+        {% for adjunto in adjuntos %}
+            <li style="color: black">{{adjunto}}</li>
+        {% endfor %}
+    </ul>
+    <h2>Detalles</h2>
+    <table style="color: white; background:#618685; white-space:nowrap">
+        <tr>
+            <td colspan="2" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Licencia de Conducir
+            </td>
+        </tr>
+        {%if brevete%}
+        <tr>
+            <td style="text-align: right; column-width: 140px">Número</td>
+            <td style="text-align: center; column-width: 260px">{{brevete.numero}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Clase</td>
+            <td style="text-align: center">{{brevete.clase}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Formato</td>
+            <td style="text-align: center">{{brevete.formato}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            <td style="text-align: center">{{brevete.fecha_desde}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Vencimiento</td>
+            <td style="text-align: center;font-weight: bold;">{{brevete.fecha_hasta}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Restricciones</td>
+            <td style="text-align: center">{{brevete.restricciones}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Local de Emisión</td>
+            <td style="text-align: center">{{brevete.local}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Puntos en Licencia</td>
+            <td style="text-align: center">{{brevete.puntos}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">N° Récord del Conductor</td>
+            <td style="text-align: center">{{brevete.record}}</td>
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro de Licencia de Conducir</td>
+        </tr>
+        {%endif%}
+
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Revisión Técnica
+            </td>
+        </tr>
+        {%if revtecs%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Placa</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center; column-width:260px">
+                {{revtec.placa}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center">
+                {{revtec.fecha_desde}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Vigencia</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center;font-weight: bold;">
+                {{revtec.fecha_hasta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Resultado</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center">
+                {{revtec.resultado}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Certificadora</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center; word-wrap: break-word;">
+                {{revtec.certificadora}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; ">Certificado</td>
+            {% for revtec in revtecs %}
+            <td style="text-align: center">
+                {{revtec.certificado}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro de Revisiones Técnicas</td>
+        </tr>
+        {%endif%}
+
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Certificado SOAT
+            </td>
+        </tr>
+        {%if soats%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Placa</td>
+            {% for soat in soats %}
+            <td style="text-align: center; column-width:260px">
+                {{soat.placa}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Aseguradora</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.aseguradora}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Inicio</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.fecha_desde}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Vigencia</td>
+            {% for soat in soats %}
+            <td style="text-align: center;font-weight: bold;">
+                {{soat.fecha_hasta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Uso</td>
+            {% for soat in soats %}
+            <td style="text-align: center; word-wrap: break-word;">
+                {{soat.uso}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; ">Clase</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.clase}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; ">Tipo</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.tipo}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; ">Certificado</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.certificado}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; ">Status</td>
+            {% for soat in soats %}
+            <td style="text-align: center">
+                {{soat.vigencia}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro de Certificado SOAT</td>
+        </tr>
+        {%endif%}
+
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Deudas Tributarias SAT Lima
+            </td>
+        </tr>
+        {%if satimps%}
+
+        <tr style="color: white; background:#618685; white-space:nowrap; border: none;">
+            <td style="text-align: right; column-width:140px">Código Tributario</td>
+            {%for satimp in satimps%}
+            <td style="text-align: center; column-width:260px">{{satimp.codigo}}</td>
+            {%endfor%}
+        </tr>
+        <tr style="color: white; background:#618685; white-space:nowrap; border: none;">
+            <td style="text-align: right; vertical-align:top">Deudas</td>
+            {%for satimp in satimps%}
+            {%if satimp.deudas%}
+            <td>
+                <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+                    <tr>
+                        <td style="text-align: center; column-width:50px; font-weight:bold"> Año </td>
+                        <td style="text-align: center; column-width:35px; font-weight:bold"> Trim. </td>
+                        <td style="text-align: center; column-width:100px; font-weight:bold"> Documento </td>
+                        <td style="text-align: center; column-width:55px; font-weight:bold"> S/</td>
+                    </tr>
+                    {% for deuda in satimp.deudas %}
+                    <tr>
+                        <td style="text-align: center">{{deuda.ano}}</td>
+                        <td style="text-align: center">{{deuda.periodo}}</td>
+                        <td style="text-align: center">{{deuda.doc_num}}</td>
+                        <td style="text-align: center">{{deuda.total_a_pagar}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+            {%else%}
+            <td style="text-align: center; column-width: 140px;vertical-align: top;">Sin deudas
+                registradas.</td>
+            {%endif%}
+            {%endfor%}
+            </td>
+
+        </tr>
+
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin deudas tributarias SAT registradas.</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Multas SUTRAN
+            </td>
+        </tr>
+        {%if sutrans%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Placa</td>
+            {% for sutran in sutrans %}
+            <td style="text-align: center; column-width:260px">
+                {{sutran.placa}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;column-width:140px">Documento</td>
+            {% for sutran in sutrans %}
+            <td style="text-align: center">
+                {{sutran.documento}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Tipo</td>
+            {% for sutran in sutrans %}
+            <td style="text-align: center">
+                {{sutran.tipo}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            {% for sutran in sutrans %}
+            <td style="text-align: center">
+                {{sutran.fecha_documento}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Infracción</td>
+            {% for sutran in sutrans %}
+            <td style="text-align: center">
+                {{sutran.infraccion}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin multas registradas.</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Multas SAT Lima
+            </td>
+        </tr>
+        {%if satmuls%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Placa</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center; column-width:260px">
+                {{satmul.placa}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right; column-width:140px">Licencia</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center; column-width:260px">
+                {{satmul.licencia}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;column-width:140px">Falta</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center">
+                {{satmul.falta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Documento</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center">
+                {{satmul.documento}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Expedición</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center">
+                {{satmul.fecha_emision}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Deuda</td>
+            {% for satmul in satmuls %}
+            <td style="text-align: center">
+                S/ {{satmul.deuda}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin multas registradas.</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Papeletas Registradas en el MTC
+            </td>
+        </tr>
+        {%if papeletas%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Entidad</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center; column-width:260px">
+                {{papeleta.entidad}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;column-width:140px">Número</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.numero}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.fecha}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha Firme</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.fecha_firme}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Falta</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.falta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Estado de Deuda</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.estado_deuda}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td colspan="4" style="text-align: center">Sin papeletas registradas.</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Estado del RUC en SUNAT
+            </td>
+        </tr>
+        {%if sunats%}
+        <tr>
+            <td style="text-align: right; column-width: 140px">RUC</td>
+            <td style="text-align: center; column-width: 260px">{{sunats.ruc}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Tipo de Contribuyente</td>
+            <td style="text-align: center">{{sunats.tipo_contribuyente}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Nombre Comercial</td>
+            <td style="text-align: center">{{sunats.nombre_comercial}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha de Inscripcción</td>
+            <td style="text-align: center">{{sunats.fecha_inscripcion}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Inicio de Actividades</td>
+            <td style="text-align: center">{{sunats.fecha_inicio_actividades}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Estado</td>
+            <td style="text-align: center;font-weight: bold;">{{sunats.estado}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Condición</td>
+            <td style="text-align: center">{{sunats.condicion}}</td>
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro en SUNAT</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <p style="font-size:x-small; color:#c5c9c9">
+        {{codigo_correo}}
+    </p>
+</body>

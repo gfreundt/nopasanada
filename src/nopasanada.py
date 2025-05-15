@@ -4,7 +4,8 @@ from pprint import pprint
 # local imports
 from src.monitor import monitor
 from src.updates import get_records_to_update, gather_all
-from src.comms import craft_messages, send_messages, craft_alerts
+from src.updates import get_recipients
+from src.comms import craft_messages, send_messages, craft_alerts, get_alerts
 
 # import maintenance
 
@@ -12,7 +13,7 @@ from src.comms import craft_messages, send_messages, craft_alerts
 # TODO: expand brevetes to include CE
 
 
-def launcher(dash, db):
+def main(dash, db):
     """Program entry point. Executes actions depending on arguments ran at prompt.
     Valid arguments: FULL, MEMBER, UPDATE, MAN, AUTO, ALL, ALERT, EMAIL, MAINT
     """
@@ -28,25 +29,36 @@ def launcher(dash, db):
         # save database changes
         db.conn.commit()
 
-    # if updates or messages selected, first update table of users that require an update
-    if any([i in sys.argv for i in ("UPDATE", "FULL", "INFO", "MSG")]):
-        all_updates = get_records_to_update.get_records(db.cursor)
+    # update table of users that require an update (will receive msg or alert)
+    get_recipients.need_message(db.cursor)
+    get_recipients.need_alert(db.cursor)
 
-        pprint(all_updates)
-        print([f"{i}: {len(all_updates[i])}" for i in all_updates])
+    # get all users and placas that need to be updated
+    from_msg = get_records_to_update.get_records(db.cursor)
+    from_alert = 
 
-        # get members that will require alert to include in records that require update
-        # required_alerts = ALERT.get_alert_list(db_cursor)
+    pprint(all_updates)
+    print([f"{i}: {len(all_updates[i])}" for i in all_updates])
+
+    # update table of users that require an alert
+    all_alerts = get_alerts.get_alert_list(db.cursor)
+
+    pprint(all_alerts)
+    print([f"{i}: {len(all_updates[i])}" for i in all_updates])
+
+    # get members that will require alert to include in records that require update
+    # required_alerts = ALERT.get_alert_list(db_cursor)
 
     # scrape information on necessary users and placas
     if any([i in sys.argv for i in ("UPDATE", "FULL")]):
         # gather data for all record types
-        gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
+        gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
 
     # craft messages, save them to outbound folder
     if "MSG" in sys.argv or "FULL" in sys.argv:
         # compose emails and write them to outbound folder
         craft_messages.craft(db.cursor, dash)
+        craft_alerts.craft(db.cursor, dash)
 
     # craft alerts, save them to outbound folder
     if "ALERT" in sys.argv or "FULL" in sys.argv:
@@ -68,29 +80,3 @@ def launcher(dash, db):
 
     # commit all changes before finishing code
     db.conn.commit()
-
-
-def main(db):
-
-    dash = monitor.Dashboard()
-
-    if not "NOMON" in sys.argv:
-        # begin monitoring in independent thread
-
-        dash.run_in_background()
-
-    # log start of script
-    # mon.log("-" * 15 + "Start Program" + "-" * 15, type="0B")
-
-    # start main program
-    launcher(dash, db)
-
-    # log end of program and quit
-    # mon.log("-" * 15 + " End Program " + "-" * 15)
-
-
-if __name__ == "__main__":
-    main()
-
-
-# idcoidog fk = 126 131 134

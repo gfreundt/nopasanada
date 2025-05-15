@@ -1,0 +1,20 @@
+<head>
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif">
+    <p>Hola {{nombre_usuario}},</p>
+    <p>Este es un correo de aviso del Servicio de Alertas Peru.</p>
+    <p>En caso no quieras recibir más correos, responde a este correo con "ELIMINAR" en el asunto.</p>
+    <p>Gracias por confiar en nosotros!</p>
+    <p>- Equipo SAP</p>
+    </br>
+    <h2>Alertas</h2>
+    <ul>
+        {% for alerta in alertas %}
+            <li style="color: red">{{alerta}}</li>
+        {% endfor %}
+    </ul>
+    </br>
+        <p style="font-size:x-small; color:#c5c9c9">
+        {{codigo_correo}}
+    </p>
+</body>

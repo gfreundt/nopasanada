@@ -284,18 +284,18 @@ def date_to_db_format(data):
     for data_item in data:
 
         # test to determine if format is date we can change to db format
-        if re.fullmatch(pattern, data_item):
-
-            # if record has date structure, alter it, everything else throws exception and no changes made
-            try:
+        try:
+            if re.fullmatch(pattern, data_item):
+                # if record has date structure, alter it, everything else throws exception and no changes made
                 sep = "/" if "/" in data_item else "-" if "-" in data_item else None
                 new_record_dates_fixed.append(
                     dt.strftime(dt.strptime(data_item, f"%d{sep}%m{sep}%Y"), "%Y-%m-%d")
                 )
 
-            except:
+            else:
                 new_record_dates_fixed.append(data_item)
-        else:
+
+        except:
             new_record_dates_fixed.append(data_item)
 
     return new_record_dates_fixed

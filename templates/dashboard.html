@@ -10,37 +10,62 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f5f7fa; /* light, clean neutral */
         }
+
+        /* Status card colors */
         .status-0 {
-            background-color: #ffffff !important;  /* Inactive - white */
+            background-color: #f1f3f5 !important;  /* Inactive - soft gray */
         }
         .status-1 {
-            background-color: #d1e7dd !important;  /* Active - light green */
+            background-color: #e6f4ea !important;  /* Active - mint green */
         }
         .status-2 {
-            background-color: #f8d7da !important;  /* Crashed - light red */
+            background-color: #fdecea !important;  /* Crashed - soft alert red */
         }
         .status-3 {
-            background-color: #f5e0b3 !important;  /* Finished ok - light yellow */
-        }        
-        .info-1 {
-            background-color: #dee6f2 !important;  /* Inactive - white */
+            background-color: #fff9e6 !important;  /* Finished ok - light gold */
         }
+
+        /* Info panels */
+        .info-1,
         .info-2 {
-            background-color: #bf5d43 !important;  /* Inactive - white */
+            padding: 15px;
+            padding-top: 10px;
+            background-color: #f8f9fb !important;  /* Slightly tinted white */
+            font-size: smaller;
+            border-left: 4px solid #0d6efd;
+        }
+
+        /* General status (top-right box) */
+        .general-0 {
+            background-color: #dee2e6 !important;  /* Neutral gray */
+            color: #212529;
+        }
+        .general-1 {
+            background-color: #198754 !important;  /* Success green */
+            color: white;
+        }
+        .general-2 {
+            background-color: #ffc107 !important;  /* Warning yellow */
+            color: black;
         }
     </style>
 </head>
+
 <body>
-<div class="container-fluid p-3">
+    <div class="container-fluid p-3">
 
     <!-- Top Row -->
     <div class="row mb-4">
         <div class="col-md-9 fs-3">
-            <div class="p-3 bg-primary text-white rounded" id="top-left">Loading...</div>
+            <div class="p-3 bg-primary text-white rounded" id="top-left">
+                <img src="{{ url_for('static', filename='logo3.png') }}" width="120" height="120">
+                No Pasa Nada
+            </div>
         </div>
         <div class="col-md-3 text-center fs-3">
-            <div class="p-3 bg-success text-white rounded" id="top-right">Loading...</div>
+            <div class="p-3 rounded" id="top-right">Loading...</div>
         </div>
     </div>
 
@@ -67,31 +92,47 @@
 
     <!-- Bottom Row -->
     <div class="row">
+
         <div class="col-md-6">
-            <div class="p-3 text-dark rounded" id="bottom-left">Loading...</div>
-        </div>
-        <div class="col-md-6">
-            <div class="card info-1" id="bottom-right"></div>
-                <div class="card-title h4">
-                    Ultimas Actividades
+            <div class="h3 m-1 text-center text-primary">
+                Actividad de Usuarios
+            </div>
+            <div class="card info-2" id="bottom-left">
+                <div class="card-body">
+                    {% for line in data.bottom_left %}
+                        <div class="py-2">{{ line }}</div>
+                    {% endfor %}
                 </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="h3 m-1 text-center text-primary">
+                Actividad de Sistema
+            </div>
+            <div class="card info-1" id="bottom-right">
                 <div class="card-body">
                     {% for line in data.bottom_right %}
-                        <div>{{ line }}</div>
+                        <div class="py-1">{{ line }}</div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
 
 <script>
     function updateDashboard() {
         fetch('/data')
             .then(response => response.json())
             .then(data => {
+
+                const topRightEl = document.getElementById('top-right');
+                topRightEl.textContent = data.top_right.content;
+                topRightEl.classList.remove('general-0', 'general-1','general-2');
+                topRightEl.classList.add(`general-${data.top_right.status}`);
+
                 document.getElementById('top-left').textContent = data.top_left;
-                document.getElementById('top-right').textContent = data.top_right;
 
                 const iconMap = {
                     3: "bi-check-circle-fill text-success",
@@ -126,19 +167,29 @@
                     iconEl.className = `bi ${iconMap[card.status]}`;
                 });
 
-                document.getElementById('bottom-left').textContent = data.bottom_left;
+                const bottomLeft = document.getElementById('bottom-left');
+                bottomLeft.innerHTML = '';  // Clear previous content
+                data.bottom_left.forEach(line => {
+                    const div = document.createElement('div');
+                    div.innerHTML = line;
+                    bottomLeft.appendChild(div);
+
+                });
+
                 const bottomRight = document.getElementById('bottom-right');
                 bottomRight.innerHTML = '';  // Clear previous content
                 data.bottom_right.forEach(line => {
                     const div = document.createElement('div');
-                    div.textContent = line;
+                    div.innerHTML = line;
                     bottomRight.appendChild(div);
 
                 });
+
+
             });
     }
 
-    setInterval(updateDashboard, 1000);
+    setInterval(updateDashboard, 2500);
     updateDashboard();
 </script>
 </body>

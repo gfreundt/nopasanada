@@ -1,6 +1,10 @@
 import sqlite3
-import os
+import os, sys
 from src.nopasanada import main
+from src.server import server
+from src.monitor import monitor
+
+import time
 
 
 class Database:
@@ -28,5 +32,26 @@ class Database:
 
 
 if __name__ == "__main__":
+
+    # connect to database
     db = Database(dev=False)
-    main(db)
+
+    # run dashboard in background (port 7000)
+    dash = monitor.Dashboard(db)
+    if not "NOMON" in sys.argv:
+        dash.run_in_background()
+
+    # run user UI in background (port 5000)
+    ui = server.UI(db=db, dash=dash)
+    if not "NOUI" in sys.argv:
+        ui.run_in_background()
+
+    # run main code in foreground
+    if not "NOMAIN" in sys.argv:
+        main(db=db, dash=dash)
+
+    quit()
+
+    while True:
+        print("<----- Looping ------->")
+        time.sleep(20)

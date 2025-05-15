@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from src.scrapers import scrape_recvehic
 from ..utils import log_action_in_db
+import logging
 import easyocr
 
 
@@ -18,7 +19,8 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR
+    # start OCR with no log to console
+    logging.getLogger("easyocr").setLevel(logging.ERROR)
     ocr = easyocr.Reader(["es"], gpu=False)
 
     # iterate on all records that require updating and get scraper results
@@ -49,7 +51,13 @@ def gather(db_cursor, dash, update_data):
 
                 # stop processing if blank response from scraper
                 if not _img_filename:
-                    break
+                    dash.log(
+                        card=CARD,
+                        status=2,
+                        text="Scraper crash",
+                        lastUpdate=dt.now(),
+                    )
+                    return
 
                 # add foreign key and current date to response
                 _values = (id_member, _img_filename, _now)
@@ -63,6 +71,7 @@ def gather(db_cursor, dash, update_data):
 
                 # insert record into database
                 db_cursor.execute(f"INSERT INTO recordConductores VALUES {_values}")
+                dash.log(action=f"[ RECORD ] {"|".join([str(i) for i in _values])}")
 
                 # update dashboard with progress and last update timestamp
                 dash.log(
@@ -86,11 +95,11 @@ def gather(db_cursor, dash, update_data):
                 )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
-        # dash.log(
-        #     card=CARD,
-        #     status=2,
-        #     msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.",
-        # )
+        dash.log(
+            card=CARD,
+            status=2,
+            msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.",
+        )
 
     # log last action
     dash.log(

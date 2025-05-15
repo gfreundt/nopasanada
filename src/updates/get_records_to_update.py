@@ -1,7 +1,4 @@
-def get_records(db_cursor):
-
-    # creates temporary tables with all members/placas that haven't received an email in 30+ days
-    create_tables_need_messages(db_cursor)
+def get_records_from_msg(db_cursor):
 
     # create dictionary with all tables as keys and empty list as value
     db_cursor.execute("SELECT * FROM '@tableInfo'")
@@ -34,58 +31,6 @@ def get_records(db_cursor):
     all_updates = {i: set(j) for i, j in all_updates.items()}
 
     return all_updates
-
-
-def create_tables_need_messages(db_cursor):
-    """creates two tables (docs and placas) with all the members that require a monthly email
-    which are later used as reference for determining which records to update"""
-
-    # cmd = """   DROP TABLE IF EXISTS _necesitan_mensajes_usuarios;
-    #             CREATE TABLE _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo);
-    #             INSERT INTO _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo) SELECT IdMember, DocTipo, DocNum FROM members JOIN (
-    #                 SELECT IdMember AS x FROM members
-    #                 EXCEPT
-    #                     SELECT IdMember_FK FROM mensajes
-    # 	                JOIN mensajeContenidos
-    # 	                ON IdMensaje = IdMensaje_FK
-    # 	            WHERE Fecha >= datetime('now','localtime', '-1 month')
-    # 		        AND (IdTipoMensaje_FK = 12 OR IdTipoMensaje_FK = 13)
-    #             )
-    #                 ON members.IdMember = x;
-
-    #             DROP TABLE IF EXISTS _necesitan_mensajes_placas;
-    #             CREATE TABLE _necesitan_mensajes_placas (IdPlaca_FK, Placa);
-    #             INSERT INTO _necesitan_mensajes_placas (IdPlaca_FK, Placa) SELECT IdPlaca, Placa FROM placas
-    #                 JOIN (_necesitan_mensajes_usuarios)
-    #                 ON placas.IdMember_FK = _necesitan_mensajes_usuarios.IdMember_FK"""
-
-    cmd = """
-            -- Crear tabla temporal primaria de usuarios que necesitan mensajes
-            DROP TABLE IF EXISTS _necesitan_mensajes_usuarios;
-            CREATE TABLE _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo);
-
-            -- Incluir usuarios que han recibido ultimo mensaje regular o de bienvenida hace mas de un mes (mensaje regular)
-            INSERT INTO _necesitan_mensajes_usuarios (IdMember_FK, DocTipo, DocNum, Tipo)
-                SELECT IdMember, DocTipo, DocNum, "R" from members 
-                WHERE IdMember NOT IN (
-                    SELECT IdMember_FK FROM mensajes 
-                        WHERE FechaEnvio >= datetime('now','localtime', '-1 month')
-                        AND (IdTipoMensaje_FK = 12 OR IdTipoMensaje_FK = 13));
-                        
-            -- Cambiar flag de mensaje de regular a bienvenida si nunca antes han recibido mensajes		
-            UPDATE _necesitan_mensajes_usuarios SET Tipo = "B"
-                WHERE IdMember_FK NOT IN (
-                    SELECT IdMember_FK FROM mensajes
-                    WHERE (IdTipoMensaje_FK = 12 OR IdTipoMensaje_FK = 13));
-                        
-            -- Crear tabla temporal secundaria que lista las placas de usarios que necesitan mensajes
-            DROP TABLE IF EXISTS _necesitan_mensajes_placas;
-            CREATE TABLE _necesitan_mensajes_placas (IdPlaca_FK, Placa);
-            INSERT INTO _necesitan_mensajes_placas (IdPlaca_FK, Placa) select idplaca, placa from placas where IdMember_FK IN (SELECT IdMember_FK from _necesitan_mensajes_usuarios)
-
-            """
-
-    db_cursor.executescript(cmd)
 
 
 def get_records_brevete(db_cursor, threshold):
@@ -171,7 +116,7 @@ def get_records_satmuls(db_cursor):
                     IdPlaca_FK
                     NOT IN
                     (SELECT IdPlaca FROM placas
-                        WHERE LastUpdateSATMUL >= datetime('now', 'localtime', '-24 hours'))
+                        WHERE LastUpdateSATMUL >= datetime('now', 'localtime', '-120 hours'))
         """
     )
     return db_cursor.fetchall()

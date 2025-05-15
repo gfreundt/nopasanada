@@ -3,13 +3,19 @@ import threading
 from copy import deepcopy as copy
 from pprint import pprint
 import os
+from datetime import datetime as dt
 
 
 class Dashboard:
-    def __init__(self):
+    def __init__(self, db):
         BASE_PATH = os.path.abspath(os.curdir)
-        self.app = Flask(__name__, template_folder=os.path.join(BASE_PATH, "templates"))
+        self.app = Flask(
+            __name__,
+            template_folder=os.path.join(BASE_PATH, "templates"),
+            static_folder=os.path.join(BASE_PATH, "static"),
+        )
         self.data_lock = threading.Lock()
+        self.db = db
 
         # Define routes
         self.app.add_url_rule("/", "dashboard", self.dashboard)
@@ -20,31 +26,36 @@ class Dashboard:
     def log(self, **kwargs):
 
         if "general_status" in kwargs:
-            self.data["top_right"] = kwargs["general_status"]
+            self.data["top_right"]["content"] = kwargs["general_status"][0]
+            self.data["top_right"]["status"] = kwargs["general_status"][1]
         if "action" in kwargs:
-            self.data["bottom_right"].append(kwargs["action"])
-            if len(self.data["bottom_right"]) > 10:
+            _ft = f"<b>{dt.now():%Y-%m-%d %H:%M:%S} ></b>{kwargs["action"]}"
+            self.data["bottom_right"].append(_ft)
+            if len(self.data["bottom_right"]) > 30:
                 self.data["bottom_right"].pop(0)
         if "card" in kwargs:
             for field in kwargs:
                 if field == "card":
                     continue
                 self.data["cards"][kwargs["card"]][field] = kwargs[field]
-        if "info1" in kwargs:
-            self.data["bottom_left"].append(kwargs["info1"])
+        if "usuario" in kwargs:
+            _ft = f"<b>{dt.now():%Y-%m-%d %H:%M:%S} ></b>{kwargs["usuario"]}"
+            self.data["bottom_left"].append(_ft)
+            if len(self.data["bottom_left"]) > 30:
+                self.data["bottom_left"].pop(0)
 
     def set_initial_data(self):
         empty_card = {
-            "title": "Sin Informacion",
+            "title": "No Asignado",
             "progress": 0,
             "msg": [],
             "status": 0,
-            "text": ".",
-            "lastUpdate": "2000-01-01",
+            "text": "Inactivo",
+            "lastUpdate": "Pendiente",
         }
         self.data = {
             "top_left": "No Pasa Nada Dashboard",
-            "top_right": "RUNNING",
+            "top_right": {"content": "Inicializando...", "status": 0},
             "cards": [copy(empty_card) for _ in range(12)],
             "bottom_left": [],
             "bottom_right": [],
