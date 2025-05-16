@@ -4,6 +4,17 @@ import os
 def pre_maint(db_cursor):
 
     # erase all alerts that might still be in outbound folder
-    for file in os.listdir(os.path("outbound")):
+    for file in os.listdir("outbound"):
         if "alert" in file:
-            os.remove(file)
+            os.remove(os.path.join("outbound", file))
+
+    # erase all placas with no associated member for database
+    cmd = "SELECT * FROM placas WHERE IdMember_FK NOT IN (SELECT IdMember FROM members)"
+    db_cursor.execute(cmd)
+    print(db_cursor.fetchall())
+
+
+def post_maint(db_cursor):
+    # extract text data from soat images
+    # create reviews: duplicate placas
+    pass
