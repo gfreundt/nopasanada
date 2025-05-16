@@ -2,10 +2,8 @@ import sys
 from pprint import pprint
 
 # local imports
-from src.monitor import monitor
-from src.updates import get_records_to_update, gather_all
-from src.updates import get_recipients
-from src.comms import craft_messages, send_messages, craft_alerts, get_alerts
+from src.updates import get_records_to_update, gather_all, get_recipients
+from src.comms import craft_messages, send_messages, craft_alerts
 
 # import maintenance
 
@@ -18,56 +16,26 @@ def main(dash, db):
     Valid arguments: FULL, MEMBER, UPDATE, MAN, AUTO, ALL, ALERT, EMAIL, MAINT
     """
 
-    # check for new members, unsub/resub requests and generate 30-day list
-    if "MEMBER" in sys.argv or "FULL" in sys.argv:
-        # add to monitor display
-        monitor.log("Checking New Members...", type=0)
-        # add new members from online form
-        add_members.add(db.cursor, monitor)
-        # process unsub/resub requests
-        process_unsub.process(db.cursor, monitor)
-        # save database changes
-        db.conn.commit()
-
-    # update table of users that require an update (will receive msg or alert)
+    # update tables: users that require monthly message and users that require alert
     get_recipients.need_message(db.cursor)
     get_recipients.need_alert(db.cursor)
 
     # get all users and placas that need to be updated
-    from_msg = get_records_to_update.get_records(db.cursor)
-    from_alert = 
+    all_updates = get_records_to_update.get_records(db.cursor)
 
-    pprint(all_updates)
+    # pprint(all_updates)
     print([f"{i}: {len(all_updates[i])}" for i in all_updates])
 
-    # update table of users that require an alert
-    all_alerts = get_alerts.get_alert_list(db.cursor)
-
-    pprint(all_alerts)
-    print([f"{i}: {len(all_updates[i])}" for i in all_updates])
-
-    # get members that will require alert to include in records that require update
-    # required_alerts = ALERT.get_alert_list(db_cursor)
-
-    # scrape information on necessary users and placas
+    # scrape information on records that need to be updated
     if any([i in sys.argv for i in ("UPDATE", "FULL")]):
-        # gather data for all record types
         gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
 
-    # craft messages, save them to outbound folder
+    # craft messages and alerts, save them to outbound folder
     if "MSG" in sys.argv or "FULL" in sys.argv:
-        # compose emails and write them to outbound folder
         craft_messages.craft(db.cursor, dash)
         craft_alerts.craft(db.cursor, dash)
 
-    # craft alerts, save them to outbound folder
-    if "ALERT" in sys.argv or "FULL" in sys.argv:
-        # get members that require alerting
-        required_alerts = ALERT.get_alert_list(db_cursor)
-        # compose alerts and write them to outbound folder
-        craft_alerts.craft(required_alerts, LOG, MONITOR)
-
-    # send all emails and alerts in outbound folder
+    # send all emails and alerts from outbound folder, clear outbound folder
     if "SEND" in sys.argv or "FULL" in sys.argv:
         send_messages.send(db.cursor, dash)
 

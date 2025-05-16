@@ -1,150 +1,163 @@
-def get_records_from_msg(db_cursor):
+def get_records(db_cursor):
 
-    # create dictionary with all tables as keys and empty list as value
-    db_cursor.execute("SELECT * FROM '@tableInfo'")
-    _data = db_cursor.fetchall()
-    all_updates = {i[1]: [] for i in _data}
-    nice_names = [i[2] for i in _data]
+    # # create dictionary with all tables as keys and empty list as value
+    # db_cursor.execute("SELECT * FROM '@tableInfo'")
+    # _data = db_cursor.fetchall()
+    # all_updates = {i[1]: [] for i in _data}
 
     # get records that require updating
 
-    # records that have expiration dates within time threshold (in days)
-    all_updates["brevetes"] = get_records_brevete(db_cursor, threshold=30)
-    all_updates["soats"] = get_records_soats(db_cursor, threshold=15)
-    all_updates["revtecs"] = get_records_revtecs(db_cursor, threshold=30)
+    HOURS_LAST_ATTEMPT = 120
+
+    updates = {}
+
+    # records that have expiration dates within time thresh (in days)
+    updates["brevetes"] = get_records_brevete(
+        db_cursor, thresh=30, HLA=HOURS_LAST_ATTEMPT
+    )
+    updates["soats"] = get_records_soats(db_cursor, thresh=15, HLA=HOURS_LAST_ATTEMPT)
+    updates["revtecs"] = get_records_revtecs(
+        db_cursor, thresh=30, HLA=HOURS_LAST_ATTEMPT
+    )
 
     # records that are updated every time an email is sent (unless updated in last 48 hours)
-    all_updates["satimpCodigos"] = get_records_satimps(db_cursor)
-    all_updates["satmuls"] = get_records_satmuls(db_cursor)
-    all_updates["sutrans"] = get_records_sutrans(db_cursor)
-    all_updates["recvehic"] = get_records_recvehic(db_cursor)
+    updates["satimpCodigos"] = get_records_satimps(db_cursor, HLA=HOURS_LAST_ATTEMPT)
+    updates["satmuls"] = get_records_satmuls(db_cursor, HLA=HOURS_LAST_ATTEMPT)
+    updates["sutrans"] = get_records_sutrans(db_cursor, HLA=HOURS_LAST_ATTEMPT)
+    updates["recvehic"] = get_records_recvehic(db_cursor, HLA=HOURS_LAST_ATTEMPT)
 
     # records that were last updated within fixed time threshold (in days)
-    all_updates["sunarps"] = get_records_sunarps(db_cursor, threshold=180)
-    all_updates["sunats"] = get_records_sunats(db_cursor, threshold=90)
+    updates["sunarps"] = get_records_sunarps(db_cursor, thresh=180)
+    updates["sunats"] = get_records_sunats(db_cursor, thresh=90)
 
-    # get all new members (no welcome email) and include in list of records to update
-    # TODO: is this really necessary??? aren't they included in step 1??
-    # all_updates = get_new_members(db_cursor, all_updates)
-
-    # eliminate any duplicates
-    all_updates = {i: set(j) for i, j in all_updates.items()}
-
-    return all_updates
+    # return without any duplicates
+    return {i: set(j) for i, j in updates.items()}
 
 
-def get_records_brevete(db_cursor, threshold):
-    # condition to update: will get email and (BREVETE expiring within threshold or no BREVETE in db) and only DNI as document and no attempt to update in last 48 hours
+def get_records_brevete(db_cursor, thresh, HLA):
+    # condition to update: will get email and (BREVETE expiring within thresh or no BREVETE in db) and only DNI as document and no attempt to update in last 48 hours
     db_cursor.execute(
-        f""" SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
+        f"""SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE IdMember_FK
                     NOT IN 
-	                (SELECT IdMember_FK FROM brevetes
-		                WHERE
-                            FechaHasta >= datetime('now','localtime', '+{threshold} days'))
+                    (SELECT IdMember_FK FROM brevetes
+                        WHERE
+                            FechaHasta >= datetime('now','localtime', '+{thresh} days'))
                             AND
                             DocTipo = 'DNI' 
                             AND
                             IdMember_FK
                             NOT IN 
-			                (SELECT IdMember_FK FROM membersLastUpdate
-		                        WHERE LastUpdateBrevete >= datetime('now','localtime', '-120 hours'))
-             """
+                            (SELECT IdMember_FK FROM membersLastUpdate
+                                WHERE LastUpdateBrevete >= datetime('now','localtime', '-{HLA} hours'))
+            UNION
+            SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_alertas
+                WHERE TipoAlerta = "BREVETE"
+            """
     )
     return db_cursor.fetchall()
 
 
-def get_records_soats(db_cursor, threshold):
-    # condition to update: will get email and (SOAT expiring within threshold or no SOAT in db) and no attempt to update in last 48 hours
+def get_records_soats(db_cursor, thresh, HLA):
+    # condition to update: will get email and (SOAT expiring within thresh or no SOAT in db) and no attempt to update latelys
     db_cursor.execute(
-        f""" SELECT * FROM _necesitan_mensajes_placas
+        f"""SELECT * FROM _necesitan_mensajes_placas
                 WHERE IdPlaca_FK
                     NOT IN 
 	                (SELECT IdPlaca_FK FROM soats
 		                WHERE
-                            FechaHasta >= datetime('now','localtime', '+{threshold} days'))
+                            FechaHasta >= datetime('now','localtime', '+{thresh} days'))
                             AND
                             IdPlaca_FK
                             NOT IN 
 			                (SELECT IdPlaca FROM placas
-		                        WHERE LastUpdateSOAT >= datetime('now','localtime', '-48 hours'))
+		                        WHERE LastUpdateSOAT >= datetime('now','localtime', '-{HLA} hours'))
+            UNION
+            SELECT IdPlaca_FK, Placa FROM _necesitan_alertas
+                WHERE TipoAlerta = "SOATS"
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_revtecs(db_cursor, threshold):
-    # condition to update: will get email and no attempt to update in last 48 hours
+def get_records_revtecs(db_cursor, thresh, HLA):
+    # condition to update: will get email and no attempt to update lately
     db_cursor.execute(
-        f""" SELECT * FROM _necesitan_mensajes_placas
+        f"""SELECT * FROM _necesitan_mensajes_placas
                 WHERE
                     IdPlaca_FK
                     NOT IN
                     (SELECT IdPlaca_FK FROM revtecs
                         WHERE 
-                        FechaHasta >= datetime('now','localtime', '+{threshold} days'))
+                        FechaHasta >= datetime('now','localtime', '+{thresh} days'))
                     AND
                     IdPlaca_FK
                     NOT IN
                     (SELECT IdPlaca FROM placas
                         WHERE
-                        LastUpdateRevtec >= datetime('now','localtime', '-120 hours'))
+                        LastUpdateRevtec >= datetime('now','localtime', '-{HLA} hours'))
+            UNION
+            SELECT IdPlaca_FK, Placa FROM _necesitan_alertas
+                WHERE TipoAlerta = "REVTEC"
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_satimps(db_cursor):
-    # condition to update: will get email and no attempt to update in last 48 hours
+def get_records_satimps(db_cursor, HLA):
+    # condition to update: will get email and no attempt to update lately
     db_cursor.execute(
-        """ SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
+        f"""SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE
                     IdMember_FK
                     NOT IN
 			        (SELECT IdMember_FK FROM membersLastUpdate
-		                WHERE LastUpdateImpSAT >= datetime('now','localtime', '-120 hours'))
+		                WHERE LastUpdateImpSAT >= datetime('now','localtime', '-{HLA} hours'))
+            UNION
+            SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_alertas
+                WHERE TipoAlerta = "SATIMPS"
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_satmuls(db_cursor):
-    # condition to update: will get email and SATMUL not updated in last 48 hours
+def get_records_satmuls(db_cursor, HLA):
+    # condition to update: will get email and SATMUL not updated lately
     db_cursor.execute(
-        """ SELECT * FROM _necesitan_mensajes_placas
+        f"""SELECT * FROM _necesitan_mensajes_placas
                 WHERE
                     IdPlaca_FK
                     NOT IN
                     (SELECT IdPlaca FROM placas
-                        WHERE LastUpdateSATMUL >= datetime('now', 'localtime', '-120 hours'))
+                        WHERE LastUpdateSATMUL >= datetime('now', 'localtime', '-{HLA} hours'))
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_sutrans(db_cursor):
+def get_records_sutrans(db_cursor, HLA):
     # condition to update: will get email and SUTRAN not updated in last 48 hours
     db_cursor.execute(
-        """ SELECT * FROM _necesitan_mensajes_placas
+        f"""SELECT * FROM _necesitan_mensajes_placas
                 WHERE
                     IdPlaca_FK
                     NOT IN 
 			        (SELECT IdPlaca FROM placas
-		                WHERE LastUpdateSUTRAN >= datetime('now','localtime', '-120 hours'))
+		                WHERE LastUpdateSUTRAN >= datetime('now','localtime', '-{HLA} hours'))
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_recvehic(db_cursor):
+def get_records_recvehic(db_cursor, HLA):
     # condition to update: will get email and no attempt to update in last 48 hours
     db_cursor.execute(
-        """ SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
+        f"""SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE
                     IdMember_FK
                     NOT IN
                     (SELECT IdMember_FK FROM membersLastUpdate
-            		    WHERE LastUpdateRecord >= datetime('now','localtime', '-120 hours'))
+            		    WHERE LastUpdateRecord >= datetime('now','localtime', '-{HLA} hours'))
                     AND DocTipo = 'DNI'
         """
     )
@@ -152,7 +165,7 @@ def get_records_recvehic(db_cursor):
     return db_cursor.fetchall()
 
 
-def get_records_sunarps(db_cursor, threshold):
+def get_records_sunarps(db_cursor, thresh):
     # condition to update: will get email and last updated within time threshold
     db_cursor.execute(
         f""" SELECT * FROM _necesitan_mensajes_placas
@@ -160,13 +173,13 @@ def get_records_sunarps(db_cursor, threshold):
                     IdPlaca_FK
                     NOT IN
 			        (SELECT IdPlaca FROM placas
-		                WHERE LastUpdateSUNARP >= datetime('now','localtime', '-{threshold} days'))
+		                WHERE LastUpdateSUNARP >= datetime('now','localtime', '-{thresh} days'))
         """
     )
     return db_cursor.fetchall()
 
 
-def get_records_sunats(db_cursor, threshold):
+def get_records_sunats(db_cursor, thresh):
     # condition to update: will get email and last updated within time threshold
     db_cursor.execute(
         f""" SELECT * FROM _necesitan_mensajes_placas
@@ -174,7 +187,7 @@ def get_records_sunats(db_cursor, threshold):
                     IdPlaca_FK
                     NOT IN
                     (SELECT IdPlaca_FK FROM sunats
-                        WHERE LastUpdate >= datetime('now','localtime', '-{threshold} days'))
+                        WHERE LastUpdate >= datetime('now','localtime', '-{thresh} days'))
         """
     )
     return db_cursor.fetchall()
@@ -183,19 +196,19 @@ def get_records_sunats(db_cursor, threshold):
 def get_new_members(db_cursor, all_updates):
     # docs
     cmd = [
-        """SELECT IdMember, DocTipo, DocNum FROM members
+        """ SELECT IdMember, DocTipo, DocNum FROM members
                 EXCEPT
                 SELECT IdMember, DocTipo, DocNum FROM (
                 SELECT mensajes.IdMember_FK FROM mensajes JOIN mensajeContenidos ON mensajes.IdMensaje = mensajeContenidos.IdMensaje_FK
                 WHERE IdTipoMensaje_FK = 12)
                 JOIN members
                 ON members.IdMember = IdMember_FK
-                """
+        """
     ]
 
     # placas
     cmd.append(
-        """SELECT IdPlaca, Placa FROM placas
+        """ SELECT IdPlaca, Placa FROM placas
                 JOIN (SELECT IdMember, DocTipo, DocNum FROM members
                 EXCEPT
                 SELECT IdMember, DocTipo, DocNum FROM (
@@ -204,7 +217,7 @@ def get_new_members(db_cursor, all_updates):
                 JOIN members
                 ON members.IdMember = IdMember_FK)
                 ON placas.IdMember_FK = IdMember
-                """
+        """
     )
 
     #

@@ -1,20 +1,100 @@
+<!DOCTYPE html>
+<html>
 <head>
+    <meta name="to" content="{{to}}">
+    <meta name="bcc" content="{{bcc}}">
+    <meta name="subject" content="{{subject}}">
+    <meta name="msgTypes" content="{{msg_types}}">
+    <meta name="idMember" content="{{idMember}}">
+    <meta name="timestamp" content="{{timestamp}}">
+    <meta name="hashcode" content= "{{hashcode}}">
+    {% for attachment_path in attachment_paths %}
+    <meta name="attachment" content="{{attachment_path}}">
+    {% endfor %}
+  <meta charset="UTF-8">
+  <title>Account Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background-color: #007BFF;
+      color: #ffffff;
+      padding: 15px;
+      border-radius: 8px 8px 0 0;
+      text-align: center;
+      font-size: 24px;
+    }
+    .content {
+      padding: 20px;
+      color: #333333;
+    }
+    .content p {
+      margin: 15px 0;
+    }
+    .alert-box {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888888;
+      margin-top: 30px;
+    }
+    a.button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        width: 95% !important;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: Arial, Helvetica, sans-serif">
-    <p>Hola {{nombre_usuario}},</p>
-    <p>Este es un correo de aviso del Servicio de Alertas Peru.</p>
-    <p>En caso no quieras recibir más correos, responde a este correo con "ELIMINAR" en el asunto.</p>
-    <p>Gracias por confiar en nosotros!</p>
-    <p>- Equipo SAP</p>
-    </br>
-    <h2>Alertas</h2>
-    <ul>
-        {% for alerta in alertas %}
-            <li style="color: red">{{alerta}}</li>
-        {% endfor %}
-    </ul>
-    </br>
-        <p style="font-size:x-small; color:#c5c9c9">
-        {{codigo_correo}}
-    </p>
+<body>
+  <div class="email-container">
+    <div class="header">
+      No Pasa Nada PE
+    </div>
+    <div class="content">
+      <p>Hola {{nombre_usuario}},</p>
+      <p>Tienes una nueva alerta.</p>
+      <div class="alert-box">
+        <strong>{{titulo_alerta}}</strong> {{texto_alerta}}
+      </div>
+      <p>Gracias por confiar en nosotros.</p>
+      <a href="" class="button">Ingresa a tu Cuenta</a>
+      {% if vencido %}
+        <p>Recibirás alertas solo hasta el tercer dia después del vencimiento.</p>
+      {% endif %}
+    </div>
+    <div class="footer">
+      &copy; 2025 No Pasa Nada PE<br>
+      Si quieres dejar de recibir estas alertas, haz los ajustes en la web de No Pasa Nada PE.
+    </div>
+  </div>
 </body>
+</html>
