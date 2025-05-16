@@ -1,6 +1,5 @@
 import os
 import uuid
-from gft_utils import EmailUtils
 from bs4 import BeautifulSoup
 
 
