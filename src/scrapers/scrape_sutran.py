@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 import time
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(placa):

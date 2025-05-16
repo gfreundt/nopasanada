@@ -3,7 +3,7 @@ import os
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import Select
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(ocr, doc_num, doc_tipo):

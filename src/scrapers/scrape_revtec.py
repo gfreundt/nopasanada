@@ -4,7 +4,7 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from PIL import Image
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(ocr, placa):

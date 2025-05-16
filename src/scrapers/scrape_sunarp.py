@@ -6,7 +6,7 @@ import io, urllib, os
 import numpy as np
 from statistics import mean
 
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(placa, ocr):

@@ -6,7 +6,7 @@ from selenium.common.exceptions import *
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
-from gft_utils import ChromeUtils
+from ..utils import ChromeUtils
 
 
 def browser(doc_num, ocr):
