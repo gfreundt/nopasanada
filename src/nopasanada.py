@@ -12,7 +12,7 @@ from src.maintenance import maintenance
 # TODO: expand brevetes to include CE
 
 
-def main(dash, db):
+def nopasanada(dash, db):
     """Program entry point. Executes actions depending on arguments ran at prompt.
     Valid arguments: FULL, MEMBER, UPDATE, MAN, AUTO, ALL, ALERT, EMAIL, MAINT
     """
@@ -37,7 +37,7 @@ def main(dash, db):
     # craft messages and alerts, save them to outbound folder
     if "MSG" in sys.argv or "FULL" in sys.argv:
         craft_messages.craft(db.cursor, dash)
-        # craft_alerts.craft(db.cursor, dash)
+        craft_alerts.craft(db.cursor, dash)
 
     # send all emails and alerts from outbound folder, clear outbound folder
     if "SEND" in sys.argv or "FULL" in sys.argv:

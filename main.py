@@ -1,10 +1,16 @@
+from datetime import datetime as dt
+from datetime import timedelta as td
+import time
 import sqlite3
 import os, sys
-from src.nopasanada import main
+from src.nopasanada import nopasanada
 from src.server import server
 from src.monitor import monitor
 
 import time
+import logging
+
+logging.getLogger("werkzeug").disabled = True
 
 
 class Database:
@@ -31,6 +37,22 @@ class Database:
         self.users = self.cursor.fetchall()
 
 
+class Scheduler:
+
+    def __init__(self, interval):
+        self.INTERVAL = interval
+        self.last_run_time = dt.now() - td(days=10)
+
+    def format_timedelta(self, delta):
+        hours, remainder = divmod(delta.total_seconds(), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+
+    def seconds_to_next_run(self):
+        _nr = self.last_run_time + td(minutes=self.INTERVAL) - dt.now()
+        return _nr.total_seconds()
+
+
 if __name__ == "__main__":
 
     # connect to database
@@ -46,12 +68,16 @@ if __name__ == "__main__":
     if not "NOUI" in sys.argv:
         ui.run_in_background()
 
-    # run main code in foreground
-    if not "NOMAIN" in sys.argv:
-        main(db=db, dash=dash)
-
-    quit()
+    # set up scheduler with 240 minute intervals (4 hours)
+    schedule = Scheduler(interval=240)
 
     while True:
-        print("<----- Looping ------->")
-        time.sleep(20)
+        nr = schedule.seconds_to_next_run()
+        dash.log(general_status=(f"- {schedule.format_timedelta(td(seconds=nr))}", 1))
+
+        if nr < 0:
+            if not "NOMAIN" in sys.argv:
+                print(f"**********Activate {dt.now()} ")
+                # nopasanada(db=db, dash=dash)
+                schedule.last_run_time = dt.now()
+        time.sleep(0.4)
