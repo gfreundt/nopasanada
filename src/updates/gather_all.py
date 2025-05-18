@@ -9,15 +9,23 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
     # auto gathering
     gather_brevetes.gather(db_cursor, dash, all_updates["brevetes"])
+    db_conn.commit()
     gather_revtecs.gather(db_cursor, dash, all_updates["revtecs"])
+    db_conn.commit()
     gather_sutrans.gather(db_cursor, dash, all_updates["sutrans"])
+    db_conn.commit()
     gather_satimps.gather(db_cursor, dash, all_updates["satimpCodigos"])
+    db_conn.commit()
     gather_recvehic.gather(db_cursor, dash, all_updates["recvehic"])
+    db_conn.commit()
     gather_sunarps.gather(db_cursor, dash, all_updates["sunarps"])
+    db_conn.commit()
     gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
+    db_conn.commit()
 
     # manual gathering
     gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
+    db_conn.commit()
 
     # in development
     # gather_sunats.gather(db_cursor, monitor, all_updates["sunats"])
