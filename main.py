@@ -7,7 +7,6 @@ import sys
 from src.nopasanada import nopasanada
 from src.server import server
 from src.monitor import monitor
-
 import time
 import logging
 
