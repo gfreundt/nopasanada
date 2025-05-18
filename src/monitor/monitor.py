@@ -8,7 +8,9 @@ from datetime import datetime as dt
 
 class Dashboard:
     def __init__(self, db):
-        BASE_PATH = os.path.abspath(os.curdir)
+        BASE_PATH = os.path.abspath(
+            "d:/pythonCode/nopasanada"
+        )  # os.path.abspath(os.curdir)
         self.app = Flask(
             __name__,
             template_folder=os.path.join(BASE_PATH, "templates"),
@@ -78,5 +80,5 @@ class Dashboard:
 
 
 if __name__ == "__main__":
-    app_instance = Dashboard()
+    app_instance = Dashboard(db=None)
     app_instance.run()

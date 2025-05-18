@@ -60,23 +60,23 @@ if __name__ == "__main__":
 
     # run dashboard in background (port 7000)
     dash = monitor.Dashboard(db)
-    if not "NOMON" in sys.argv:
+    if "NOMON" not in sys.argv:
         dash.run_in_background()
 
     # run user UI in background (port 5000)
     ui = server.UI(db=db, dash=dash)
-    if not "NOUI" in sys.argv:
+    if "NOUI" not in sys.argv:
         ui.run_in_background()
 
     # set up scheduler with 240 minute intervals (4 hours)
-    schedule = Scheduler(interval=240)
+    schedule = Scheduler(interval=1)
 
     while True:
         nr = schedule.seconds_to_next_run()
         dash.log(general_status=(f"- {schedule.format_timedelta(td(seconds=nr))}", 1))
 
         if nr < 0:
-            if not "NOMAIN" in sys.argv:
+            if "NOMAIN" not in sys.argv:
                 print(f"**********Activate {dt.now()} ")
                 # nopasanada(db=db, dash=dash)
                 schedule.last_run_time = dt.now()

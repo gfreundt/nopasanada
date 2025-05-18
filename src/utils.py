@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 import re
-import os, sys
+import os
 import platform
 from pathlib import Path
 from selenium import webdriver
@@ -15,7 +15,7 @@ import pypdfium2.raw as pdfium
 import math
 from PIL import Image
 import img2pdf
-from contextlib import contextmanager
+import pyautogui
 
 
 class ChromeUtils:
@@ -244,6 +244,32 @@ class SpeechUtils:
                     return None
 
 
+class VPNUtils:
+
+    def __init__(self):
+        try:
+            self.avp = os.path.join(
+                r"C:\Program Files (x86)",
+                "Kaspersky Lab",
+                "Kaspersky VPN 5.20",
+                "ksdeui.exe",
+            )
+            subprocess.Popen([self.avp])
+            self.button_location = pyautogui.locateOnScreen("kpvn.png")
+            self.vpn_on = False
+            return True
+        except:
+            return False
+
+    def turn_on(self):
+        if self.button_location and self.vpn_on:
+            pyautogui.click(self.button_location)
+
+    def turn_off(self):
+        if self.button_location and not self.vpn_on:
+            pyautogui.click(self.button_location)
+
+
 def log_action_in_db(db_cursor, table_name, idMember="", idPlaca=""):
     """Registers scraping action in actions table in database."""
 
@@ -254,7 +280,7 @@ def log_action_in_db(db_cursor, table_name, idMember="", idPlaca=""):
 def revisar_symlinks():
     """validate symlink to see image files is active, if not create it"""
     link_path = Path("static/images")
-    target_path = Path("../data/images").resolve()
+    target_path = Path("data/images").resolve()
 
     if link_path.exists():
         if link_path.is_symlink():
@@ -299,17 +325,3 @@ def date_to_db_format(data):
             new_record_dates_fixed.append(data_item)
 
     return new_record_dates_fixed
-
-
-@contextmanager
-def suppress_output():
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        old_stderr = sys.stderr
-        sys.stdout = devnull
-        sys.stderr = devnull
-        try:
-            yield
-        finally:
-            sys.stdout = old_stdout
-            sys.stderr = old_stderr
