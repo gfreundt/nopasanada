@@ -1,8 +1,9 @@
 from datetime import datetime as dt
 from copy import deepcopy as copy
 from src.updates import soat_gui_speech, soat_gui_typed, soat_image_generator
-from ..utils import date_to_db_format, log_action_in_db
+from ..utils import date_to_db_format, log_action_in_db, use_truecaptcha
 from src.scrapers import scrape_soat
+import os
 
 
 def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
@@ -38,12 +39,17 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                 # grab captcha image from website and save to temp file
                 scraper.get_captcha()
 
-                # send to manual captcha solving (typed or speech)
-                if gui_option == "TYPED":
-                    pass
-                    # captcha = soat_gui_typed(canvas)
-                elif gui_option == "SPEECH":
-                    captcha = soat_gui_speech.get_captcha()
+                # use saved temp file and external OCR to solve captcha
+                captcha = use_truecaptcha(os.path.join("static", "captcha_soat.png"))[
+                    "result"
+                ]
+
+                # # send to manual captcha solving (typed or speech)
+                # if gui_option == "TYPED":
+                #     pass
+                #     # captcha = soat_gui_typed(canvas)
+                # elif gui_option == "SPEECH":
+                #     captcha = soat_gui_speech.get_captcha()
 
                 # captcha timeout - manual user not there to enter captcha, skip process
                 if captcha == -1:
@@ -72,6 +78,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                         text="Detenido por limite Apeseg.",
                         lastUpdate=dt.now(),
                     )
+                    scraper.webdriver.quit()
                     return
 
                 # if there is data in response, enter into database, go to next placa
@@ -125,17 +132,17 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
             except KeyboardInterrupt:
                 quit()
 
-            # except Exception:
-            #     retry_attempts += 1
-            #     dash.log(
-            #         card=CARD,
-            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-            #     )
+            except Exception:
+                retry_attempts += 1
+                dash.log(
+                    card=CARD,
+                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+                )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
 
-        # log last action
+        # log last action and close webdriver
     dash.log(
         card=CARD,
         title="Certificados Soat",
@@ -144,3 +151,5 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
         text="Inactivo",
         lastUpdate=dt.now(),
     )
+
+    scraper.webdriver.quit()

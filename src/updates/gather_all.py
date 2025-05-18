@@ -2,8 +2,6 @@ import time
 from threading import Thread
 from src.updates import *
 
-import random
-
 
 def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
@@ -16,11 +14,10 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
     gather_satimps.gather(db_cursor, dash, all_updates["satimpCodigos"])
     gather_recvehic.gather(db_cursor, dash, all_updates["recvehic"])
     gather_sunarps.gather(db_cursor, dash, all_updates["sunarps"])
+    gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
 
-    # manual gathering (try with SATMUL, if timeout skip all manuals because user not present)
-    timeout = gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
-    if not timeout:
-        gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
+    # manual gathering
+    gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
 
     # in development
     # gather_sunats.gather(db_cursor, monitor, all_updates["sunats"])
@@ -70,16 +67,16 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
             args=(db_cursor, dash, all_updates["recvehic"]),
         )
     )
-    # threads.append(
-    #     Thread(
-    #         target=gather_sunats.gather,
-    #         args=(db_cursor, monitor, all_updates["sunats"]),
-    #     )
-    # )
     threads.append(
         Thread(
             target=gather_sunarps.gather,
             args=(db_cursor, dash, all_updates["sunarps"]),
+        )
+    )
+    threads.append(
+        Thread(
+            target=gather_soats.gather,
+            args=(db_conn, db_cursor, dash, all_updates["soats"]),
         )
     )
 
@@ -88,10 +85,8 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
         thread.start()
         time.sleep(2)
 
-    # manual gathering (try with SATMUL, if timeout skip all manual scrapers because user not present)
-    timeout = gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
-    if not timeout:
-        gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
+    # manual gathering (might not proceed because of timeout)
+    gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
 
     # wait for all active threads to finish in case manual gathering finishes before auto
     while any([i.is_alive() for i in threads]):
@@ -101,16 +96,6 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     # commit all changes to database
     db_conn.commit()
 
-    #
-    time.sleep(5)
+    # final log update and give some time for webpage update
     dash.log(general_status=("Inactivo", 2))
-
     time.sleep(5)
-
-
-def erase(dash):
-
-    for i in range(40):
-        time.sleep(random.randrange(0, 3))
-        dash.log(action=f"{i}sdklfhjosidfj{random.randrange(0,999)}jkldfhsdj")
-        dash.log(usuario=f"{i}ghgfhtyhythfj{random.randrange(0,999)}hgfghhhfbh")

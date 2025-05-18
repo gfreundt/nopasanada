@@ -16,6 +16,7 @@ import math
 from PIL import Image
 import img2pdf
 import pyautogui
+import base64
 
 
 class ChromeUtils:
@@ -325,3 +326,17 @@ def date_to_db_format(data):
             new_record_dates_fixed.append(data_item)
 
     return new_record_dates_fixed
+
+
+def use_truecaptcha(img_path):
+    with open(img_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode("ascii")
+        url = "https://api.apitruecaptcha.org/one/gettext"
+
+        data = {
+            "userid": "gabfre@gmail.com",
+            "apikey": "UEJgzM79VWFZh6MpOJgh",
+            "data": encoded_string,
+        }
+        response = requests.post(url=url, json=data)
+        return response.json()

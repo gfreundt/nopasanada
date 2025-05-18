@@ -8,7 +8,7 @@ from ..utils import ChromeUtils
 
 def browser(placa):
 
-    TIMEOUT = 60
+    TIMEOUT = 300  # seconds
 
     webdriver = ChromeUtils().init_driver(
         headless=False, verbose=False, maximized=True, incognito=False

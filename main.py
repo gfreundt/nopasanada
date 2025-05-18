@@ -2,7 +2,8 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 import time
 import sqlite3
-import os, sys
+import os
+import sys
 from src.nopasanada import nopasanada
 from src.server import server
 from src.monitor import monitor
@@ -78,6 +79,6 @@ if __name__ == "__main__":
         if nr < 0:
             if "NOMAIN" not in sys.argv:
                 print(f"**********Activate {dt.now()} ")
-                # nopasanada(db=db, dash=dash)
+                nopasanada(db=db, dash=dash)
                 schedule.last_run_time = dt.now()
-        time.sleep(0.4)
+        time.sleep(0.9)

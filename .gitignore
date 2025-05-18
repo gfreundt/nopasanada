@@ -1,3 +1,7 @@
 data/images/
 data/images/
 data/dev/
+static/captcha_recveh.png
+static/captcha_satimp.png
+static/captcha_soat.png
+static/temp_img.png
