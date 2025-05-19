@@ -1,12 +1,13 @@
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
 import time
 from PIL import Image
-import io, urllib, os
+import io
+import urllib
+import os
 import numpy as np
 from statistics import mean
 
-from ..utils import ChromeUtils
+from ..utils import ChromeUtils, use_truecaptcha
 
 
 def browser(placa, ocr):
@@ -40,11 +41,12 @@ def browser(placa, ocr):
                 if retry_captcha:
                     webdriver.refresh()
                     time.sleep(1)
-                # capture captcha image from webpage store in variable
-                _img = webdriver.find_element(By.ID, "image").get_attribute("src")
-                _img = Image.open(io.BytesIO(urllib.request.urlopen(_img).read()))
-                captcha_txt = process_captcha(_img, ocr=ocr)
-
+                # capture captcha image from webpage and save
+                _path = os.path.join("static", "captcha_sunarp.png")
+                _img = webdriver.find_element(By.ID, "image")
+                with open(_path, "wb+") as file:
+                    file.write(_img.screenshot_as_png)
+                captcha_txt = use_truecaptcha(_path)["result"]
                 retry_captcha = True
 
             # enter data into fields and run
@@ -96,7 +98,7 @@ def browser(placa, ocr):
 
             # save image in file
             _img_path = os.path.abspath(
-                os.path.join("..", "data", "images", f"SUNARP_{placa}.png")
+                os.path.join("data", "images", f"SUNARP_{placa}.png")
             )
             with open(_img_path, "wb") as file:
                 file.write(_card_image[0].screenshot_as_png)
@@ -116,12 +118,12 @@ def browser(placa, ocr):
 def process_captcha(img, ocr):
 
     # split image into six pieces and run OCR to each
-    img.save(os.path.join("..", "other", "sunarp_temp.jpg"))
+    img.save(os.path.join("static", "sunarp_temp.jpg"))
 
     WHITE = np.asarray((255, 255, 255, 255))
     BLACK = np.asarray((0, 0, 0, 0))
 
-    img_object = Image.open(os.path.join("..", "other", "sunarp_temp.jpg"))
+    img_object = Image.open(os.path.join("static", "sunarp_temp.jpg"))
 
     original_img = np.asarray(img_object)
     original_img = np.asarray(
@@ -152,7 +154,7 @@ def process_captcha(img, ocr):
     phrase = ""
     for k in range(len(stopx) // 2):
         i = img_object.crop((stopx[2 * k], 0, stopx[2 * k + 1], 60))
-        fn = os.path.join("..", "images", f"temp{k}.jpg")
+        fn = os.path.join("static", f"temp{k}.jpg")
         i.save(fn)
         c = ocr.readtext(fn, text_threshold=0.4)
         if c:
@@ -160,5 +162,7 @@ def process_captcha(img, ocr):
 
     # ocr text correction
     phrase.replace("€", "C")
+
+    print(phrase)
 
     return phrase.upper() if len(phrase) == 6 else ""

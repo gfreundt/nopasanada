@@ -5,7 +5,7 @@ from ..utils import date_to_db_format, log_action_in_db
 from src.scrapers import scrape_brevete
 
 
-def gather(db_cursor, dash, update_data):
+def gather(db_cursor, db_conn, dash, update_data):
 
     CARD = 0
 
@@ -71,6 +71,9 @@ def gather(db_cursor, dash, update_data):
                     f"DELETE FROM brevetes WHERE IdMember_FK = {id_member}"
                 )
 
+                print(_values)
+                print(tuple(_values))
+
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO brevetes VALUES {tuple(_values)}")
                 dash.log(action=f"[ BREVETES ] {"|".join([str(i) for i in _values])}")
@@ -79,9 +82,7 @@ def gather(db_cursor, dash, update_data):
                 for papeleta in pimpagas_response:
 
                     # adjust date to match db format (YYYY-MM-DD)
-                    papeleta_dates_fixed = date_to_db_format(
-                        data=papeleta.values(), sep="/"
-                    )
+                    papeleta_dates_fixed = date_to_db_format(data=papeleta.values())
 
                     # add foreign key and current date to response
                     _values = [id_member] + papeleta_dates_fixed + [_now]
@@ -123,6 +124,8 @@ def gather(db_cursor, dash, update_data):
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.")
+
+        db_conn.commit()
 
     # log last action
     dash.log(

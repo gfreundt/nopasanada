@@ -4,7 +4,7 @@ from src.scrapers import scrape_sunarp
 import easyocr
 
 
-def gather(db_cursor, dash, update_data):
+def gather(db_cursor, db_conn, dash, update_data):
 
     CARD = 6
 
@@ -89,6 +89,8 @@ def gather(db_cursor, dash, update_data):
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
+
+        db_conn.commit()
 
     # log last action
     dash.log(

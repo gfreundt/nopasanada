@@ -5,7 +5,7 @@ import logging
 import easyocr
 
 
-def gather(db_cursor, dash, update_data):
+def gather(db_cursor, db_conn, dash, update_data):
 
     CARD = 1
 
@@ -94,12 +94,7 @@ def gather(db_cursor, dash, update_data):
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
                 )
 
-        # if code gets here, means scraping has encountred three consecutive errors, skip record
-        dash.log(
-            card=CARD,
-            status=2,
-            msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.",
-        )
+        db_conn.commit()
 
     # log last action
     dash.log(

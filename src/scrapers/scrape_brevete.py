@@ -2,7 +2,7 @@ import time
 import io
 import urllib
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
@@ -90,28 +90,36 @@ def browser(doc_num, ocr):
             break
 
     # extract data from table and parse relevant data, return dictionary
+    time.sleep(3)
+    # exact IDs for "tipo" depends if there are one or two licenses shown
+    if webdriver.find_elements(
+        By.XPATH,
+        "/html/body/app-root/div[2]/app-search/div[2]/mat-tab-group/div/mat-tab-body[1]/div/div/div/mat-card/mat-card-content/div/div/div/div[1]/mat-form-field/div/div[1]/div/input",
+    ):
+        _id_tipo = 12
+    else:
+        _id_tipo = 18
+
     data_index = (
         ("clase", 6),
         ("numero", 7),
-        ("tipo", 12),
+        ("tipo", _id_tipo),
         ("fecha_expedicion", 8),
         ("restricciones", 9),
         ("fecha_hasta", 10),
         ("centro", 11),
     )
-    try:
-        response = {}
-        for data_unit, pos in data_index:
-            response.update(
-                {
-                    data_unit: webdriver.find_element(
-                        By.ID,
-                        f"mat-input-{pos}",
-                    ).get_attribute("value")
-                }
-            )
-    except NoSuchElementException:
-        response = []
+
+    response = {}
+    for data_unit, pos in data_index:
+        response.update(
+            {
+                data_unit: webdriver.find_element(
+                    By.ID,
+                    f"mat-input-{pos}",
+                ).get_attribute("value")
+            }
+        )
 
     # check if no licencia registrada, respond with empty for each field
     _nr = webdriver.find_elements(By.CLASS_NAME, "div_non_data")

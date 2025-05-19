@@ -1,6 +1,15 @@
 import time
 from threading import Thread
-from src.updates import *
+from src.updates import (
+    gather_brevetes,
+    gather_revtecs,
+    gather_sutrans,
+    gather_satimps,
+    gather_recvehic,
+    gather_sunarps,
+    gather_soats,
+    gather_satmuls,
+)
 
 
 def gather_no_threads(db_conn, db_cursor, dash, all_updates):
@@ -8,20 +17,13 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
     dash.log(general_status=("Activo", 1))
 
     # auto gathering
-    gather_brevetes.gather(db_cursor, dash, all_updates["brevetes"])
-    db_conn.commit()
+    gather_brevetes.gather(db_cursor, db_conn, dash, all_updates["brevetes"])
     gather_revtecs.gather(db_cursor, dash, all_updates["revtecs"])
-    db_conn.commit()
     gather_sutrans.gather(db_cursor, dash, all_updates["sutrans"])
-    db_conn.commit()
     gather_satimps.gather(db_cursor, dash, all_updates["satimpCodigos"])
-    db_conn.commit()
-    gather_recvehic.gather(db_cursor, dash, all_updates["recvehic"])
-    db_conn.commit()
-    gather_sunarps.gather(db_cursor, dash, all_updates["sunarps"])
-    db_conn.commit()
+    gather_recvehic.gather(db_cursor, db_conn, dash, all_updates["recvehic"])
+    gather_sunarps.gather(db_cursor, db_conn, dash, all_updates["sunarps"])
     gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
-    db_conn.commit()
 
     # manual gathering
     gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
@@ -48,7 +50,7 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     threads.append(
         Thread(
             target=gather_brevetes.gather,
-            args=(db_cursor, dash, all_updates["brevetes"]),
+            args=(db_cursor, db_conn, dash, all_updates["brevetes"]),
         )
     )
     threads.append(
@@ -72,13 +74,13 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     threads.append(
         Thread(
             target=gather_recvehic.gather,
-            args=(db_cursor, dash, all_updates["recvehic"]),
+            args=(db_cursor, db_conn, dash, all_updates["recvehic"]),
         )
     )
     threads.append(
         Thread(
             target=gather_sunarps.gather,
-            args=(db_cursor, dash, all_updates["sunarps"]),
+            args=(db_cursor, db_conn, dash, all_updates["sunarps"]),
         )
     )
     threads.append(
