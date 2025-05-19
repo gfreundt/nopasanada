@@ -70,7 +70,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # update placas table with last update information
                 db_cursor.execute(
-                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE Placa = '{placa}'"
+                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE IdPlaca = '{id_placa}'"
                 )
 
                 # register action and skip to next record

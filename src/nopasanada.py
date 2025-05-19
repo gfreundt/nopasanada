@@ -33,7 +33,7 @@ def nopasanada(dash, db):
 
     # scrape information on records that need to be updated
     if any([i in sys.argv for i in ("UPDATE", "FULL")]):
-        gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
+        gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
 
     # craft messages and alerts, save them to outbound folder
     if "MSG" in sys.argv or "FULL" in sys.argv:
