@@ -124,17 +124,7 @@ def browser(doc_num, ocr):
     # check if no licencia registrada, respond with empty for each field
     _nr = webdriver.find_elements(By.CLASS_NAME, "div_non_data")
     if _nr:
-        return {
-            "clase": "",
-            "numero": "",
-            "tipo": "",
-            "fecha_expedicion": "",
-            "restricciones": "",
-            "fecha_hasta": "",
-            "centro": "",
-            "puntos": 0,
-            "record_num": "",
-        }, []
+        return -1, []
 
     # next tab (Puntos) - make sure all is populated before tabbing along (with timeout) and wait a little
     timeout = 0

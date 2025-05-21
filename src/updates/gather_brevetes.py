@@ -58,6 +58,10 @@ def gather(db_cursor, db_conn, dash, update_data):
                     )
                     return
 
+                # go to next record if no brevete info
+                if brevete_response == -1:
+                    continue
+
                 # adjust date to match db format (YYYY-MM-DD)
                 new_record_dates_fixed = date_to_db_format(
                     data=brevete_response.values()

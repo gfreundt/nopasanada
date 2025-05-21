@@ -1,4 +1,3 @@
-import sys
 from pprint import pprint
 
 # local imports
@@ -12,9 +11,9 @@ from src.maintenance import maintenance
 # TODO: expand brevetes to include CE
 
 
-def nopasanada(dash, db):
+def nopasanada(dash, db, cmds):
     """Program entry point. Executes actions depending on arguments ran at prompt.
-    Valid arguments: FULL, MEMBER, UPDATE, MAN, AUTO, ALL, ALERT, EMAIL, MAINT
+    Valid cmds: 'update', 'comms', 'send'
     """
 
     # perform pre-maintenance
@@ -26,22 +25,23 @@ def nopasanada(dash, db):
 
     # get all users and placas that need to be updated
     all_updates = get_records_to_update.get_records(db.cursor)
-    print(all_updates)
 
-    # pprint(all_updates)
-    print([f"{i}: {len(all_updates[i])}" for i in all_updates])
+    pprint(all_updates)
+    pprint([f"{i}: {len(all_updates[i])}" for i in all_updates])
 
     # scrape information on records that need to be updated
-    if any([i in sys.argv for i in ("UPDATE", "FULL")]):
+    if "update" in cmds:
         gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
+    elif "update-threads" in cmds:
+        gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
 
     # craft messages and alerts, save them to outbound folder
-    if "MSG" in sys.argv or "FULL" in sys.argv:
+    if "comms" in cmds:
         craft_messages.craft(db.cursor, dash)
         craft_alerts.craft(db.cursor, dash)
 
     # send all emails and alerts from outbound folder, clear outbound folder
-    if "SEND" in sys.argv or "FULL" in sys.argv:
+    if "send" in cmds:
         send_messages.send(db.cursor, dash)
 
     # perform post-maintenance

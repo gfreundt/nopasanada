@@ -280,15 +280,16 @@ def compose_message(
     db_cursor.execute(
         f"SELECT * FROM mtcPapeletas WHERE IdMember_FK = {member[0]} ORDER BY LastUpdate DESC"
     )
+
     for _m in db_cursor.fetchall():
         _papeletas.append(
             {
-                "entidad": _m[2],
-                "numero": _m[3],
-                "fecha": date_friendly(_m[4]),
-                "fecha_firme": date_friendly(_m[5]),
-                "falta": _m[6],
-                "estado_deuda": _m[7],
+                "entidad": _m[1],
+                "numero": _m[2],
+                "fecha": date_friendly(_m[3]),
+                "fecha_firme": date_friendly(_m[4]),
+                "falta": _m[5],
+                "estado_deuda": _m[6],
             }
         )
     _info.update({"papeletas": _papeletas})

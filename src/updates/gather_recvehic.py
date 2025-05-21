@@ -49,7 +49,11 @@ def gather(db_cursor, db_conn, dash, update_data):
                     f"UPDATE membersLastUpdate SET LastUpdateRecord = '{_now}' WHERE IdMember_FK = '{id_member}'"
                 )
 
-                # stop processing if blank response from scraper
+                # response from scraper is that there is no record
+                if _img_filename == -1:
+                    continue
+
+                # stop process if blank response from scraper
                 if not _img_filename:
                     dash.log(
                         card=CARD,

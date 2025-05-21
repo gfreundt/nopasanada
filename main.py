@@ -1,15 +1,17 @@
 from datetime import datetime as dt
-from datetime import timedelta as td
 import time
 import sqlite3
 import os
 import sys
+import logging
+import schedule
+
+# local imports
 from src.nopasanada import nopasanada
 from src.server import server
 from src.monitor import monitor
-import time
-import logging
 
+# reduce Flask output to command line
 logging.getLogger("werkzeug").disabled = True
 
 
@@ -37,23 +39,27 @@ class Database:
         self.users = self.cursor.fetchall()
 
 
-class Scheduler:
-
-    def __init__(self, interval):
-        self.INTERVAL = interval
-        self.last_run_time = dt.now() - td(days=10)
-
-    def format_timedelta(self, delta):
-        hours, remainder = divmod(delta.total_seconds(), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
-
-    def seconds_to_next_run(self):
-        _nr = self.last_run_time + td(minutes=self.INTERVAL) - dt.now()
-        return _nr.total_seconds()
+def update_remaining_time(dash):
+    delta = schedule.next_run("update") - dt.now()
+    hours, remainder = divmod(int(delta.total_seconds()), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    dash.log(general_status=(f"- {hours:02} : {minutes:02} : {seconds:02}", 1))
 
 
-if __name__ == "__main__":
+def update_db_stats(dash, db):
+    # get number of users
+    db.cursor.execute("SELECT COUNT( ) FROM members")
+    response = {"users": db.cursor.fetchone()[0]}
+
+    # get number of placas
+    db.cursor.execute("SELECT COUNT( ) FROM placas")
+    response.update({"placas": db.cursor.fetchone()[0]})
+
+    # update dashboard
+    dash.log(kpis=response)
+
+
+def main():
 
     # connect to database
     db = Database(dev=False)
@@ -68,16 +74,35 @@ if __name__ == "__main__":
     if "NOUI" not in sys.argv:
         ui.run_in_background()
 
-    # set up scheduler with 240 minute intervals (4 hours)
-    schedule = Scheduler(interval=1)
+    if "NOW" in sys.argv:
+        nopasanada(dash, db, cmds=["update", "comms"])
+
+    # set up scheduler: dashboard updates
+    schedule.every().second.do(update_remaining_time, dash)
+    schedule.every(15).minutes.do(update_db_stats, dash, db)
+
+    # set up scheduler: three updates (no messages/alerts) + one update (and messages/alerts)
+    _update = "update-threads" if "THREAD" in sys.argv else "update"
+    schedule.every().day.at("08:00").do(
+        nopasanada, dash=dash, db=db, cmds=[_update]
+    ).tag("update")
+    schedule.every().day.at("12:00").do(
+        nopasanada, dash=dash, db=db, cmds=[_update]
+    ).tag("update")
+    schedule.every().day.at("16:00").do(
+        nopasanada, dash=dash, db=db, cmds=[_update]
+    ).tag("update")
+    schedule.every().day.at("21:57").do(
+        nopasanada, dash=dash, db=db, cmds=[_update, "comms"]
+    ).tag("update")
+
+    # run stats update for dashboard before scheduling begins
+    update_db_stats(dash, db)
 
     while True:
-        nr = schedule.seconds_to_next_run()
-        dash.log(general_status=(f"- {schedule.format_timedelta(td(seconds=nr))}", 1))
+        schedule.run_pending()
+        time.sleep(1)
 
-        if nr < 0:
-            if "NOMAIN" not in sys.argv:
-                print(f"**********Activate {dt.now()} ")
-                nopasanada(db=db, dash=dash)
-                schedule.last_run_time = dt.now()
-        time.sleep(0.9)
+
+if __name__ == "__main__":
+    main()

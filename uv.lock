@@ -419,6 +419,7 @@ dependencies = [
     { name = "pypdfium2" },
     { name = "pywin32" },
     { name = "requests" },
+    { name = "schedule" },
     { name = "selenium" },
     { name = "speechrecognition" },
 ]
@@ -437,6 +438,7 @@ requires-dist = [
     { name = "pypdfium2", specifier = ">=4.30.1" },
     { name = "pywin32", specifier = ">=310" },
     { name = "requests", specifier = ">=2.32.3" },
+    { name = "schedule", specifier = ">=1.2.2" },
     { name = "selenium", specifier = ">=4.32.0" },
     { name = "speechrecognition", specifier = ">=3.14.2" },
 ]
@@ -948,6 +950,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d3/13/586c9baa985eae0f718029506b40ca41295d51a546567414b2bcf8ccacef/rubicon_objc-0.5.0.tar.gz", hash = "sha256:18f075649780d95df53d483642068c767d7d2cfbbf075ddef124a44b40b6d92e", size = 173652, upload-time = "2025-01-07T00:25:10.491Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6d/30/5b2407b8762ed882e5732e19c485b9ea2f07d35462615a3212638bab66c2/rubicon_objc-0.5.0-py3-none-any.whl", hash = "sha256:a9c2a605120d6e5be327d3f42a71b60963125987e116f51846757b5e110854fa", size = 62711, upload-time = "2025-01-07T00:25:08.959Z" },
+]
+
+[[package]]
+name = "schedule"
+version = "1.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/91/b525790063015759f34447d4cf9d2ccb52cdee0f1dd6ff8764e863bcb74c/schedule-1.2.2.tar.gz", hash = "sha256:15fe9c75fe5fd9b9627f3f19cc0ef1420508f9f9a46f45cd0769ef75ede5f0b7", size = 26452, upload-time = "2024-06-18T20:03:14.633Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/a7/84c96b61fd13205f2cafbe263cdb2745965974bdf3e0078f121dfeca5f02/schedule-1.2.2-py3-none-any.whl", hash = "sha256:5bef4a2a0183abf44046ae0d164cadcac21b1db011bdd8102e4a0c1e91e06a7d", size = 12220, upload-time = "2024-05-25T18:41:59.121Z" },
 ]
 
 [[package]]

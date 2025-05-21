@@ -1,6 +1,5 @@
 import os
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
 import time
 import re
 import numpy as np
@@ -121,7 +120,7 @@ def browser(doc_num, ocr):
             ).click()
             time.sleep(1)
             webdriver.quit()
-            return ""
+            return -1
         else:
             break
 

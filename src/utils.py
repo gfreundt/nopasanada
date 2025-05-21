@@ -17,6 +17,9 @@ from PIL import Image
 import img2pdf
 import pyautogui
 import base64
+import smtplib
+from email.message import EmailMessage
+import mimetypes
 
 
 class ChromeUtils:
@@ -269,6 +272,53 @@ class VPNUtils:
     def turn_off(self):
         if self.button_location and not self.vpn_on:
             pyautogui.click(self.button_location)
+
+
+class Email:
+
+    def __init__(self, from_account):
+        self.from_account = from_account
+        self.password = "5QJWEKi0trAL"  # os.getenv("ZOHO_PASSWORD")  # Fetch from environment variable
+
+    def send_email(self, emails):
+
+        for email in emails:
+            # create the email message
+            msg = EmailMessage()
+            msg["From"] = self.from_account
+            msg["To"] = email["to"]
+            msg["Subject"] = email["subject"]
+
+            # add plain text and HTML alternative
+            msg.set_content(email["plain_content"])
+            msg.add_alternative(email["html_content"], subtype="html")
+
+            # process attachments
+            for file_path in email["attachment_paths"]:
+                if os.path.isfile(file_path):
+                    mime_type, _ = mimetypes.guess_type(file_path)
+                    mime_type = mime_type or "application/octet-stream"
+                    maintype, subtype = mime_type.split("/", 1)
+
+                    with open(file_path, "rb") as f:
+                        file_data = f.read()
+                        filename = os.path.basename(file_path)
+                        msg.add_attachment(
+                            file_data,
+                            maintype=maintype,
+                            subtype=subtype,
+                            filename=filename,
+                        )
+
+            # send the email via Zoho's SMTP server
+            try:
+                with smtplib.SMTP("smtp.zoho.com", 587) as server:
+                    server.starttls()  # Secure the connection
+                    server.login(self.from_account, self.password)
+                    server.send_message(msg)
+                    print("Email sent successfully.")
+            except Exception as e:
+                print(f"Failed to send email: {e}")
 
 
 def log_action_in_db(db_cursor, table_name, idMember="", idPlaca=""):

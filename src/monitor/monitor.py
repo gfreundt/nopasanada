@@ -45,6 +45,8 @@ class Dashboard:
             self.data["bottom_left"].append(_ft)
             if len(self.data["bottom_left"]) > 30:
                 self.data["bottom_left"].pop(0)
+        if "kpis" in kwargs:
+            print(kwargs["kpis"])
 
     def set_initial_data(self):
         empty_card = {
