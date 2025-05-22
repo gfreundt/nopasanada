@@ -20,6 +20,7 @@ import base64
 import smtplib
 from email.message import EmailMessage
 import mimetypes
+import logging
 
 
 class ChromeUtils:
@@ -401,3 +402,16 @@ def base64_to_image(base64_string, output_path):
             file.write(image_data)
     except Exception as e:
         print(f"An error occurred: {e}")
+
+
+def disable_all_loggers():
+    # Get the root logger
+    root_logger = logging.getLogger()
+    root_logger.disabled = True
+
+    # Get all other existing loggers from the logger manager
+    logger_dict = logging.Logger.manager.loggerDict
+
+    for logger_name, logger in logger_dict.items():
+        if isinstance(logger, logging.Logger):
+            logger.disabled = True

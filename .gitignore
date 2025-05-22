@@ -5,3 +5,11 @@ static/captcha_recveh.png
 static/captcha_satimp.png
 static/captcha_soat.png
 static/temp_img.png
+outbound/
+static/captcha_sunarp.png
+static/sunarp_temp.jpg
+erase.html
+erase.py
+kpvn.png
+test.png
+data/members.db-journal

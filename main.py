@@ -57,11 +57,14 @@ def update_db_stats(dash, db):
     response.update({"placas": db.cursor.fetchone()[0]})
 
     # get balance left in truecaptcha
-    url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
-    r = requests.get(url)
-    response.update(
-        {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
-    )
+    try:
+        url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
+        r = requests.get(url)
+        response.update(
+            {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
+        )
+    except ConnectionError:
+        response.update({"truecaptcha_balance": "N/A"})
 
     # update dashboard
     dash.log(kpis=response)
