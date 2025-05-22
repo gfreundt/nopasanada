@@ -9,31 +9,19 @@
 <meta name="attachment" content="{{attachment}}">
 {% endfor %}
 
-<head>
-</head>
+<head></head>
 
-<body style="font-family: Arial, Helvetica, sans-serif">
+<body style="color: black; font-family: Arial, Helvetica, sans-serif">
     <p>Hola {{nombre_usuario}},</p>
-    <p>Gracias por inscribirte a <strong>No Pasa Nada PE.</strong></p> 
+    <p>Servicio de Alertas Perú se actualizó y hoy es <strong>No Pasa Nada PE.</strong></p> 
+    <p>Este es el primer boletín mensual con toda tu informacion actualizada.</p>
+    <p>Pronto recibirás otro correo con información para que puedas entrar a un portal privado y actualizar tus placas y tu información de contacto o eliminar tu suscripción.</p>
     {% if lista_placas|length <= 6 %}
     <p>Tu placa registada es: <b>{{lista_placas}}</b>.</p>
     {% else %}
     <p>Tus placas registradas son: <b>{{lista_placas}}</b>.</p>
     {% endif %}
-    <p>Recibirás un boletín mensual como este con toda tu informacion actualizada. Además las siguientes alertas:</p>
-        <ul>
-        <li>Vencimiento de Licencia de Conducir.</li>
-        <li>Vencimiento de Revisión Técnica.</li>
-        <li>Vencimiento del SOAT.</li>
-        <li>Vencimiento del Impuesto Vehicular SAT.</li>
-        <li>Nueva multa en SUTRAN.</li>
-        <li>Nueva multa en SAT Lima.</li>
-        <li>Nueva Papeleta del MTC.</li>
-        </p>
-    </ul>
-    <p>Pronto recibirás otro correo con información para que puedas entrar a un portal privado y actualizar tus placas y tu información de contacto o eliminar tu suscripción.</p>
-    <p>Gracias confiar en nosotros.</p>
-
+    <p>Gracias por seguir confiando en nosotros.</p>
     <h2>Alertas</h2>
     <ul>
         {% for alerta in alertas %}
@@ -85,6 +73,14 @@
         <tr>
             <td style="text-align: right">Local de Emisión</td>
             <td style="text-align: center">{{brevete.local}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Puntos en Licencia</td>
+            <td style="text-align: center">{{brevete.puntos}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">N° Récord del Conductor</td>
+            <td style="text-align: center">{{brevete.record}}</td>
         </tr>
         {%else%}
         <tr>
@@ -151,7 +147,7 @@
         </tr>
         {%else%}
         <tr>
-            <td style="text-align: center; column-width: 140px">Sin registro de Revisiones Tecnicas</td>
+            <td style="text-align: center; column-width: 140px">Sin registro de Revisiones Técnicas</td>
         </tr>
         {%endif%}
 
@@ -281,7 +277,7 @@
                 </table>
             </td>
             {%else%}
-            <td style="text-align: center; column-width: 140px;vertical-align: top;font-weight: bold;">Sin deudas
+            <td style="text-align: center; column-width: 140px;vertical-align: top;">Sin deudas
                 registradas.</td>
             {%endif%}
             {%endfor%}
@@ -411,111 +407,112 @@
         </tr>
         {%endif%}
     </table>
-</br>
-<table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
-    <tr>
-        <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
-            Papeletas Registradas en el MTC
-        </td>
-    </tr>
-    {%if papeletas%}
-    <tr>
-        <td style="text-align: right; column-width:140px">Entidad</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center; column-width:260px">
-            {{papeleta.entidad}}
-        </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td style="text-align: right;column-width:140px">Número</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center">
-            {{papeleta.numero}}
-        </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td style="text-align: right">Fecha</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center">
-            {{papeleta.fecha}}
-        </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td style="text-align: right">Fecha Firme</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center">
-            {{papeleta.fecha_firme}}
-        </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td style="text-align: right">Falta</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center">
-            {{papeleta.falta}}
-        </td>
-        {% endfor %}
-    </tr>
-    <tr>
-        <td style="text-align: right">Estado de Deuda</td>
-        {% for papeleta in papeletas %}
-        <td style="text-align: center">
-            {{papeleta.estado_deuda}}
-        </td>
-        {% endfor %}
-    </tr>
-    {%else%}
-    <tr>
-        <td colspan="4" style="text-align: center">Sin papeletas registradas.</td>
-    </tr>
-    {%endif%}
-</table>
-</br>
-<table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
-    <tr>
-        <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
-            Estado del RUC en SUNAT
-        </td>
-    </tr>
-    {%if sunats%}
-    <tr>
-        <td style="text-align: right; column-width: 140px">RUC</td>
-        <td style="text-align: center; column-width: 260px">{{sunats.ruc}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right">Tipo de Contribuyente</td>
-        <td style="text-align: center">{{sunats.tipo_contribuyente}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right">Nombre Comercial</td>
-        <td style="text-align: center">{{sunats.nombre_comercial}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right">Fecha de Inscripcción</td>
-        <td style="text-align: center">{{sunats.fecha_inscripcion}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right">Inicio de Actividades</td>
-        <td style="text-align: center">{{sunats.fecha_inicio_actividades}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right;font-weight: bold;">Estado</td>
-        <td style="text-align: center;font-weight: bold;">{{sunats.estado}}</td>
-    </tr>
-    <tr>
-        <td style="text-align: right">Condición</td>
-        <td style="text-align: center">{{sunats.condicion}}</td>
-    </tr>
-    {%else%}
-    <tr>
-        <td style="text-align: center; column-width: 140px">Sin registro en SUNAT</td>
-    </tr>
-    {%endif%}
-</table>
-<p style="font-size:x-small; color:#c5c9c9">
-    {{codigo_correo}}
-</p>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Papeletas Registradas en el MTC
+            </td>
+        </tr>
+        {%if papeletas%}
+        <tr>
+            <td style="text-align: right; column-width:140px">Entidad</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center; column-width:260px">
+                {{papeleta.entidad}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right;column-width:140px">Número</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.numero}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.fecha}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha Firme</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.fecha_firme}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Falta</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.falta}}
+            </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align: right">Estado de Deuda</td>
+            {% for papeleta in papeletas %}
+            <td style="text-align: center">
+                {{papeleta.estado_deuda}}
+            </td>
+            {% endfor %}
+        </tr>
+        {%else%}
+        <tr>
+            <td colspan="4" style="text-align: center">Sin papeletas registradas.</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
+        <tr>
+            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
+                Estado del RUC en SUNAT
+            </td>
+        </tr>
+        {%if sunats%}
+        <tr>
+            <td style="text-align: right; column-width: 140px">RUC</td>
+            <td style="text-align: center; column-width: 260px">{{sunats.ruc}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Tipo de Contribuyente</td>
+            <td style="text-align: center">{{sunats.tipo_contribuyente}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Nombre Comercial</td>
+            <td style="text-align: center">{{sunats.nombre_comercial}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Fecha de Inscripcción</td>
+            <td style="text-align: center">{{sunats.fecha_inscripcion}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Inicio de Actividades</td>
+            <td style="text-align: center">{{sunats.fecha_inicio_actividades}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;font-weight: bold;">Estado</td>
+            <td style="text-align: center;font-weight: bold;">{{sunats.estado}}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right">Condición</td>
+            <td style="text-align: center">{{sunats.condicion}}</td>
+        </tr>
+        {%else%}
+        <tr>
+            <td style="text-align: center; column-width: 140px">Sin registro en SUNAT</td>
+        </tr>
+        {%endif%}
+    </table>
+    </br>
+    <p style="font-size:x-small; color:#c5c9c9">
+        {{codigo_correo}}
+    </p>
 </body>

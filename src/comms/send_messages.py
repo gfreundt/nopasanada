@@ -1,19 +1,17 @@
 import os
-import uuid
 from bs4 import BeautifulSoup
 from src.utils import Email
-from pprint import pprint
-
-# TODO: create alerts to let members know that email has been sent
 
 
-def send(db_cursor, monitor):
+def send(db_cursor, dash, max=9999):
 
-    # take html information and craft email
+    email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
 
-    messages = []
+    k = 0
 
+    # take html information and create email
     html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
+
     for html_file in html_files:
         with open(os.path.join("outbound", html_file), "r", encoding="utf-8") as file:
             data = file.read()
@@ -33,58 +31,38 @@ def send(db_cursor, monitor):
                 if i.get("name") == "attachment"
             ]
         msg.update({"html_content": data})
-        messages.append(msg)
 
-    messages = [i for i in messages if i["idMember"] == "1"]
+        # TEST----
+        if msg["idMember"] == "1":
 
-    pprint(messages)
+            # only send up to max emails
+            if k < max:
 
-    # activate mail API and send all
-    email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
-    print(len(messages))
-    if len(messages) == 1:
-        response = email.send_email(messages)
-        print("Response:", response)
+                # activate mail API and send all
+                response = email.send_email(msg)
 
-    return
+                # register message sent in mensajes table (if email sent correctly)
+                if response:
+                    db_cursor.execute(
+                        f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
+                    )
 
-    # update mensaje and mensajeContenido tables depending on success reply from email attempt
-    for file_name, result, message in zip(html_files, results, messages):
-        if result:
-            monitor.log(
-                f"Email sent to {message['to']} (IdMember = {message['idMember']}). Type: {message['msgTypes']}",
-                type=4,
-            )
+                    # get IdMensaje for record
+                    db_cursor.execute(
+                        f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
+                    )
+                    _idmensaje = db_cursor.fetchone()[0]
 
-            # register message sent in mensajes table
-            db_cursor.execute(
-                f"INSERT INTO mensajes (IdMember_FK, Fecha, HashCode) VALUES ({message['idMember']},'{message['timestamp']}','{message['hashcode']}')"
-            )
+                    # register all message types included in message in mensajeContenidos table
+                    for msg_type in msg["msgTypes"]:
+                        db_cursor.execute(
+                            f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
+                        )
 
-            # get IdMensaje for record
-            db_cursor.execute(
-                f"SELECT * FROM mensajes WHERE HashCode = '{message['hashcode']}'"
-            )
-            _idmensaje = db_cursor.fetchone()[0]
+                    # erase message from outbound folder
+                    os.remove(os.path.join("outbound", html_file))
 
-            # register all message types included in message in mensajeContenidos table
-            for msg_type in message["msgTypes"]:
-                db_cursor.execute(
-                    f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
-                )
+                else:
+                    print(f"ERROR sending email to {msg['to']}.")
 
-            # craft alert informing email sent and place it in outbound folder
-            _msg_tail = "mensual" if "13" in message["msgTypes"] else "de bienvenida"
-            _path = os.path.join(
-                "..", "outbound", f"alert_{str(uuid.uuid4())[-6:]}.txt"
-            )
-            with open(_path, "w") as outfile:
-                outfile.write(
-                    f"Hola. Has recibido un mensaje del Sistema de Alertas Peru a tu correo {message['to']} con tu resumen {_msg_tail}."
-                )
-
-            # erase message from outbound folder
-            os.remove(os.path.join("..", "outbound", file_name))
-
-        else:
-            monitor.log(f"ERROR sending email to {message['to']}.")
+            k += 1

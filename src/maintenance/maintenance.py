@@ -3,8 +3,6 @@ import os
 
 def pre_maint(db_cursor):
 
-    return
-
     # erase all comms that might still be in outbound folder
     for file in os.listdir("outbound"):
         if "alert" in file or "message" in file:

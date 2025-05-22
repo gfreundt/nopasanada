@@ -13,10 +13,15 @@
 
 <body style="color: black; font-family: Arial, Helvetica, sans-serif">
     <p>Hola {{nombre_usuario}},</p>
-    <p>Este es tu correo mensual del Servicio de Alertas Perú. Placas registradas: <b>{{lista_placas}}</b>.</p>
-    <p><b style="color:blue">Desde hoy recibe mensualmente el estado de tu RUC en SUNAT. Revísalo al final del correo.</b></p>
-    <p style="color: black">En caso no quieras recibir más correos, responde a este correo con "ELIMINAR" en el asunto.</p>
-    <p>Gracias por confiar en nosotros.</p>
+    <p>Servicio de Alertas Perú se actualizó y hoy es <strong>No Pasa Nada PE.</strong></p> 
+    <p>Este es el primer boletín mensual con toda tu informacion actualizada.</p>
+    <p>Pronto recibirás otro correo con información para que puedas entrar a un portal privado y actualizar tus placas y tu información de contacto o eliminar tu suscripción.</p>
+    {% if lista_placas|length <= 6 %}
+    <p>Tu placa registada es: <b>{{lista_placas}}</b>.</p>
+    {% else %}
+    <p>Tus placas registradas son: <b>{{lista_placas}}</b>.</p>
+    {% endif %}
+    <p>Gracias por seguir confiando en nosotros.</p>
     <h2>Alertas</h2>
     <ul>
         {% for alerta in alertas %}
@@ -461,48 +466,6 @@
         {%else%}
         <tr>
             <td colspan="4" style="text-align: center">Sin papeletas registradas.</td>
-        </tr>
-        {%endif%}
-    </table>
-    </br>
-    <table style="color: white; background:#618685; max-width:100%; white-space:nowrap">
-        <tr>
-            <td colspan="4" style="color: white; font-weight: bold; background-color: #003b6d; text-align: center">
-                Estado del RUC en SUNAT
-            </td>
-        </tr>
-        {%if sunats%}
-        <tr>
-            <td style="text-align: right; column-width: 140px">RUC</td>
-            <td style="text-align: center; column-width: 260px">{{sunats.ruc}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right">Tipo de Contribuyente</td>
-            <td style="text-align: center">{{sunats.tipo_contribuyente}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right">Nombre Comercial</td>
-            <td style="text-align: center">{{sunats.nombre_comercial}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right">Fecha de Inscripcción</td>
-            <td style="text-align: center">{{sunats.fecha_inscripcion}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right">Inicio de Actividades</td>
-            <td style="text-align: center">{{sunats.fecha_inicio_actividades}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right;font-weight: bold;">Estado</td>
-            <td style="text-align: center;font-weight: bold;">{{sunats.estado}}</td>
-        </tr>
-        <tr>
-            <td style="text-align: right">Condición</td>
-            <td style="text-align: center">{{sunats.condicion}}</td>
-        </tr>
-        {%else%}
-        <tr>
-            <td style="text-align: center; column-width: 140px">Sin registro en SUNAT</td>
         </tr>
         {%endif%}
     </table>

@@ -42,7 +42,7 @@ def nopasanada(dash, db, cmds):
 
     # send all emails and alerts from outbound folder, clear outbound folder
     if "send" in cmds:
-        send_messages.send(db.cursor, dash)
+        send_messages.send(db.cursor, dash, max=7)
 
     # perform post-maintenance
     maintenance.post_maint(db.cursor)

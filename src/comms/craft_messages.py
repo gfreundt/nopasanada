@@ -45,7 +45,7 @@ def craft(db_cursor, dash):
                 db_cursor,
                 IdMember[0],
                 template=template_regular,
-                subject="Informe Mensual del Servicio de Alertas Perú",
+                subject="No Pasa Nada PE [antes Servicio de Alertas Perú]",
                 msg_type=13,
             )
         )

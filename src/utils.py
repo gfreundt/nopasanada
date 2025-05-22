@@ -283,6 +283,10 @@ class Email:
 
     def send_email(self, emails):
 
+        # if user sends single email, change format
+        if emails is not list:
+            emails = [emails]
+
         for email in emails:
             # create the email message
             msg = EmailMessage()
@@ -320,7 +324,7 @@ class Email:
                     server.login(self.from_account, self.password)
                     server.send_message(msg)
                     return True
-            except Exception as e:
+            except Exception:
                 return False
 
 
