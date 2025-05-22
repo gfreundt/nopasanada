@@ -98,7 +98,7 @@ def main():
 
     # set up scheduler: three updates (no messages/alerts) + one update (and messages/alerts)
     _update = "update-threads" if "THREAD" in sys.argv else "update"
-    schedule.every().day.at("19:00").do(
+    schedule.every().day.at("18:15").do(
         nopasanada, dash=dash, db=db, cmds=[_update, "comms"]
     ).tag("update")
 
