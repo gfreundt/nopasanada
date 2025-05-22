@@ -1,23 +1,27 @@
 import os
 import uuid
 from bs4 import BeautifulSoup
+from src.utils import Email
+from pprint import pprint
+
+# TODO: create alerts to let members know that email has been sent
 
 
 def send(db_cursor, monitor):
 
-    messages = []
-    # loop on all message html files in outbound folder
-    html_files = [
-        i for i in os.listdir(os.path.join("..", "outbound")) if "message" in i
-    ]
+    # take html information and craft email
 
+    messages = []
+
+    html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
     for html_file in html_files:
-        with open(
-            os.path.join("..", "outbound", html_file), "r", encoding="utf-8"
-        ) as file:
+        with open(os.path.join("outbound", html_file), "r", encoding="utf-8") as file:
             data = file.read()
             soup = BeautifulSoup(data, features="lxml")
+
+        # load all meta information into variable
         msg = {i.get("name"): i.get("content") for i in soup.find_all("meta")}
+
         # parse message types and convert to list
         msg["msgTypes"] = [i for i in msg["msgTypes"][1:-1].split(",")]
 
@@ -28,15 +32,21 @@ def send(db_cursor, monitor):
                 for i in soup.find_all("meta")
                 if i.get("name") == "attachment"
             ]
-        msg.update({"html_body": data})
+        msg.update({"html_content": data})
         messages.append(msg)
 
-    # activate mail API and send all
-    # email = EmailUtils(account="servicioalertasperu@outlook.com")
-    # results = email.send_from_outlook(emails=messages)
-    results = [True] * 20
+    messages = [i for i in messages if i["idMember"] == "1"]
 
-    # TODO: create alerts to let members know that email has been sent
+    pprint(messages)
+
+    # activate mail API and send all
+    email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
+    print(len(messages))
+    if len(messages) == 1:
+        response = email.send_email(messages)
+        print("Response:", response)
+
+    return
 
     # update mensaje and mensajeContenido tables depending on success reply from email attempt
     for file_name, result, message in zip(html_files, results, messages):

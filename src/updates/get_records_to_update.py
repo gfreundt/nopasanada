@@ -74,7 +74,7 @@ def get_records_soats(db_cursor, thresh, HLA):
 		                        WHERE LastUpdateSOAT >= datetime('now','localtime', '-{HLA} hours'))
             UNION
             SELECT IdPlaca_FK, Placa FROM _necesitan_alertas
-                WHERE TipoAlerta = "SOATS"
+                WHERE TipoAlerta = 'SOATS'
         """
     )
     return db_cursor.fetchall()

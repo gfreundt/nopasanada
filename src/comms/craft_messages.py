@@ -235,7 +235,7 @@ def compose_message(
             }
         )
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("..", "data", "images", _m[11]))
+        _img_path = os.path.abspath(os.path.join("data", "images", _m[11]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -266,7 +266,7 @@ def compose_message(
             }
         )
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("..", "data", "images", _m[14]))
+        _img_path = os.path.abspath(os.path.join("data", "images", _m[14]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -296,12 +296,15 @@ def compose_message(
 
     # add SUNARP image
     db_cursor.execute(
-        f"""SELECT * FROM sunarps WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member[0]}
-                AND IdMember_FK IN _newSunarpRequired) ORDER BY LastUpdate DESC"""
+        f"""    SELECT * FROM sunarps 
+                WHERE IdPlaca_FK IN
+                    (SELECT IdPlaca FROM placas
+                        WHERE IdMember_FK = {member[0]})
+                ORDER BY LastUpdate DESC"""
     )
     for _m in db_cursor.fetchall():
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("..", "data", "images", _m[15]))
+        _img_path = os.path.abspath(os.path.join("data", "images", _m[15]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -315,7 +318,7 @@ def compose_message(
     )
     for _m in db_cursor.fetchall():
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("..", "data", "images", _m[1]))
+        _img_path = os.path.abspath(os.path.join("data", "images", _m[1]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append("Récord del Conductor MTC.")
@@ -349,7 +352,7 @@ def compose_message(
     _subj = (
         f"{len(_txtal)} ALERTAS"
         if len(_txtal) > 1
-        else f"1 ALERTA" if len(_txtal) == 1 else "SIN ALERTAS"
+        else "1 ALERTA" if len(_txtal) == 1 else "SIN ALERTAS"
     )
 
     # meta data
@@ -360,7 +363,7 @@ def compose_message(
     _info.update({"idMember": int(member[0])})
     _info.update({"timestamp": dt.now().strftime("%Y-%m-%d %H:%M:%S")})
     _info.update({"hashcode": email_id})
-    _info.update({"attachment_paths": _attachments})
+    _info.update({"attachments": _attachments})
 
     return template.render(_info)
 

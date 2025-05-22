@@ -132,12 +132,12 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
             except KeyboardInterrupt:
                 quit()
 
-            except Exception:
-                retry_attempts += 1
-                dash.log(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+            #     )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")

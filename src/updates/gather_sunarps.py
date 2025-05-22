@@ -32,7 +32,7 @@ def gather(db_cursor, db_conn, dash, update_data):
                 dash.log(card=CARD, text=f"Procesando: {placa}")
 
                 # send request to scraper
-                response = scrape_sunarp.browser(placa=placa, ocr=ocr)
+                response = scrape_sunarp.browser(placa=placa)
 
                 # update dashboard with progress and last update timestamp
                 dash.log(

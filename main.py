@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import schedule
+import requests
 
 # local imports
 from src.nopasanada import nopasanada
@@ -55,6 +56,13 @@ def update_db_stats(dash, db):
     db.cursor.execute("SELECT COUNT( ) FROM placas")
     response.update({"placas": db.cursor.fetchone()[0]})
 
+    # get balance left in truecaptcha
+    url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
+    r = requests.get(url)
+    response.update(
+        {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
+    )
+
     # update dashboard
     dash.log(kpis=response)
 
@@ -77,22 +85,17 @@ def main():
     if "NOW" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms"])
 
+    if "SEND" in sys.argv:
+        nopasanada(dash, db, cmds=["send"])
+        return
+
     # set up scheduler: dashboard updates
     schedule.every().second.do(update_remaining_time, dash)
     schedule.every(15).minutes.do(update_db_stats, dash, db)
 
     # set up scheduler: three updates (no messages/alerts) + one update (and messages/alerts)
     _update = "update-threads" if "THREAD" in sys.argv else "update"
-    schedule.every().day.at("08:00").do(
-        nopasanada, dash=dash, db=db, cmds=[_update]
-    ).tag("update")
-    schedule.every().day.at("12:00").do(
-        nopasanada, dash=dash, db=db, cmds=[_update]
-    ).tag("update")
-    schedule.every().day.at("16:00").do(
-        nopasanada, dash=dash, db=db, cmds=[_update]
-    ).tag("update")
-    schedule.every().day.at("21:57").do(
+    schedule.every().day.at("19:00").do(
         nopasanada, dash=dash, db=db, cmds=[_update, "comms"]
     ).tag("update")
 

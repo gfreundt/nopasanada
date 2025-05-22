@@ -276,9 +276,9 @@ class VPNUtils:
 
 class Email:
 
-    def __init__(self, from_account):
+    def __init__(self, from_account, password):
         self.from_account = from_account
-        self.password = "5QJWEKi0trAL"  # os.getenv("ZOHO_PASSWORD")  # Fetch from environment variable
+        self.password = password
 
     def send_email(self, emails):
 
@@ -290,11 +290,13 @@ class Email:
             msg["Subject"] = email["subject"]
 
             # add plain text and HTML alternative
-            msg.set_content(email["plain_content"])
-            msg.add_alternative(email["html_content"], subtype="html")
+            if email.get("plain_content"):
+                msg.set_content(email["plain_content"])
+            if email.get("html_content"):
+                msg.add_alternative(email["html_content"], subtype="html")
 
             # process attachments
-            for file_path in email["attachment_paths"]:
+            for file_path in email["attachments"]:
                 if os.path.isfile(file_path):
                     mime_type, _ = mimetypes.guess_type(file_path)
                     mime_type = mime_type or "application/octet-stream"
@@ -316,9 +318,9 @@ class Email:
                     server.starttls()  # Secure the connection
                     server.login(self.from_account, self.password)
                     server.send_message(msg)
-                    print("Email sent successfully.")
+                    return True
             except Exception as e:
-                print(f"Failed to send email: {e}")
+                return False
 
 
 def log_action_in_db(db_cursor, table_name, idMember="", idPlaca=""):
@@ -390,3 +392,12 @@ def use_truecaptcha(img_path):
         }
         response = requests.post(url=url, json=data)
         return response.json()
+
+
+def base64_to_image(base64_string, output_path):
+    try:
+        image_data = base64.b64decode(base64_string)
+        with open(output_path, "wb") as file:
+            file.write(image_data)
+    except Exception as e:
+        print(f"An error occurred: {e}")

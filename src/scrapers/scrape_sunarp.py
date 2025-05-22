@@ -7,10 +7,10 @@ import os
 import numpy as np
 from statistics import mean
 
-from ..utils import ChromeUtils, use_truecaptcha
+from ..utils import ChromeUtils, use_truecaptcha, base64_to_image
 
 
-def browser(placa, ocr):
+def browser(placa):
     """returns:
     -1 = captcha ok, image did not load (retry)
      1 = captcha ok, placa does not exist
@@ -96,12 +96,16 @@ def browser(placa, ocr):
         # grab image and save in file, return succesful
         else:
 
-            # save image in file
-            _img_path = os.path.abspath(
-                os.path.join("data", "images", f"SUNARP_{placa}.png")
-            )
-            with open(_img_path, "wb") as file:
-                file.write(_card_image[0].screenshot_as_png)
+            base64_string = _card_image[0].get_attribute("src")[21:]
+            output_path = os.path.join("data", "images", f"SUNARP_{placa}.png")
+            base64_to_image(base64_string, output_path)
+
+            # # save image in file
+            # _img_path = os.path.abspath(
+            #     os.path.join("data", "images", f"SUNARP_{placa}.png")
+            # )
+            # with open(_img_path, "wb") as file:
+            #     file.write(_card_image[0].screenshot_as_png)
 
             # press boton to start over
             time.sleep(1)
