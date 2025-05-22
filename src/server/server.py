@@ -276,7 +276,7 @@ class UI:
             selection=session["selection"],
         )
 
-    # my account endpoint (NAVBAR)
+    # mi cuenta endpoint (NAVBAR)
     def mic(self):
 
         # user not logged in, got to login page
@@ -300,10 +300,10 @@ class UI:
                     f"DELETE FROM placas WHERE IdMember_FK = {session['user'][0]}"
                 )
                 self.db.cursor.execute(
-                    f"SELECT IdPlaca FROM placas ORDER BY IdPlaca DESC"
+                    "SELECT IdPlaca FROM placas ORDER BY IdPlaca DESC"
                 )
                 rec = int(self.db.cursor.fetchone()[0])
-                ph = "2020-01-01"  #
+                ph = "2020-01-01"  # default placeholder value for last scrape
                 for placa in (
                     form_response["placa1"],
                     form_response["placa2"],
@@ -315,8 +315,6 @@ class UI:
                             f"INSERT INTO placas VALUES ({rec}, {session['user'][0]}, '{placa}', '{ph}', '{ph}', '{ph}', '{ph}', '{ph}')"
                         )
                 rec += 1
-
-                # TODO: process updated communication options
 
                 self.db.conn.commit()
 
@@ -343,19 +341,30 @@ class UI:
         )
         comm = {
             "siguiente_mensaje": siguiente_mensaje,
-            "opt_in_mensajes": True,
-            "Soat": True,
-            "Brevete": True,
-            "RevTec": False,
-            "Dni": False,
-            "opt_in_alertas1": True,
-            "Sutran": False,
-            "Sat": True,
-            "Mtc": False,
-            "opt_in_alertas2": False,
         }
+
+        if not form_response:
+            user = session["user"]
+        else:
+            user = (
+                session["user"][0],
+                form_response["codigo"],
+                form_response["nombre"],
+                session["user"][3],
+                form_response["dni"],
+                form_response["celular"],
+                form_response["correo"],
+                session["user"][7],
+                session["user"][8],
+                session["user"][9],
+            )
+
         return render_template(
-            "mic.html", user=form_response, placas=placas, comm=comm, errors=errors
+            "mic.html",
+            user=user,
+            placas=placas,
+            comm=comm,
+            errors=errors,
         )
 
     # logout endpoint (NAVBAR)

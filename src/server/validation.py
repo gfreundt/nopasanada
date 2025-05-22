@@ -11,7 +11,7 @@ class FormValidate:
         self.cursor = db.cursor
 
         # load members
-        cmd = f"SELECT * FROM members"
+        cmd = "SELECT * FROM members"
         self.cursor.execute(cmd)
         self.user_db = self.cursor.fetchall()
         self.dnis = [i[4] for i in self.user_db]
@@ -139,23 +139,24 @@ class FormValidate:
             "placa1": [],
             "placa2": [],
             "placa3": [],
-            "correo": [],
-            "password1": [],
-            "password2": [],
+            "dni": [],
+            "nombre": [],
+            "celular": [],
         }
 
-        # placa
-        return errors
+        # nombre
+        if len(mic["nombre"]) < 6:
+            errors["nombre"].append("Nombre debe tener minimo 5 digitos")
 
-        # contraseña
-        # if not re.match(r"^(?=.*[A-Z])(?=.*\d).{6,20}$", rec["password1"]):
-        #     errors["password1"].append(
-        #         "Al menos 6 caracteres e incluir una mayuscula y un numero"
-        #     )
+        # dni
+        if not re.match(r"^[0-9]{8}$", mic["dni"]):
+            errors["dni"].append("DNI solamente debe tener 8 digitos")
+        if mic["dni"] in self.dnis:
+            errors["dni"].append("DNI ya esta registado")
 
-        # # validacion de constraseña
-        # if rec["password1"] != rec["password2"]:
-        #     errors["password2"].append("Contraseñas no coinciden")
+        # celular
+        if not re.match(r"^[0-9]{9}$", mic["celular"]):
+            errors["celular"].append("Ingrese un celular valido")
 
         return errors
 
