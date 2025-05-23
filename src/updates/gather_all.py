@@ -9,6 +9,7 @@ from src.updates import (
     gather_sunarps,
     gather_soats,
     gather_satmuls,
+    gather_sunats,
 )
 
 
@@ -27,10 +28,9 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
     # manual gathering
     gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
-    db_conn.commit()
 
     # in development
-    # gather_sunats.gather(db_cursor, monitor, all_updates["sunats"])
+    gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
 
     # commit all changes to database
     db_conn.commit()

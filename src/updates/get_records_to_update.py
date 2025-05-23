@@ -28,7 +28,7 @@ def get_records(db_cursor):
 
     # records that were last updated within fixed time threshold (in days)
     updates["sunarps"] = get_records_sunarps(db_cursor, thresh=180)
-    updates["sunats"] = get_records_sunats(db_cursor, thresh=90)
+    updates["sunats"] = get_records_sunats(db_cursor, HLA=HOURS_LAST_ATTEMPT)
 
     # return without any duplicates
     return {i: set(j) for i, j in updates.items()}
@@ -179,17 +179,19 @@ def get_records_sunarps(db_cursor, thresh):
     return db_cursor.fetchall()
 
 
-def get_records_sunats(db_cursor, thresh):
-    # condition to update: will get email and last updated within time threshold
+def get_records_sunats(db_cursor, HLA):
+    # condition to update: will get email and no attempt to update in last 48 hours
     db_cursor.execute(
-        f""" SELECT * FROM _necesitan_mensajes_placas
+        f"""SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
                 WHERE
-                    IdPlaca_FK
+                    IdMember_FK
                     NOT IN
-                    (SELECT IdPlaca_FK FROM sunats
-                        WHERE LastUpdate >= datetime('now','localtime', '-{thresh} days'))
+                    (SELECT IdMember_FK FROM membersLastUpdate
+            		    WHERE LastUpdateSUNAT >= datetime('now','localtime', '-{HLA} hours'))
+                    AND DocTipo = 'DNI'
         """
     )
+
     return db_cursor.fetchall()
 
 

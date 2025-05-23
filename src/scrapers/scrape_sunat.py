@@ -8,7 +8,7 @@ from ..utils import ChromeUtils
 
 def browser(doc_tipo, doc_num):
 
-    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
     webdriver.get(
         "https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
     )

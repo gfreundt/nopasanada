@@ -7,7 +7,15 @@ def gather(db_cursor, dash, update_data):
 
     CARD = 8
 
-    monitor.log(card=CARD, title="Consulta RUC de SUNAT...", status=1)
+    # log first action
+    dash.log(
+        card=CARD,
+        title=f"Sunat [{len(update_data)}]",
+        status=1,
+        progress=0,
+        text="Inicializando",
+        lastUpdate="Actualizado:",
+    )
 
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data, start=1):
@@ -16,14 +24,19 @@ def gather(db_cursor, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                monitor.log(
-                    card=CARD,
-                    msg=f"[{counter}/{len(update_data)}] SUNAT: {doc_tipo}-{doc_num}",
-                    type=1,
-                )
+                dash.log(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
                 sunat_response = scrape_sunat.browser(doc_tipo, doc_num)
+
+                _now = dt.now().strftime("%Y-%m-%d")
+
+                # update dashboard with progress and last update timestamp
+                dash.log(
+                    card=CARD,
+                    progress=int((counter / len(update_data)) * 100),
+                    lastUpdate=dt.now(),
+                )
 
                 if not sunat_response:
                     break
@@ -32,17 +45,18 @@ def gather(db_cursor, dash, update_data):
                 new_record_dates_fixed = date_to_db_format(data=sunat_response)
 
                 # add foreign key and current date to scraper response
-                _values = (
-                    [id_member]
-                    + new_record_dates_fixed
-                    + [dt.now().strftime("%Y-%m-%d")]
-                )
+                _values = [id_member] + new_record_dates_fixed + [_now]
 
                 # delete all old records from member
                 db_cursor.execute(f"DELETE FROM sunats WHERE IdMember_FK = {id_member}")
 
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
+
+                # update placas table with last update information
+                db_cursor.execute(
+                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE Placa = '{doc_num}'"
+                )
                 dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
                 # register action and skip to next record
@@ -52,20 +66,19 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
-                retry_attempts += 1
-                monitor.log(
-                    card=CARD,
-                    msg=f"< SUNAT > Retrying {doc_tipo}-{doc_num}.",
-                    error=True,
-                    type=1,
-                )
+            # except:
+            #    retry_attempts += 1
+            #    dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
+            #     )
 
-        else:
-            # if code gets here, means scraping has encountred three consecutive errors, skip record
-            monitor.log(
-                card=CARD,
-                msg=f"< SUNAT > Could not process {doc_tipo}-{doc_num}. Skipping Record.",
-                error=True,
-                type=1,
-            )
+    # log last action
+    dash.log(
+        card=CARD,
+        title="Sunarp",
+        progress=100,
+        status=3,
+        text="Inactivo",
+        lastUpdate=dt.now(),
+    )
