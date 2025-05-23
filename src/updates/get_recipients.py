@@ -12,14 +12,14 @@ def need_message(db_cursor):
                 SELECT IdMember, DocTipo, DocNum, "R" from members 
                 WHERE IdMember NOT IN (
                     SELECT IdMember_FK FROM mensajes 
-                        WHERE FechaEnvio >= datetime('now','localtime', '-1 month')
-                        AND (IdTipoMensaje_FK = 12 OR IdTipoMensaje_FK = 13));
+                        WHERE FechaEnvio >= datetime('now','localtime', '-1 month'));
                         
-            -- Cambiar flag de mensaje de regular a bienvenida si nunca antes han recibido mensajes		
+            -- Cambiar flag de mensaje de regular a bienvenida si nunca antes han recibido mensajes
             UPDATE _necesitan_mensajes_usuarios SET Tipo = "B"
-                WHERE IdMember_FK NOT IN (
+                WHERE IdMember_FK in (
                     SELECT IdMember_FK FROM mensajes
-                    WHERE (IdTipoMensaje_FK = 12 OR IdTipoMensaje_FK = 13));
+                        GROUP BY IdMember_FK
+                        HAVING count(*) = 1);		
                         
             -- Crear tabla temporal secundaria que lista las placas de usarios que necesitan mensajes
             DROP TABLE IF EXISTS _necesitan_mensajes_placas;
