@@ -29,7 +29,11 @@ def gather(db_cursor, dash, update_data):
                 # send request to scraper
                 sunat_response = scrape_sunat.browser(doc_tipo, doc_num)
 
+                # update memberLastUpdate table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")
+                db_cursor.execute(
+                    f"UPDATE membersLastUpdate SET LastUpdateSunat = '{_now}' WHERE IdMember_FK = {id_member}"
+                )
 
                 # update dashboard with progress and last update timestamp
                 dash.log(
@@ -53,10 +57,6 @@ def gather(db_cursor, dash, update_data):
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
 
-                # update placas table with last update information
-                db_cursor.execute(
-                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE Placa = '{doc_num}'"
-                )
                 dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
                 # register action and skip to next record

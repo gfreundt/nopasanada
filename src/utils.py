@@ -205,9 +205,12 @@ class PDFUtils:
             return img
 
     def image_to_pdf(self, image_bytes, to_path):
-
-        with open(to_path, "wb") as file:
-            file.write(img2pdf.convert(image_bytes.filename))
+        try:
+            with open(to_path, "wb") as file:
+                file.write(img2pdf.convert(image_bytes.filename))
+            return True
+        except Exception:
+            return False
 
 
 class SpeechUtils:

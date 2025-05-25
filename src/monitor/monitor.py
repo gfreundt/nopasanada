@@ -33,7 +33,7 @@ class Dashboard:
         if "action" in kwargs:
             _ft = f"<b>{dt.now():%Y-%m-%d %H:%M:%S} ></b>{kwargs["action"]}"
             self.data["bottom_right"].append(_ft)
-            if len(self.data["bottom_right"]) > 30:
+            if len(self.data["bottom_right"]) > 15:
                 self.data["bottom_right"].pop(0)
         if "card" in kwargs:
             for field in kwargs:

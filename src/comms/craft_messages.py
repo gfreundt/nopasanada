@@ -206,10 +206,10 @@ def compose_message(
         for _x in db_cursor.fetchall():
             _s.append(
                 {
-                    "ano": _x[2],
-                    "periodo": _x[3],
-                    "doc_num": _x[4],
-                    "total_a_pagar": _x[5],
+                    "ano": _x[1],
+                    "periodo": _x[2],
+                    "doc_num": _x[3],
+                    "total_a_pagar": _x[4],
                 }
             )
         _v.append({"codigo": satimp[2], "deudas": _s})

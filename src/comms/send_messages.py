@@ -32,37 +32,36 @@ def send(db_cursor, dash, max=9999):
             ]
         msg.update({"html_content": data})
 
-        # TEST----
-        if msg["idMember"] == "1":
+        # only send up to max emails
+        if k < max:
 
-            # only send up to max emails
-            if k < max:
+            # activate mail API and send all
+            response = email.send_email(msg)
 
-                # activate mail API and send all
-                response = email.send_email(msg)
+            # register message sent in mensajes table (if email sent correctly)
+            if response:
+                db_cursor.execute(
+                    f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
+                )
 
-                # register message sent in mensajes table (if email sent correctly)
-                if response:
+                # get IdMensaje for record
+                db_cursor.execute(
+                    f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
+                )
+                _idmensaje = db_cursor.fetchone()[0]
+
+                # register all message types included in message in mensajeContenidos table
+                for msg_type in msg["msgTypes"]:
                     db_cursor.execute(
-                        f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
+                        f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
                     )
 
-                    # get IdMensaje for record
-                    db_cursor.execute(
-                        f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
-                    )
-                    _idmensaje = db_cursor.fetchone()[0]
+                # erase message from outbound folder
+                os.remove(os.path.join("outbound", html_file))
 
-                    # register all message types included in message in mensajeContenidos table
-                    for msg_type in msg["msgTypes"]:
-                        db_cursor.execute(
-                            f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
-                        )
+                print(f"OK sending email to {msg['to']}.")
 
-                    # erase message from outbound folder
-                    os.remove(os.path.join("outbound", html_file))
+            else:
+                print(f"ERROR sending email to {msg['to']}.")
 
-                else:
-                    print(f"ERROR sending email to {msg['to']}.")
-
-            k += 1
+        k += 1
