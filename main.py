@@ -16,6 +16,12 @@ from src.monitor import monitor
 logging.getLogger("werkzeug").disabled = True
 
 
+class Environment:
+
+    def __init__(self):
+        self.email_password = os.environ("ZOHO-1-PWD")
+
+
 class Database:
 
     def __init__(self, dev):
@@ -71,6 +77,9 @@ def update_db_stats(dash, db):
 
 
 def main():
+
+    # start environment information
+    # env = Environment()
 
     # connect to database
     db = Database(dev=False)

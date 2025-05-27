@@ -13,13 +13,14 @@ def post_maint(db_cursor):
     # extract text data from soat images
 
     # review: duplicate placas
-    cmd = """     DELETE FROM '$review';
+    cmd = """   DELETE FROM '$review';
                     INSERT INTO '$review' 
                         SELECT NULL, Placa, "Placa Duplicada", NULL FROM placas GROUP BY Placa HAVING COUNT(*) > 1;
-            """
-    db_cursor.execute(cmd)
+          """
+    db_cursor.executescript(cmd)
 
     # review: placas with no associated member
-    cmd = """   INSERT INTO '$review' SELECT NULL, Placa, "Placa sin Usuario", NULL FROM placas
-                WHERE IdMember_FK NOT IN (SELECT IdMember FROM members)"""
-    db_cursor.execute(cmd)
+    cmd = """ INSERT INTO '$review' SELECT NULL, Placa, "Placa sin Usuario", NULL FROM placas
+                    WHERE IdMember_FK NOT IN (SELECT IdMember FROM members)
+            """
+    db_cursor.executescript(cmd)

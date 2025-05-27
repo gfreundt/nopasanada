@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from src.utils import Email
 
 
-def send(db_cursor, dash, max=9999):
+def send(db, dash, max=9999):
 
     email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
 
@@ -40,19 +40,19 @@ def send(db_cursor, dash, max=9999):
 
             # register message sent in mensajes table (if email sent correctly)
             if response:
-                db_cursor.execute(
+                db.cursor.execute(
                     f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
                 )
 
                 # get IdMensaje for record
-                db_cursor.execute(
+                db.cursor.execute(
                     f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
                 )
-                _idmensaje = db_cursor.fetchone()[0]
+                _idmensaje = db.cursor.fetchone()[0]
 
                 # register all message types included in message in mensajeContenidos table
                 for msg_type in msg["msgTypes"]:
-                    db_cursor.execute(
+                    db.cursor.execute(
                         f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
                     )
 
@@ -65,3 +65,5 @@ def send(db_cursor, dash, max=9999):
                 print(f"ERROR sending email to {msg['to']}.")
 
         k += 1
+
+    db.conn.commit()
