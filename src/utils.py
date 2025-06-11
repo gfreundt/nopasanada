@@ -304,21 +304,22 @@ class Email:
                 msg.add_alternative(email["html_content"], subtype="html")
 
             # process attachments
-            for file_path in email["attachments"]:
-                if os.path.isfile(file_path):
-                    mime_type, _ = mimetypes.guess_type(file_path)
-                    mime_type = mime_type or "application/octet-stream"
-                    maintype, subtype = mime_type.split("/", 1)
+            if email.get("attachments"):
+                for file_path in email["attachments"]:
+                    if os.path.isfile(file_path):
+                        mime_type, _ = mimetypes.guess_type(file_path)
+                        mime_type = mime_type or "application/octet-stream"
+                        maintype, subtype = mime_type.split("/", 1)
 
-                    with open(file_path, "rb") as f:
-                        file_data = f.read()
-                        filename = os.path.basename(file_path)
-                        msg.add_attachment(
-                            file_data,
-                            maintype=maintype,
-                            subtype=subtype,
-                            filename=filename,
-                        )
+                        with open(file_path, "rb") as f:
+                            file_data = f.read()
+                            filename = os.path.basename(file_path)
+                            msg.add_attachment(
+                                file_data,
+                                maintype=maintype,
+                                subtype=subtype,
+                                filename=filename,
+                            )
 
             # send the email via Zoho's SMTP server
             try:

@@ -10,7 +10,7 @@ def send(db, dash, max=9999):
     k = 0
 
     # take html information and create email
-    html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
+    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
 
     for html_file in html_files:
         with open(os.path.join("outbound", html_file), "r", encoding="utf-8") as file:

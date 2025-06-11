@@ -85,9 +85,9 @@ def compose_message(
     if tipo_alerta == "BREVETE":
         _t = "Licencia de Conducir"
     elif tipo_alerta == "REVTEC":
-        _t = f"Revisión Técnica"
+        _t = "Revisión Técnica"
     elif tipo_alerta == "SOAT":
-        _t = f"SOAT"
+        _t = "SOAT"
     elif tipo_alerta == "SATIMP":
         _t = "Impuesto Vehicular SAT Lima"
 
