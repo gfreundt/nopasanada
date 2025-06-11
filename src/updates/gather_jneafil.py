@@ -1,16 +1,16 @@
 from datetime import datetime as dt
 from ..utils import date_to_db_format, log_action_in_db
-from src.scrapers import scrape_sunat
+from src.scrapers import scrape_jneafil
 
 
 def gather(db_cursor, dash, update_data):
 
-    CARD = 8
+    CARD = 9
 
     # log first action
     dash.log(
         card=CARD,
-        title=f"Sunat [{len(update_data)}]",
+        title=f"JNE Afiliacion [{len(update_data)}]",
         status=1,
         progress=0,
         text="Inicializando",

@@ -1,10 +1,5 @@
 def get_records(db_cursor):
 
-    # # create dictionary with all tables as keys and empty list as value
-    # db_cursor.execute("SELECT * FROM '@tableInfo'")
-    # _data = db_cursor.fetchall()
-    # all_updates = {i[1]: [] for i in _data}
-
     # get records that require updating
 
     HOURS_LAST_ATTEMPT = 120
@@ -27,7 +22,9 @@ def get_records(db_cursor):
     updates["recvehic"] = get_records_recvehic(db_cursor, HLA=HOURS_LAST_ATTEMPT)
 
     # records that were last updated within fixed time threshold (in days)
-    updates["sunarps"] = get_records_sunarps(db_cursor, thresh=180)
+    updates["sunarps"] = get_records_sunarps(
+        db_cursor, thresh=180, HLA=HOURS_LAST_ATTEMPT
+    )
     updates["sunats"] = get_records_sunats(db_cursor, HLA=HOURS_LAST_ATTEMPT)
 
     # return without any duplicates
@@ -165,7 +162,7 @@ def get_records_recvehic(db_cursor, HLA):
     return db_cursor.fetchall()
 
 
-def get_records_sunarps(db_cursor, thresh):
+def get_records_sunarps(db_cursor, thresh, HLA):
     # condition to update: will get email and last updated within time threshold
     db_cursor.execute(
         f""" SELECT * FROM _necesitan_mensajes_placas

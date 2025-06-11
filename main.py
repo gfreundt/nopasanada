@@ -1,11 +1,10 @@
-from datetime import datetime as dt
 import time
 import sqlite3
 import os
 import sys
 import logging
 import schedule
-import requests
+import atexit
 
 # local imports
 from src.nopasanada import nopasanada
@@ -46,37 +45,16 @@ class Database:
         self.users = self.cursor.fetchall()
 
 
-def update_remaining_time(dash):
-    delta = schedule.next_run("update") - dt.now()
-    hours, remainder = divmod(int(delta.total_seconds()), 3600)
-    minutes, seconds = divmod(remainder, 60)
-    dash.log(general_status=(f"- {hours:02} : {minutes:02} : {seconds:02}", 1))
-
-
-def update_db_stats(dash, db):
-    # get number of users
-    db.cursor.execute("SELECT COUNT( ) FROM members")
-    response = {"users": db.cursor.fetchone()[0]}
-
-    # get number of placas
-    db.cursor.execute("SELECT COUNT( ) FROM placas")
-    response.update({"placas": db.cursor.fetchone()[0]})
-
-    # get balance left in truecaptcha
-    try:
-        url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
-        r = requests.get(url)
-        response.update(
-            {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
-        )
-    except ConnectionError:
-        response.update({"truecaptcha_balance": "N/A"})
-
-    # update dashboard
-    dash.log(kpis=response)
+def run_at_exit(dash, db):
+    # ensure dashboard shows disconnected when code ends
+    dash.log(general_status=("Disconnnected", 3))
+    # close db connection
+    db.conn.close()
 
 
 def main():
+
+    atexit.register(run_at_exit)
 
     # start environment information
     # env = Environment()
@@ -102,8 +80,8 @@ def main():
         return
 
     # set up scheduler: dashboard updates
-    schedule.every().second.do(update_remaining_time, dash)
-    schedule.every(15).minutes.do(update_db_stats, dash, db)
+    schedule.every().second.do(dash.update_remaining_time, dash)
+    schedule.every(15).minutes.do(dash.update_db_stats, dash, db)
 
     # set up scheduler: three updates (no messages/alerts) + one update (and messages/alerts)
     _update = "update-threads" if "THREAD" in sys.argv else "update"
@@ -112,7 +90,7 @@ def main():
     ).tag("update")
 
     # run stats update for dashboard before scheduling begins
-    update_db_stats(dash, db)
+    dash.update_db_stats(dash, db)
 
     while True:
         schedule.run_pending()

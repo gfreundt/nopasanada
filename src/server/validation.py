@@ -20,16 +20,20 @@ class FormValidate:
 
     def log(self, form_data, db):
 
-        # TODO: replace with SQL request
+        # check if correo exists
+        cmd = f"SELECT * FROM members WHERE Correo = '{form_data["correo"]}'"
+        self.cursor.execute(cmd)
+        if not self.cursor.fetchone():
+            return {"correo": ["Correo no registrado"]}
 
-        for user in db.users:
-            if user[6] == form_data["correo"]:
-                if user[11] == form_data["password"]:
-                    return False
-                else:
-                    return {"password": ["Contraseña equivocada"]}
+        # check if password correct for that correo
+        cmd += f" AND Password = '{form_data["password"]}"
+        self.cursor.execute(cmd)
+        if not self.cursor.fetchone():
+            return {"password": ["Contraseña equivocada"]}
 
-        return {"correo": ["Correo no registrado"]}
+        # correo/password combo correct
+        return False
 
     def reg(self, reg, page, codigo=None):
 

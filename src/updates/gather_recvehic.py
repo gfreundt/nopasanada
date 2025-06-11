@@ -12,7 +12,7 @@ def gather(db_cursor, db_conn, dash, update_data):
     # log first action
     dash.log(
         card=CARD,
-        title=f"Record del Conductor [{len(update_data)}]",
+        title=f"Record Conductor [{len(update_data)}]",
         status=1,
         progress=0,
         text="Inicializando",
