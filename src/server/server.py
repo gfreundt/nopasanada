@@ -11,6 +11,7 @@ from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
 from ..utils import revisar_symlinks
 
+
 # TODO: fix last two to show correct format
 # TODO: add soat image
 # TODO: add vencimiento DNI

@@ -1,18 +1,40 @@
 import os
 from bs4 import BeautifulSoup
 from src.utils import Email
+from datetime import datetime as dt
 
 
 def send(db, dash, max=9999):
 
+    CARD = 9
+
+    # select all the emails in outbound folder
+    html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
+
+    # log first action
+    dash.log(
+        card=CARD,
+        title=f"Brevete [{min(max, len(html_files))}]",
+        status=1,
+        progress=0,
+        text="Inicializando",
+        lastUpdate="Actualizado:",
+    )
+
+    # activate send account
     email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
 
-    k = 0
+    counter = 0
+    # iterate on all html files in outbound folder
+    for counter, html_file in enumerate(html_files):
 
     # take html information and create email
     html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
+        # exit loop if reached max emails
+        if counter >= max:
+            break
 
-    for html_file in html_files:
+        # open files and find all relevant elements
         with open(os.path.join("outbound", html_file), "r", encoding="utf-8") as file:
             data = file.read()
             soup = BeautifulSoup(data, features="lxml")
@@ -32,38 +54,43 @@ def send(db, dash, max=9999):
             ]
         msg.update({"html_content": data})
 
-        # only send up to max emails
-        if k < max:
+        # log action
+        dash.log(card=CARD, text=f"Enviando: {msg["to"]}")
 
-            # activate mail API and send all
-            response = email.send_email(msg)
+        # activate mail API and send all
+        response = email.send_email(msg)
 
-            # register message sent in mensajes table (if email sent correctly)
-            if response:
+        # update dashboard with progress and last update timestamp
+        dash.log(
+            card=CARD,
+            progress=int((counter / len(counter)) * 100),
+            lastUpdate=dt.now(),
+        )
+
+        # register message sent in mensajes table (if email sent correctly)
+        if response:
+            db.cursor.execute(
+                f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
+            )
+
+            # get IdMensaje for record
+            db.cursor.execute(
+                f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
+            )
+            _idmensaje = db.cursor.fetchone()[0]
+
+            # register all message types included in message in mensajeContenidos table
+            for msg_type in msg["msgTypes"]:
                 db.cursor.execute(
-                    f"INSERT INTO mensajes (IdMember_FK, FechaEnvio, HashCode) VALUES ({msg['idMember']},'{msg['timestamp']}','{msg['hashcode']}')"
+                    f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
                 )
 
-                # get IdMensaje for record
-                db.cursor.execute(
-                    f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
-                )
-                _idmensaje = db.cursor.fetchone()[0]
+            # erase message from outbound folder
+            os.remove(os.path.join("outbound", html_file))
 
-                # register all message types included in message in mensajeContenidos table
-                for msg_type in msg["msgTypes"]:
-                    db.cursor.execute(
-                        f"INSERT INTO mensajeContenidos VALUES ({_idmensaje}, {msg_type})"
-                    )
+            dash.log(action=f"[ SEND ] {"|".join([str(i) for i in _values])}")
 
-                # erase message from outbound folder
-                os.remove(os.path.join("outbound", html_file))
-
-                print(f"OK sending email to {msg['to']}.")
-
-            else:
-                print(f"ERROR sending email to {msg['to']}.")
-
-        k += 1
+        else:
+            print(f"ERROR sending email to {msg['to']}.")
 
     db.conn.commit()

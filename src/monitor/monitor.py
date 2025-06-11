@@ -4,6 +4,8 @@ from copy import deepcopy as copy
 from pprint import pprint
 import os
 from datetime import datetime as dt
+import requests
+import schedule
 
 
 class Dashboard:
@@ -67,6 +69,34 @@ class Dashboard:
 
     def dashboard(self):
         return render_template("dashboard.html", data=self.data)
+
+    def update_remaining_time(self):
+        delta = schedule.next_run("update") - dt.now()
+        hours, remainder = divmod(int(delta.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        self.log(general_status=(f"- {hours:02} : {minutes:02} : {seconds:02}", 1))
+
+    def update_db_stats(self, db):
+        # get number of users
+        db.cursor.execute("SELECT COUNT( ) FROM members")
+        response = {"users": db.cursor.fetchone()[0]}
+
+        # get number of placas
+        db.cursor.execute("SELECT COUNT( ) FROM placas")
+        response.update({"placas": db.cursor.fetchone()[0]})
+
+        # get balance left in truecaptcha
+        try:
+            url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
+            r = requests.get(url)
+            response.update(
+                {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
+            )
+        except ConnectionError:
+            response.update({"truecaptcha_balance": "N/A"})
+
+        # update dashboard
+        self.log(kpis=response)
 
     def get_data(self):
         with self.data_lock:

@@ -50,6 +50,10 @@
             background-color: #ffc107 !important;  /* Warning yellow */
             color: black;
         }
+        .general-3 {
+            background-color: #fdecea !important;  /* Alert red */
+            color: black;
+        }
         table, th, td {
       border: 1px solid black;
       border-collapse: collapse;
@@ -182,7 +186,7 @@
 
                 const topRightEl = document.getElementById('top-right');
                 topRightEl.textContent = data.top_right.content;
-                topRightEl.classList.remove('general-0', 'general-1','general-2');
+                topRightEl.classList.remove('general-0', 'general-1','general-2','general-3');
                 topRightEl.classList.add(`general-${data.top_right.status}`);
 
                 document.getElementById('top-left').textContent = data.top_left;

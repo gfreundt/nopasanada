@@ -10,6 +10,8 @@ from src.updates import (
     gather_soats,
     gather_satmuls,
     gather_sunats,
+    gather_jneafil,
+    gather_jnemulta,
 )
 
 
@@ -31,6 +33,8 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
     # in development
     gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
+    gather_jnemulta.gather(db_cursor, dash, all_updates["sunats"])
+    gather_jneafil.gather(db_cursor, dash, all_updates["sunats"])
 
     # commit all changes to database
     db_conn.commit()
