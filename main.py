@@ -47,14 +47,13 @@ class Database:
 
 def run_at_exit(dash, db):
     # ensure dashboard shows disconnected when code ends
-    dash.log(general_status=("Disconnnected", 3))
+    dash.log(general_status=("Desconectado", 3))
+    time.sleep(3)
     # close db connection
     db.conn.close()
 
 
 def main():
-
-    atexit.register(run_at_exit)
 
     # start environment information
     # env = Environment()
@@ -66,6 +65,9 @@ def main():
     dash = monitor.Dashboard(db)
     if "NOMON" not in sys.argv:
         dash.run_in_background()
+
+    # code to run after exiting program
+    atexit.register(run_at_exit, dash, db)
 
     # run user UI in background (port 5000)
     ui = server.UI(db=db, dash=dash)
@@ -100,3 +102,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    time.sleep(1800)

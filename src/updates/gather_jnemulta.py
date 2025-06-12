@@ -27,7 +27,7 @@ def gather(db_cursor, dash, update_data):
                 dash.log(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
-                sunat_response = scrape_sunat.browser(doc_tipo, doc_num)
+                sunat_response = scrape_jnemulta.browser(doc_tipo, doc_num)
 
                 # update memberLastUpdate table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")
@@ -76,7 +76,7 @@ def gather(db_cursor, dash, update_data):
     # log last action
     dash.log(
         card=CARD,
-        title="Sunat",
+        title="JNE Multas",
         progress=100,
         status=3,
         text="Inactivo",

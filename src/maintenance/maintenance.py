@@ -24,3 +24,5 @@ def post_maint(db_cursor):
                     WHERE IdMember_FK NOT IN (SELECT IdMember FROM members)
             """
     db_cursor.executescript(cmd)
+
+    # TODO: eliminate all placas with IdMember_FK = 0 and LastUpdates old

@@ -1,16 +1,22 @@
 {% extends "base_page.html" %}
 
 {% block title %}
-Fin de Registro
+    Fin de Registro
 {% endblock %}
 
+
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">Su usuario ha sido creado con exito.</h2>
-        <button type="submit" class="btn btn-primary" onclick="document.location='/'">Volver</button>
+    <div class="container mt-5 text-center">
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Tu usuario ha sido creado con éxito. </h4>           
+            <p>Recibirás un correo de bienvenida dentro de las próximas 24 horas con toda tu información actualizada.</p>
+            <p><b>No olvides ingresar tus placas en la siguiente pantalla.</b></p>
+        </div>
+        <a href="/mic" class="btn btn-primary mt-3">
+            Ingresar Placas
+        </a>
     </div>
+{% endblock %}
 
-    
 
-{% endblock content %}
-
+ 

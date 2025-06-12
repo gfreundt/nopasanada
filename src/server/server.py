@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 from random import randrange
 from string import ascii_uppercase
 from datetime import datetime as dt
@@ -142,7 +142,7 @@ class UI:
 
                 # define all values to be included in database
                 nom = session["registration_attempt"]["nombre"]
-                cod = "SAP-" + str(uuid.uuid4())[-6:].upper()
+                cod = "NPN-" + str(uuid.uuid4())[-6:].upper()
                 dni = session["registration_attempt"]["dni"]
                 cel = session["registration_attempt"]["celular"]
                 cor = session["registration_attempt"]["correo"]
@@ -151,7 +151,7 @@ class UI:
 
                 # get last record of table
                 self.db.cursor.execute(
-                    f"SELECT IdMember FROM members ORDER BY IdMember DESC"
+                    "SELECT IdMember FROM members ORDER BY IdMember DESC"
                 )
                 rec = int(self.db.cursor.fetchone()[0]) + 1
                 ph = "2020-01-01"
@@ -169,10 +169,9 @@ class UI:
                 session.clear()
                 self.db.load_members()
 
-                # log in recently created user and
-
+                # log in recently created user and success message
                 session["user"] = self.users.get_header(correo=cor)
-                return redirect("mic")
+                return render_template("reg-3.html")
 
         # render form for user to fill (first time or returned with errors)
         if "password1" in form_response:
@@ -284,6 +283,12 @@ class UI:
         if "user" not in session:
             return redirect("log")
 
+        # extract user placas
+        self.db.cursor.execute(
+            f"SELECT * FROM placas WHERE IdMember_FK = {session['user'][0]}"
+        )
+        placas = [i[2] for i in self.db.cursor.fetchall()]
+
         # empty data for first time
         form_response = {}
         errors = {}
@@ -291,41 +296,86 @@ class UI:
         # validating form response
         if request.method == "POST":
             form_response = dict(request.form)
-            errors = self.validacion.mic(form_response)
 
-            # no errors
+            # remove account
+            if "eliminar" in form_response:
+
+                # TODO: confirmation
+
+                cmd = f"""  DELETE FROM members WHERE IdMember = {session['user'][0]};
+                            DELETE FROM placas WHERE IdMember_FK = {session['user'][0]}"""
+
+                self.db.cursor.executescript(cmd)
+
+                return redirect("logout")
+
+            # update account
+            errors = self.validacion.mic(form_response)
+            changes_made = self.validacion.mic_changes(
+                user=session["user"], placas=placas, post=form_response
+            )
+
+            # no errors and changes made to any field
             if not any(errors.values()):
 
-                # process updated placas
-                self.db.cursor.execute(
-                    f"DELETE FROM placas WHERE IdMember_FK = {session['user'][0]}"
-                )
-                self.db.cursor.execute(
-                    "SELECT IdPlaca FROM placas ORDER BY IdPlaca DESC"
-                )
-                rec = int(self.db.cursor.fetchone()[0])
-                ph = "2020-01-01"  # default placeholder value for last scrape
-                for placa in (
-                    form_response["placa1"],
-                    form_response["placa2"],
-                    form_response["placa3"],
-                ):
-                    if placa:
-                        rec += 1
-                        self.db.cursor.execute(
-                            f"INSERT INTO placas VALUES ({rec}, {session['user'][0]}, '{placa}', '{ph}', '{ph}', '{ph}', '{ph}', '{ph}')"
+                if not changes_made:
+                    # no processing
+                    flash("No se realizaron cambios", "warning")
+
+                else:
+
+                    # update member information
+                    self.db.cursor.execute(
+                        f"""    UPDATE members SET NombreCompleto = '{form_response["nombre"]}',
+                                DocNum = '{form_response["dni"]}', Celular = '{form_response["celular"]}'
+                                WHERE IdMember = {session['user'][0]}"""
+                    )
+
+                    _ph = "2020-01-01"  # default placeholder value for date of last scrape
+
+                    # erase foreign key linking placa to member
+                    self.db.cursor.execute(
+                        f"UPDATE placas SET IdMember_FK = 0 WHERE IdMember_FK = {session['user'][0]}"
+                    )
+
+                    _vps = [
+                        i
+                        for i in (
+                            form_response["placa1"],
+                            form_response["placa2"],
+                            form_response["placa3"],
                         )
-                rec += 1
+                        if i
+                    ]
 
-                self.db.conn.commit()
+                    # loop all non-empty placas and link foreign key to member if placa exists or create new placa record
+                    for placa in _vps:
 
-                return render_template("mic-2.html")
+                        self.db.cursor.execute(
+                            f"SELECT * FROM placas WHERE Placa = '{placa}'"
+                        )
+                        if len(self.db.cursor.fetchall()) > 0:
+                            # placa already exists in the database, assign foreign key to member
+                            self.db.cursor.execute(
+                                f"UPDATE placas SET IdMember_FK = {session['user'][0]} WHERE Placa = '{placa}'"
+                            )
+                        else:
+                            # create new record
+                            self.db.cursor.execute(
+                                "SELECT IdPlaca FROM placas ORDER BY IdPlaca DESC"
+                            )
+                            rec = int(self.db.cursor.fetchone()[0]) + 1
+                            self.db.cursor.execute(
+                                f"INSERT INTO placas VALUES ({rec}, {session['user'][0]}, '{placa}', '{_ph}', '{_ph}', '{_ph}', '{_ph}', '{_ph}')"
+                            )
+
+                    self.db.conn.commit()
+                    flash("Informacion actualizada correctamente", "success")
+
+            return redirect("mic")
 
         # render form for user to edit (first time or returned with errors)
-        self.db.cursor.execute(
-            f"SELECT * FROM placas WHERE IdMember_FK = {session['user'][0]}"
-        )
-        placas = [i[2] for i in self.db.cursor.fetchall()]
+
         self.db.cursor.execute(
             f"SELECT FechaEnvio FROM mensajes WHERE IdMember_FK = {session['user'][0]} ORDER BY FechaEnvio DESC"
         )

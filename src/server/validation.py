@@ -1,5 +1,3 @@
-from random import randrange
-from string import ascii_uppercase
 import re
 
 
@@ -27,7 +25,7 @@ class FormValidate:
             return {"correo": ["Correo no registrado"]}
 
         # check if password correct for that correo
-        cmd += f" AND Password = '{form_data["password"]}"
+        cmd += f" AND Password = '{form_data["password"]}'"
         self.cursor.execute(cmd)
         if not self.cursor.fetchone():
             return {"password": ["Contraseña equivocada"]}
@@ -51,7 +49,7 @@ class FormValidate:
         if page == 1:
 
             # nombre
-            if len(reg["nombre"]) < 6:
+            if len(reg["nombre"]) < 5:
                 errors["nombre"].append("Nombre debe tener minimo 5 digitos")
 
             # dni
@@ -136,8 +134,6 @@ class FormValidate:
 
     def mic(self, mic):
 
-        # TODO: complete validations
-
         # realizar todas las validaciones
         errors = {
             "placa1": [],
@@ -149,20 +145,32 @@ class FormValidate:
         }
 
         # nombre
-        if len(mic["nombre"]) < 6:
-            errors["nombre"].append("Nombre debe tener minimo 5 digitos")
+        # if len(mic["nombre"]) < 6:
+        #     errors["nombre"].append("Nombre debe tener minimo 5 digitos")
 
         # dni
-        if not re.match(r"^[0-9]{8}$", mic["dni"]):
-            errors["dni"].append("DNI solamente debe tener 8 digitos")
-        if mic["dni"] in self.dnis:
-            errors["dni"].append("DNI ya esta registado")
+        # if not re.match(r"^[0-9]{8}$", mic["dni"]):
+        #     errors["dni"].append("DNI solamente debe tener 8 digitos")
+        # if mic["dni"] in self.dnis:
+        #     errors["dni"].append("DNI ya esta registado")
 
         # celular
         if not re.match(r"^[0-9]{9}$", mic["celular"]):
             errors["celular"].append("Ingrese un celular valido")
 
         return errors
+
+    def mic_changes(self, user, placas, post):
+
+        _c = [
+            user[2] != post["nombre"],
+            user[4] != post["dni"],
+            user[5] != post["celular"],
+            sorted([i for i in (post["placa1"], post["placa2"], post["placa3"]) if i])
+            != sorted(placas),
+        ]
+
+        return any(_c)
 
     def update_password(self, correo, password, db):
         cmd = f"UPDATE members SET Password = '{password}' WHERE Correo = '{correo}'"

@@ -6,7 +6,7 @@ from datetime import datetime as dt
 
 def send(db, dash, max=9999):
 
-    CARD = 9
+    CARD = 11
 
     # select all the emails in outbound folder
     html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
@@ -14,7 +14,7 @@ def send(db, dash, max=9999):
     # log first action
     dash.log(
         card=CARD,
-        title=f"Brevete [{min(max, len(html_files))}]",
+        title=f"Comunicaciones [{min(max, len(html_files))}]",
         status=1,
         progress=0,
         text="Inicializando",
@@ -22,14 +22,16 @@ def send(db, dash, max=9999):
     )
 
     # activate send account
-    email = Email(from_account="info@nopasanadape.com", password="5QJWEKi0trAL")
+    email = Email(
+        from_account="info@nopasanadape.com", password=os.environ["ZOHO-1-PWD"]
+    )
 
     counter = 0
     # iterate on all html files in outbound folder
     for counter, html_file in enumerate(html_files):
 
-    # take html information and create email
-    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
+        # take html information and create email
+        html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
         # exit loop if reached max emails
         if counter >= max:
             break
@@ -87,8 +89,7 @@ def send(db, dash, max=9999):
 
             # erase message from outbound folder
             os.remove(os.path.join("outbound", html_file))
-
-            dash.log(action=f"[ SEND ] {"|".join([str(i) for i in _values])}")
+            dash.log(action=f"[ SEND ] | {msg['to']}")
 
         else:
             print(f"ERROR sending email to {msg['to']}.")

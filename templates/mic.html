@@ -55,41 +55,19 @@
                         <!-- Campo de nombre -->
                         <div class="form-group justify-content-between align-items-center form-floating mb-3">
                             <input type="text" class="form-control {% if errors.get('nombre') %} is-invalid {% endif %}"
-                                    id="nombre" name="nombre" value="{{ user[2] }}" , placeholder="empty">
+                                    id="nombre" name="nombre" value="{{ user[2] }}" , placeholder="empty" readonly>
                             <label for="nombre" class="form-label">
                                 Nombre
                             </label>
-                            <!-- Mensajes de error -->
-                            {% if errors.get("nombre") %}
-                                <div class="mt-2">
-                                {% for error in errors.nombre %}
-                                    <small class="text-danger">
-                                        {{ error }}
-                                    </small>
-                                    <br>
-                                {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
 
                         <!-- Campo de DNI -->
                         <div class="form-group justify-content-between align-items-center form-floating mb-3">
                             <input type="text" class="form-control {% if errors.get('dni') %} is-invalid {% endif %}"
-                                    id="dni" name="dni" value="{{ user[4] }}" , placeholder="empty">
+                                    id="dni" name="dni" value="{{ user[4] }}" , placeholder="empty" readonly>
                             <label for="dni" class="form-label">
                                 DNI
                             </label>
-                            <!-- Mensajes de error -->
-                            {% if errors.get("dni") %}
-                                <div class="mt-2">
-                                {% for error in errors.dni %}
-                                    <small class="text-danger">
-                                        {{ error }}
-                                    </small>
-                                    <br>
-                                {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
 
                         <!-- Campo de celular -->
@@ -189,57 +167,16 @@
                 </div>
             </div>
 
-        <!-- Boton Grabar Cambios -->
+        <!-- Botones Grabar Cambios y Eliminar Cuenta -->
         <div class = "row">
             <div class="col p-4 text-center">
-                <button type="submit" class="btn text-white" style="background-color: #2196f3">Actualizar</button>
+                <button type="submit" name="actualizar" class="btn text-white" style="background-color: #2196f3">Actualizar</button>
+                <button type="submit" name="eliminar" class="btn text-white" style="background-color: #dc3545; margin-left: 10px;">Eliminar Cuenta</button>
             </div>
         </div>
         </form>
         </div>
     </div>
 </div>
-
-<script>
-
-    // Cambia el estado de los checkboxes a desactivado si "Quiero Recibir Alerta" se desactiva
-    document.addEventListener('DOMContentLoaded', function() {
-        const mainSwitch1 = document.getElementById('alertaPreference1');
-        const docOptions1 = document.querySelectorAll('.doc-option1');
-        const docLabels1 = document.querySelectorAll('.doc-option1 + label');
-
-        const mainSwitch2 = document.getElementById('alertaPreference2');
-        const docOptions2 = document.querySelectorAll('.doc-option2');
-        const docLabels2 = document.querySelectorAll('.doc-option2 + label');
-
-        function updateCheckboxStates() {
-            const isEnabled1 = mainSwitch1.checked;
-            const isEnabled2 = mainSwitch2.checked;
-            
-            docOptions1.forEach(option => {
-                option.disabled = !isEnabled1;
-                option.parentElement.classList.toggle('disabled', !isEnabled1);
-            });
-            docOptions2.forEach(option => {
-                option.disabled = !isEnabled2;
-                option.parentElement.classList.toggle('disabled', !isEnabled2);
-            });
-            
-            docLabels1.forEach(label => {
-                label.classList.toggle('text-muted', !isEnabled1);
-            });
-
-            docLabels2.forEach(label => {
-                label.classList.toggle('text-muted', !isEnabled2);
-            });
-        }
-       
-        updateCheckboxStates();
-        
-        mainSwitch1.addEventListener('change', updateCheckboxStates);
-        mainSwitch2.addEventListener('change', updateCheckboxStates);
-    });
-
-</script>
 
 {% endblock content %}
