@@ -76,10 +76,14 @@ class UI:
             if not errors:
                 # gather user data header
                 session["user"] = self.users.get_header(correo=form_response["correo"])
-                self.dash.log(usuario=f"Login {session['user'][:4]}")
+                self.dash.log(
+                    usuario=f"Login {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                )
                 return redirect("mic")
             else:
-                self.dash.log(usuario=f"Unsuccesful Login")
+                self.dash.log(
+                    usuario=f"Unsuccesful Login ({form_response['correo']} | {form_response['password']})"
+                )
 
         # render form for user to fill (first time or with errors)
         if "password" in form_response:
@@ -115,6 +119,9 @@ class UI:
                     ]
                 )
                 print("@@@@@", session["codigo_generado"])
+                self.dash.log(
+                    usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}"
+                )
 
                 return redirect("reg-2")
 
@@ -164,6 +171,9 @@ class UI:
                     f"INSERT INTO membersLastUpdate VALUES ({rec},'{ph}','{ph}',{ph},'{ph}','{ph}','{ph}','{ph}')"
                 )
                 self.db.conn.commit()
+                self.dash.log(
+                    usuario=f"Nuevo Registro Completo. {rec} | {cod} | {nom} | {dni} | {cel} | {cor} | {dat} | {pwd}'"
+                )
 
                 # clear session data (back to login) and reload db to include new record
                 session.clear()
@@ -204,6 +214,9 @@ class UI:
                     ]
                 )
                 print("@@@@@", session["codigo_generado"])
+                self.dash.log(
+                    usuario=f"Recuperacion. Correo enviado. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                )
 
                 return redirect("rec-2")
 
@@ -236,12 +249,21 @@ class UI:
                     f"UPDATE members SET Password = '{pwd}' WHERE Correo = '{cor}'"
                 )
                 self.db.conn.commit()
+                self.dash.log(
+                    usuario=f"Recuperacion ok. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                )
 
                 # clear session data (back to login) and reload db to include new record
                 session.clear()
                 self.db.load_members()
 
                 return render_template("rec-3.html")
+
+            else:
+
+                self.dash.log(
+                    usuario=f"Recuperacion ERROR. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                )
 
         # render form for user to fill (first time or returned with errors)
         if "password1" in form_response:
@@ -307,6 +329,10 @@ class UI:
 
                 self.db.cursor.executescript(cmd)
 
+                self.dash.log(
+                    usuario=f"Eliminado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                )
+
                 return redirect("logout")
 
             # update account
@@ -371,6 +397,9 @@ class UI:
 
                     self.db.conn.commit()
                     flash("Informacion actualizada correctamente", "success")
+                    self.dash.log(
+                        usuario=f"Actualizado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    )
 
             return redirect("mic")
 
