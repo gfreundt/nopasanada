@@ -461,7 +461,6 @@ class UI:
             threaded=True,
             host="0.0.0.0",
             port=5000,
-            ssl_context=("cert.pem", "cert-key.pem"),
         )
 
     def run_in_background(self):
