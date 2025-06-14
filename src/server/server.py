@@ -456,7 +456,13 @@ class UI:
         return redirect("log")
 
     def run(self):
-        self.app.run(debug=False, threaded=True, host="0.0.0.0", port=5000)
+        self.app.run(
+            debug=False,
+            threaded=True,
+            host="0.0.0.0",
+            port=5000,
+            ssl_context=("cert.pem", "cert-key.pem"),
+        )
 
     def run_in_background(self):
         flask_thread = threading.Thread(target=self.run, daemon=True)
