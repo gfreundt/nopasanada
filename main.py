@@ -80,6 +80,9 @@ def main():
     if "SEND" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms", "send"])
 
+    while True:
+        time.sleep(10)
+
     return
 
     # set up scheduler: dashboard updates

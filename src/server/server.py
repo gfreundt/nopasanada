@@ -77,7 +77,7 @@ class UI:
                 # gather user data header
                 session["user"] = self.users.get_header(correo=form_response["correo"])
                 self.dash.log(
-                    usuario=f"Login {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    usuario=f"Login {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
                 )
                 return redirect("mic")
             else:
@@ -215,7 +215,7 @@ class UI:
                 )
                 print("@@@@@", session["codigo_generado"])
                 self.dash.log(
-                    usuario=f"Recuperacion. Correo enviado. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}"
                 )
 
                 return redirect("rec-2")
@@ -250,7 +250,7 @@ class UI:
                 )
                 self.db.conn.commit()
                 self.dash.log(
-                    usuario=f"Recuperacion ok. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    usuario=f"Recuperacion ok. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
                 )
 
                 # clear session data (back to login) and reload db to include new record
@@ -262,7 +262,7 @@ class UI:
             else:
 
                 self.dash.log(
-                    usuario=f"Recuperacion ERROR. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    usuario=f"Recuperacion ERROR. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
                 )
 
         # render form for user to fill (first time or returned with errors)
@@ -330,7 +330,7 @@ class UI:
                 self.db.cursor.executescript(cmd)
 
                 self.dash.log(
-                    usuario=f"Eliminado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                    usuario=f"Eliminado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
                 )
 
                 return redirect("logout")
@@ -398,7 +398,7 @@ class UI:
                     self.db.conn.commit()
                     flash("Informacion actualizada correctamente", "success")
                     self.dash.log(
-                        usuario=f"Actualizado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][7]}"
+                        usuario=f"Actualizado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
                     )
 
             return redirect("mic")
@@ -450,6 +450,9 @@ class UI:
     # logout endpoint (NAVBAR)
     def logout(self):
         session.clear()
+        self.dash.log(
+            usuario=f"Logout {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
+        )
         return redirect("log")
 
     def run(self):
