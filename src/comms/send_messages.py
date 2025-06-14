@@ -65,7 +65,7 @@ def send(db, dash, max=9999):
         # update dashboard with progress and last update timestamp
         dash.log(
             card=CARD,
-            progress=int((counter / len(counter)) * 100),
+            progress=int((counter / len(html_files)) * 100),
             lastUpdate=dt.now(),
         )
 
@@ -95,3 +95,13 @@ def send(db, dash, max=9999):
             print(f"ERROR sending email to {msg['to']}.")
 
     db.conn.commit()
+
+    # log last action
+    dash.log(
+        card=CARD,
+        title="Comunicaciones",
+        progress=100,
+        status=3,
+        text="Inactivo",
+        lastUpdate=dt.now(),
+    )

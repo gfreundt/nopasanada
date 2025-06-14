@@ -119,6 +119,17 @@ class ChromeUtils:
             # delete unnecesary files after unzipping
             os.remove(os.path.join(UNZIPPED_PATH, "LICENSE.chromedriver"))
 
+        def file_cleanup(path):
+
+            # erase downloaded zip file
+            os.remove("chromedriver.zip")
+
+            # erase files in unzipped folder and then erase folder
+            _folder = os.path.join(path, "chromedriver-win64")
+            for file in _folder:
+                os.remove(file)
+            os.rmdir(_folder)
+
         # define URIs
         GOOGLE_CHROMEDRIVER_API = "https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json"
         if "Windows" in platform.uname().system:
@@ -138,6 +149,9 @@ class ChromeUtils:
         if driver != browser:
             download_chromedriver(browser)
             print("*** Updated Chromedriver ***")
+
+        # clean all unnecessary files
+        file_cleanup(BASE_PATH)
 
 
 class PDFUtils:

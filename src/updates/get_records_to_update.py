@@ -27,6 +27,10 @@ def get_records(db_cursor):
     )
     updates["sunats"] = get_records_sunats(db_cursor, HLA=HOURS_LAST_ATTEMPT)
 
+    # in development
+    updates["jnemultas"] = get_records_jnemultas(db_cursor, HLA=HOURS_LAST_ATTEMPT)
+    updates["jneafils"] = get_records_jneafils(db_cursor, HLA=HOURS_LAST_ATTEMPT)
+
     # return without any duplicates
     return {i: set(j) for i, j in updates.items()}
 
@@ -71,7 +75,7 @@ def get_records_soats(db_cursor, thresh, HLA):
 		                        WHERE LastUpdateSOAT >= datetime('now','localtime', '-{HLA} hours'))
             UNION
             SELECT IdPlaca_FK, Placa FROM _necesitan_alertas
-                WHERE TipoAlerta = 'SOATS'
+                WHERE TipoAlerta = 'SOAT'
         """
     )
     return db_cursor.fetchall()
@@ -112,7 +116,7 @@ def get_records_satimps(db_cursor, HLA):
 		                WHERE LastUpdateImpSAT >= datetime('now','localtime', '-{HLA} hours'))
             UNION
             SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_alertas
-                WHERE TipoAlerta = "SATIMPS"
+                WHERE TipoAlerta = "SATIMP"
         """
     )
     return db_cursor.fetchall()
@@ -190,6 +194,16 @@ def get_records_sunats(db_cursor, HLA):
     )
 
     return db_cursor.fetchall()
+
+
+def get_records_jnemultas(db_cursor, HLA):
+    # TODO: develop
+    return []
+
+
+def get_records_jneafils(db_cursor, HLA):
+    # TODO: develop
+    return []
 
 
 def get_new_members(db_cursor, all_updates):

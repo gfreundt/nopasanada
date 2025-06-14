@@ -47,8 +47,8 @@ def need_alert(db_cursor):
                                     AND DATE('now', 'localtime', '-3 days') <= FechaHasta)
                     UNION
                     SELECT idplaca_FK, FechaHasta, "REVTEC", (SELECT Placa FROM placas WHERE IdPlaca = IdPlaca_FK), (SELECT IdMember_FK FROM placas WHERE IdPlaca = IdPlaca_FK) FROM revtecs
-                        WHERE 	DATE('now', 'localtime', '+15 days')= FechaHasta
-                        OR 		DATE('now', 'localtime', '+7 days')= FechaHasta
+                        WHERE 	DATE('now', 'localtime', '+15 days') = FechaHasta
+                        OR 		DATE('now', 'localtime', '+7 days') = FechaHasta
                         OR 		(DATE('now', 'localtime', '0 days') >= FechaHasta
                                     AND DATE('now', 'localtime', '-3 days') <= FechaHasta);
                     

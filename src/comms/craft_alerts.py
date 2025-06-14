@@ -17,9 +17,9 @@ def craft(db_cursor, dash):
 
     # loop all members that required an alert
     db_cursor.execute(
-        "SELECT IdMember_FK, TipoAlerta, Vencido, FechaHasta FROM _necesitan_alertas"
+        "SELECT IdMember_FK, TipoAlerta, Vencido, FechaHasta, Placa FROM _necesitan_alertas"
     )
-    for idmember, tipo_alerta, vencido, fecha_hasta in db_cursor.fetchall():
+    for idmember, tipo_alerta, vencido, fecha_hasta, placa in db_cursor.fetchall():
 
         if idmember:
             alerts.append(
@@ -32,6 +32,7 @@ def craft(db_cursor, dash):
                     msg_type=index_alertas[tipo_alerta],
                     tipo_alerta=tipo_alerta,
                     vencido=vencido,
+                    placa=placa,
                 )
             )
 
@@ -66,7 +67,15 @@ def compose_wapp(alert_data):
 
 
 def compose_message(
-    db_cursor, idmember, template, subject, msg_type, tipo_alerta, vencido, fecha_hasta
+    db_cursor,
+    idmember,
+    template,
+    subject,
+    msg_type,
+    tipo_alerta,
+    vencido,
+    fecha_hasta,
+    placa,
 ):
 
     # get member information
@@ -85,13 +94,13 @@ def compose_message(
     if tipo_alerta == "BREVETE":
         _t = "Licencia de Conducir"
     elif tipo_alerta == "REVTEC":
-        _t = "Revisión Técnica"
+        _t = f"Revisión Técnica para placa {placa}"
     elif tipo_alerta == "SOAT":
-        _t = "SOAT"
+        _t = f"SOAT para placa {placa}"
     elif tipo_alerta == "SATIMP":
-        _t = "Impuesto Vehicular SAT Lima"
+        _t = f"Impuesto Vehicular SAT Lima para placa {placa}"
 
-    texto_alerta = f"Tu {_t} {"ha vencido" if vencido else "esta cerca de vencer"} en {fecha_hasta}."
+    texto_alerta = f"Tu {_t} {"ha vencido" if vencido else "está cerca de vencer"} el {fecha_hasta}."
 
     _info.update(
         {

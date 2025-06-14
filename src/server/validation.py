@@ -50,25 +50,25 @@ class FormValidate:
 
             # nombre
             if len(reg["nombre"]) < 5:
-                errors["nombre"].append("Nombre debe tener minimo 5 digitos")
+                errors["nombre"].append("Nombre debe tener mínimo 5 dígitos")
 
             # dni
             if not re.match(r"^[0-9]{8}$", reg["dni"]):
-                errors["dni"].append("DNI solamente debe tener 8 digitos")
+                errors["dni"].append("DNI solamente debe tener 8 dígitos")
             if reg["dni"] in self.dnis:
-                errors["dni"].append("DNI ya esta registado")
+                errors["dni"].append("DNI ya está registado")
 
             # correo
             if not re.match(
                 r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", reg["correo"]
             ):
-                errors["correo"].append("Ingrese un correo valido")
+                errors["correo"].append("Ingrese un correo válido")
             if reg["correo"] in self.correos:
-                errors["correo"].append("Correo ya esta registrado")
+                errors["correo"].append("Correo ya está registrado")
 
             # celular
             if not re.match(r"^[0-9]{9}$", reg["celular"]):
-                errors["celular"].append("Ingrese un celular valido")
+                errors["celular"].append("Ingrese un celular válido")
             if reg["celular"] in self.celulares:
                 errors["celular"].append("Celular ya esta registrado")
 
@@ -78,12 +78,12 @@ class FormValidate:
             if not re.match(r"^[A-Za-z]{4}$", reg["codigo"]):
                 errors["codigo"].append("Codigo de validacion son 4 letras")
             if reg["codigo"] != codigo:
-                errors["codigo"].append("Codigo de validacion incorrecto")
+                errors["codigo"].append("Código de validación incorrecto")
 
             # constraseña
             if not re.match(r"^(?=.*[A-Z])(?=.*\d).{6,20}$", reg["password1"]):
                 errors["password1"].append(
-                    "Al menos 6 caracteres e incluir una mayuscula y un numero"
+                    "Al menos 6 caracteres e incluir una mayúscula y un número"
                 )
 
             # validacion de constraseña
