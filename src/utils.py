@@ -15,7 +15,6 @@ import pypdfium2.raw as pdfium
 import math
 from PIL import Image
 import img2pdf
-import pyautogui
 import base64
 import smtplib
 from email.message import EmailMessage
@@ -264,32 +263,6 @@ class SpeechUtils:
                     self.speech_driver_errors += 1
                 else:
                     return None
-
-
-class VPNUtils:
-
-    def __init__(self):
-        try:
-            self.avp = os.path.join(
-                r"C:\Program Files (x86)",
-                "Kaspersky Lab",
-                "Kaspersky VPN 5.20",
-                "ksdeui.exe",
-            )
-            subprocess.Popen([self.avp])
-            self.button_location = pyautogui.locateOnScreen("kpvn.png")
-            self.vpn_on = False
-            return True
-        except:
-            return False
-
-    def turn_on(self):
-        if self.button_location and self.vpn_on:
-            pyautogui.click(self.button_location)
-
-    def turn_off(self):
-        if self.button_location and not self.vpn_on:
-            pyautogui.click(self.button_location)
 
 
 class Email:
