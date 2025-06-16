@@ -367,9 +367,9 @@ class UI:
                     _vps = [
                         i
                         for i in (
-                            form_response["placa1"],
-                            form_response["placa2"],
-                            form_response["placa3"],
+                            form_response["placa1"].upper(),
+                            form_response["placa2"].upper(),
+                            form_response["placa3"].upper(),
                         )
                         if i
                     ]
@@ -404,7 +404,6 @@ class UI:
             return redirect("mic")
 
         # render form for user to edit (first time or returned with errors)
-
         self.db.cursor.execute(
             f"SELECT FechaEnvio FROM mensajes WHERE IdMember_FK = {session['user'][0]} ORDER BY FechaEnvio DESC"
         )
@@ -449,10 +448,10 @@ class UI:
 
     # logout endpoint (NAVBAR)
     def logout(self):
-        session.clear()
         self.dash.log(
             usuario=f"Logout {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
         )
+        session.clear()
         return redirect("log")
 
     def run(self):
