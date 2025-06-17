@@ -1,8 +1,6 @@
 from datetime import datetime as dt
 from src.scrapers import scrape_recvehic
 from ..utils import log_action_in_db
-import logging
-import easyocr
 
 
 def gather(db_cursor, db_conn, dash, update_data):
@@ -19,10 +17,6 @@ def gather(db_cursor, db_conn, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR with no log to console
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
-    ocr = easyocr.Reader(["es"], gpu=False)
-
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data, start=1):
 
@@ -38,7 +32,7 @@ def gather(db_cursor, db_conn, dash, update_data):
                 dash.log(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
 
                 # send request to scraper
-                _img_filename = scrape_recvehic.browser(doc_num=doc_num, ocr=ocr)
+                _img_filename = scrape_recvehic.browser(doc_num=doc_num)
 
                 # register action
                 log_action_in_db(db_cursor, table_name="revtec", idMember=id_member)
