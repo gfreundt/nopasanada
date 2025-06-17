@@ -6,6 +6,7 @@ import os
 from datetime import datetime as dt
 import requests
 import schedule
+from ..utils import get_local_ip
 
 
 class Dashboard:
@@ -103,6 +104,7 @@ class Dashboard:
             return jsonify(self.data)
 
     def run(self):
+        print(f"MONITOR RUNNING ON: http://{get_local_ip()}:7000")
         self.app.run(debug=False, threaded=True, host="0.0.0.0", port=7000)
 
     def run_in_background(self):

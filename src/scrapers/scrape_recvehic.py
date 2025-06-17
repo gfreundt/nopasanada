@@ -68,7 +68,7 @@ def browser(doc_num, ocr):
         os.remove(from_path)
 
     pdf = PDFUtils()
-    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
     webdriver.get("https://recordconductor.mtc.gob.pe/")
 
     retry_captcha = False
@@ -127,7 +127,7 @@ def browser(doc_num, ocr):
     b = webdriver.find_elements(By.ID, "btnprint")
     try:
         b[0].click()
-    except:
+    except Exception:
         webdriver.quit()
         return ""
 
@@ -142,7 +142,10 @@ def browser(doc_num, ocr):
         from_path = os.path.join(from_path)
         to_path = os.path.join("data", "images", f"RECORD_{doc_num.upper()}.png")
 
-        img = pdf.pdf_to_png(from_path, scale=1.3)
+        try:
+            img = pdf.pdf_to_png(from_path, scale=1.3)
+        except Exception:
+            print("error transforming PDF to PNG")
 
         # delete image with same name (previous version) from destination folder if it exists
         if os.path.exists(to_path):

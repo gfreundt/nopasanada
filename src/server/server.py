@@ -9,7 +9,7 @@ import os
 
 from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
-from ..utils import revisar_symlinks
+from ..utils import revisar_symlinks, get_local_ip
 
 
 # TODO: fix last two to show correct format
@@ -455,6 +455,7 @@ class UI:
         return redirect("log")
 
     def run(self):
+        print(f"SERVER RUNNING ON: http://{get_local_ip()}:5000")
         self.app.run(
             debug=False,
             threaded=True,

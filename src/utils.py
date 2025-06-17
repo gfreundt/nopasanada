@@ -20,6 +20,7 @@ import smtplib
 from email.message import EmailMessage
 import mimetypes
 import logging
+import socket
 
 
 class ChromeUtils:
@@ -69,7 +70,7 @@ class ChromeUtils:
 
         try:
             self.driver_update(verbose=False)
-        except:
+        except KeyboardInterrupt:
             print("*** Cannot update Chromedriver ***")
 
         return webdriver.Chrome(
@@ -89,7 +90,7 @@ class ChromeUtils:
             try:
                 version = subprocess.check_output(f"{CURRENT_PATH} -v").decode("utf-8")
                 return version.split(".")[0][-3:]
-            except:
+            except KeyboardInterrupt:
                 return 0
 
         def download_chromedriver(target_version):
@@ -148,9 +149,8 @@ class ChromeUtils:
         if driver != browser:
             download_chromedriver(browser)
             print("*** Updated Chromedriver ***")
-
-        # clean all unnecessary files
-        file_cleanup(BASE_PATH)
+            # clean all unnecessary files
+            file_cleanup(BASE_PATH)
 
 
 class PDFUtils:
@@ -410,3 +410,9 @@ def disable_all_loggers():
     for logger_name, logger in logger_dict.items():
         if isinstance(logger, logging.Logger):
             logger.disabled = True
+
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 1))  # connect() for UDP doesn't send packets
+    return s.getsockname()[0]
