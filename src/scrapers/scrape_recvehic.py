@@ -7,21 +7,25 @@ from ..utils import ChromeUtils, use_truecaptcha
 
 def browser(doc_num):
 
-    # erase file from destination directory before downloading new one
+    # get paths to Downloads folder and destination folder
     from_path = os.path.join(
-        r"C:\Users", "Gabriel", "Downloads", "RECORD DE CONDUCTOR.pdf"
+        os.path.expanduser("~/Downloads"), "RECORD DE CONDUCTOR.pdf"
     )
+    to_path = os.path.join("data", "images", f"RECORD_{doc_num}.pdf")
+
+    # erase file from Downloads folder before downloading new one
     if os.path.exists(from_path):
         os.remove(from_path)
 
+    # start browser, navigate to url
     webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
     webdriver.get("https://recordconductor.mtc.gob.pe/")
 
-    retry_captcha = False
     # outer loop: in case captcha is not accepted by webpage, try with a new one
+    retry_captcha = False
     while True:
-        captcha_txt = ""
         # inner loop: in case OCR cannot figure out captcha, retry new captcha
+        captcha_txt = ""
         while not captcha_txt:
             if retry_captcha:
                 webdriver.refresh()
@@ -89,6 +93,5 @@ def browser(doc_num):
 
     # if file was downloaded successfully, transfer to correct folder and return filename
     if count < 10:
-        _filename = os.path.basename(from_path)
-        shutil.move(from_path, os.path.join(os.curdir, "data", "images", _filename))
-        return str(_filename)
+        shutil.move(from_path, to_path)
+        return str(os.path.basename(from_path))
