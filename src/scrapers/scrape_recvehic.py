@@ -92,6 +92,13 @@ def browser(doc_num):
     webdriver.quit()
 
     # if file was downloaded successfully, transfer to correct folder and return filename
+
+    print(from_path)
+
+    print(os.path.isfile(os.path.join(from_path)))
+
+    print(to_path)
+
     if count < 10:
         shutil.move(from_path, to_path)
         return str(os.path.basename(from_path))
