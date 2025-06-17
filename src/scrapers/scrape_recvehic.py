@@ -1,64 +1,10 @@
 import os
 from selenium.webdriver.common.by import By
 import time
-import re
-import numpy as np
-from PIL import Image
 from ..utils import ChromeUtils, PDFUtils, use_truecaptcha
 
 
-def get_captcha(ocr):
-
-    def invert(img):
-        a = len(img)
-        b = len(img[1])
-        h = np.full((b, a), 0)
-        for x in range(len(img)):
-            for y in range(len(img[0])):
-                h[y][x] = int(img[x][y][0])
-        return h
-
-    def valid(text):
-        if len(text) != 6:
-            return False
-        text1 = "".join(re.findall("[a-zA-Z0-9]", text))
-        return text == text1
-
-    def process(depth, f):
-        img = np.asarray(f)
-        copyimg = np.copy(a=img)
-        for i, x in enumerate(img):
-            for j, y in enumerate(x):
-                if max(y) > 150:
-                    copyimg[i][j] = [0, 0, 0]
-                else:
-                    copyimg[i][j] = [255, 255, 255]
-        h = invert(copyimg)
-        h = h.tolist()
-        for x in range(len(h)):
-            if h[x].count(255) < depth:
-                h[x] = [0] * len(copyimg)
-        h = np.asarray(h).tolist()
-        a = len(h) - 1
-        b = len(h[0]) - 1
-        k = [[h[i][j] for i in range(a)] for j in range(b)]
-        return np.asarray(k, dtype=np.uint8)
-
-    text = None
-    max_cert = 0
-    for depth in range(2, 7):
-        f = Image.open(os.path.join("static", "captcha_recveh.png"))
-        img = process(depth=depth, f=f)
-        c = ocr.readtext(img, text_threshold=0.4)
-        if c and valid(c[0][1]) and c[0][2] > max_cert:
-            max_cert = c[0][2]
-            text = c[0][1]
-            text = text.replace("9", "g")
-            text = text.replace("l", "1")
-    return text
-
-
-def browser(doc_num, ocr):
+def browser(doc_num):
 
     # erase file from destination directory before downloading new one
     from_path = os.path.join(
@@ -88,7 +34,7 @@ def browser(doc_num, ocr):
                         webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
                     )
                 # convert image to text using OCR
-                captcha_txt = use_truecaptcha(_path)
+                captcha_txt = use_truecaptcha(_path)["result"]
                 retry_captcha = True
 
             except ValueError:
