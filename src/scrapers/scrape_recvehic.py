@@ -4,7 +4,7 @@ import time
 import re
 import numpy as np
 from PIL import Image
-from ..utils import ChromeUtils, PDFUtils
+from ..utils import ChromeUtils, PDFUtils, use_truecaptcha
 
 
 def get_captcha(ocr):
@@ -82,12 +82,13 @@ def browser(doc_num, ocr):
                 time.sleep(2)
             # capture captcha image from webpage and store in variable
             try:
-                with open(os.path.join("static", "captcha_recveh.png"), "wb") as file:
+                _path = os.path.join("static", "recvehic_temp.png")
+                with open(_path, "wb") as file:
                     file.write(
                         webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
                     )
                 # convert image to text using OCR
-                captcha_txt = get_captcha(ocr)
+                captcha_txt = use_truecaptcha(_path)
                 retry_captcha = True
 
             except ValueError:
@@ -103,7 +104,7 @@ def browser(doc_num, ocr):
         time.sleep(1)
 
         # if captcha is not correct, refresh and restart cycle, if no data found, return blank
-        _alerta = webdriver.find_elements(By.ID, "idxAlertmensaje")
+        _alerta = webdriver.find_elements(By.ID, "AlertMessage")
         if _alerta and "ingresado" in _alerta[0].text:
             # click on "Cerrar" to close pop-up
             webdriver.find_element(
