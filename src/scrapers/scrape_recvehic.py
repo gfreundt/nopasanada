@@ -11,7 +11,7 @@ def browser(doc_num):
     from_path = os.path.join(
         os.path.expanduser("~/Downloads"), "RECORD DE CONDUCTOR.pdf"
     )
-    to_path = os.path.join("..", "data", "images", f"RECORD_{doc_num}.pdf")
+    to_path = os.path.join(".", "data", "images", f"RECORD_{doc_num}.pdf")
 
     # erase file from Downloads folder before downloading new one
     if os.path.exists(from_path):
