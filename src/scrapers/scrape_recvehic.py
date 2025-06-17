@@ -1,7 +1,8 @@
 import os
+import shutil
 from selenium.webdriver.common.by import By
 import time
-from ..utils import ChromeUtils, PDFUtils, use_truecaptcha
+from ..utils import ChromeUtils, use_truecaptcha
 
 
 def browser(doc_num):
@@ -13,7 +14,6 @@ def browser(doc_num):
     if os.path.exists(from_path):
         os.remove(from_path)
 
-    pdf = PDFUtils()
     webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
     webdriver.get("https://recordconductor.mtc.gob.pe/")
 
@@ -71,6 +71,7 @@ def browser(doc_num):
         else:
             break
 
+    # click on download button
     b = webdriver.find_elements(By.ID, "btnprint")
     try:
         b[0].click()
@@ -84,26 +85,10 @@ def browser(doc_num):
         time.sleep(1)
         count += 1
 
-    # take downloaded PDF, process image and save in data folder
-    try:
-        from_path = os.path.join(from_path)
-        to_path = os.path.join("data", "images", f"RECORD_{doc_num.upper()}.png")
+    webdriver.quit()
 
-        try:
-            img = pdf.pdf_to_png(from_path, scale=1.3)
-        except Exception:
-            print("error transforming PDF to PNG")
-
-        # delete image with same name (previous version) from destination folder if it exists
-        if os.path.exists(to_path):
-            os.remove(to_path)
-        img.save(to_path)
-
-        # delete original downloaded file (saves space and avoids "(1)" appended on filename in future)
-        os.remove(from_path)
-
-        webdriver.quit()
-        return str(os.path.basename(to_path))
-
-    except KeyboardInterrupt:
-        quit()
+    # if file was downloaded successfully, transfer to correct folder and return filename
+    if count < 10:
+        _filename = os.path.basename(from_path)
+        shutil.move(from_path, os.path.join(os.curdir, "data", "images", _filename))
+        return str(_filename)
