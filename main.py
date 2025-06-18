@@ -15,10 +15,11 @@ from src.monitor import monitor
 logging.getLogger("werkzeug").disabled = True
 
 
-class Environment:
+class Context:
 
     def __init__(self):
-        self.email_password = os.environ("ZOHO-1-PWD")
+        self.email_password = os.environ["ZOHO-1-PWD"]
+        self.test = False
 
 
 class Database:
@@ -28,16 +29,22 @@ class Database:
         self.load_members()
 
     def start(self, dev=True):
-        """Connect to database. Use development database by default."""
+        """Connect to database. Network database preferred. Fallback is local database."""
 
-        # production
-        SQLDATABASE = os.path.join("data", "members.db")
-        if dev:
-            # development
-            SQLDATABASE = os.path.join("data", "dev", "members.db")
-            # SQLDATABASE = os.path.join(r"\\192.168.68.105", "Downloads", "members.db")
+        SQLDB_LOCAL = os.path.join("data", "members.db")
+        SQLDB_NETWORK = os.path.join(
+            r"\\192.168.68.110\d\pythonCode\nopasanada\data\members.db"
+        )
 
-        self.conn = sqlite3.connect(SQLDATABASE, check_same_thread=False)
+        # attempt tp connect to network production database, default to local if not possible
+        try:
+            self.conn = sqlite3.connect(SQLDB_NETWORK, check_same_thread=False)
+            print("Network Database Connected")
+        except sqlite3.Error:
+            self.conn = sqlite3.connect(SQLDB_LOCAL, check_same_thread=False)
+            print("LOCAL Database Connected")
+
+        # create cursor object
         self.cursor = self.conn.cursor()
 
     def load_members(self):
@@ -56,7 +63,7 @@ def run_at_exit(dash, db):
 def main():
 
     # start environment information
-    # env = Environment()
+    context = Context()
 
     # connect to database
     db = Database(dev=False)

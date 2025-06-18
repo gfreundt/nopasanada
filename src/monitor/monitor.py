@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, redirect
 import threading
 from copy import deepcopy as copy
 from pprint import pprint
@@ -7,6 +7,8 @@ from datetime import datetime as dt
 import requests
 import schedule
 from ..utils import get_local_ip
+from src.nopasanada import nopasanada
+from datetime import datetime as dt
 
 
 class Dashboard:
@@ -25,6 +27,18 @@ class Dashboard:
         # Define routes
         self.app.add_url_rule("/", "dashboard", self.dashboard)
         self.app.add_url_rule("/data", "get_data", self.get_data)
+        self.app.add_url_rule(
+            "/crear_mensajes",
+            endpoint="crear_mensajes",
+            view_func=self.launch_gather_comm,
+            methods=["POST"],
+        )
+        self.app.add_url_rule(
+            "/enviar_mensajes",
+            endpoint="enviar_mensajes",
+            view_func=self.launch_gather_comm,
+            methods=["POST"],
+        )
 
         self.set_initial_data()
 
@@ -33,11 +47,17 @@ class Dashboard:
         if "general_status" in kwargs:
             self.data["top_right"]["content"] = kwargs["general_status"][0]
             self.data["top_right"]["status"] = kwargs["general_status"][1]
+            # write to permanent log in database
+            cmd = f"INSERT INTO log VALUES ('STATUS', '{kwargs["general_status"][0]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
+            self.db.cursor.execute(cmd)
         if "action" in kwargs:
             _ft = f"<b>{dt.now():%Y-%m-%d %H:%M:%S} ></b>{kwargs["action"]}"
             self.data["bottom_right"].append(_ft)
             if len(self.data["bottom_right"]) > 15:
                 self.data["bottom_right"].pop(0)
+            # write to permanent log in database
+            cmd = f"INSERT INTO log VALUES ('SISTEMA', '{kwargs["action"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
+            self.db.cursor.execute(cmd)
         if "card" in kwargs:
             for field in kwargs:
                 if field == "card":
@@ -48,6 +68,9 @@ class Dashboard:
             self.data["bottom_left"].append(_ft)
             if len(self.data["bottom_left"]) > 30:
                 self.data["bottom_left"].pop(0)
+            # write to permanent log in database
+            cmd = f"INSERT INTO log VALUES ('USUARIO', '{kwargs["usuario"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
+            self.db.cursor.execute(cmd)
         if "kpis" in kwargs:
             print(kwargs["kpis"])
 
@@ -102,6 +125,14 @@ class Dashboard:
     def get_data(self):
         with self.data_lock:
             return jsonify(self.data)
+
+    def launch_gather_comm(self):
+        nopasanada(self, self.db, cmds=["update", "comms"])
+        return redirect("/")
+
+    def launch_gather_send(self):
+        nopasanada(self, self.db, cmds=["update", "comms", "send"])
+        return redirect("/")
 
     def run(self):
         print(f"MONITOR RUNNING ON: http://{get_local_ip()}:7000")

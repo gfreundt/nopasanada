@@ -22,14 +22,16 @@ def browser(placa):
 
         # start chromedriver
         webdriver = ChromeUtils().init_driver(
-            headless=True, verbose=False, maximized=True, incognito=True
+            headless=False, verbose=True, maximized=True, incognito=True
         )
 
         # open first URL, wait and open second URL (avoids limiting requests)
         webdriver.get("https://www.gob.pe/sunarp")
         time.sleep(2)
-        webdriver.get("https://www.sunarp.gob.pe/consulta-vehicular.html")
-        time.sleep(1)
+        webdriver.get(
+            "https://consultavehicular.sunarp.gob.pe/consulta-vehicular/inicio"
+        )
+        time.sleep(5)
         retry_captcha = False
 
         # inner loop to restart in case captcha is not ok
@@ -81,42 +83,43 @@ def browser(placa):
             else:
                 break
 
-        # search for SUNARP image
-        _card_image = webdriver.find_elements(
-            By.XPATH,
-            "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/img",
-        )
-
-        # no image found, restart outer loop
-        if not _card_image:
+        time_start = time.perf_counter()
+        _card_image = None
+        while not _card_image and time.perf_counter() - time_start < 10:
+            # search for SUNARP image
+            _card_image = webdriver.find_elements(
+                By.XPATH,
+                "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/img",
+            )
             webdriver.refresh()
             time.sleep(0.5)
+
+        # no image found in 10 sec, restart outer loop
+        if not _card_image:
             continue
 
         # grab image and save in file, return succesful
-        else:
+        base64_string = _card_image[0].get_attribute("src")[21:]
+        output_path = os.path.join("data", "images", f"SUNARP_{placa}.png")
+        base64_to_image(base64_string, output_path)
 
-            base64_string = _card_image[0].get_attribute("src")[21:]
-            output_path = os.path.join("data", "images", f"SUNARP_{placa}.png")
-            base64_to_image(base64_string, output_path)
+        # # save image in file
+        # _img_path = os.path.abspath(
+        #     os.path.join("data", "images", f"SUNARP_{placa}.png")
+        # )
+        # with open(_img_path, "wb") as file:
+        #     file.write(_card_image[0].screenshot_as_png)
 
-            # # save image in file
-            # _img_path = os.path.abspath(
-            #     os.path.join("data", "images", f"SUNARP_{placa}.png")
-            # )
-            # with open(_img_path, "wb") as file:
-            #     file.write(_card_image[0].screenshot_as_png)
+        # press boton to start over
+        time.sleep(1)
+        q = webdriver.find_element(
+            By.XPATH,
+            "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/nz-form-item/nz-form-control/div/div/div/button",
+        )
+        q.click()
 
-            # press boton to start over
-            time.sleep(1)
-            q = webdriver.find_element(
-                By.XPATH,
-                "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/nz-form-item/nz-form-control/div/div/div/button",
-            )
-            q.click()
-
-            webdriver.quit()
-            return True
+        webdriver.quit()
+        return True
 
 
 def process_captcha(img, ocr):
