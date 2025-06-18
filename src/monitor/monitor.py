@@ -36,7 +36,7 @@ class Dashboard:
         self.app.add_url_rule(
             "/enviar_mensajes",
             endpoint="enviar_mensajes",
-            view_func=self.launch_gather_comm,
+            view_func=self.launch_gather_send,
             methods=["POST"],
         )
 

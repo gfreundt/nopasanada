@@ -9,7 +9,7 @@ def send(db, dash, max=9999):
     CARD = 11
 
     # select all the emails in outbound folder
-    html_files = [i for i in os.listdir(os.path.join("outbound")) if "message" in i]
+    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
 
     # log first action
     dash.log(
