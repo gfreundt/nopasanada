@@ -86,7 +86,7 @@ class FormValidate:
                     "Al menos 6 caracteres e incluir una mayúscula y un número"
                 )
 
-            # validacion de constraseña
+            # validacion de contraseña
             if reg["password1"] != reg["password2"]:
                 errors["password2"].append("Contraseñas no coinciden")
 
@@ -126,7 +126,7 @@ class FormValidate:
                     "Al menos 6 caracteres e incluir una mayuscula y un numero"
                 )
 
-            # validacion de constraseña
+            # validacion de contraseña
             if rec["password1"] != rec["password2"]:
                 errors["password2"].append("Contraseñas no coinciden")
 
@@ -142,35 +142,65 @@ class FormValidate:
             "dni": [],
             "nombre": [],
             "celular": [],
+            "contra1": [],
+            "contra2": [],
+            "contra3": [],
         }
-
-        # nombre
-        # if len(mic["nombre"]) < 6:
-        #     errors["nombre"].append("Nombre debe tener minimo 5 digitos")
-
-        # dni
-        # if not re.match(r"^[0-9]{8}$", mic["dni"]):
-        #     errors["dni"].append("DNI solamente debe tener 8 digitos")
-        # if mic["dni"] in self.dnis:
-        #     errors["dni"].append("DNI ya esta registado")
 
         # celular
         if not re.match(r"^[0-9]{9}$", mic["celular"]):
-            errors["celular"].append("Ingrese un celular valido")
+            errors["celular"].append("Ingrese un celular válido")
+
+        # placas: dos letras y cuatro números, o tres letras y tres números, sin guion
+        for p in range(1, 4):
+            if mic[f"placa{p}"] and not re.match(
+                r"^[A-Z][A-Z0-9]{2}\d{3}$", mic[f"placa{p}"]
+            ):
+                errors[f"placa{p}"].append("Usar un formato válido")
+
+        # revisar solo si se ingreso algo en el campo de contraseña actual
+        if len(mic["contra1"]) > 0:
+
+            # contraseña actual
+            self.cursor.execute(
+                f"SELECT Password FROM members WHERE Correo = '{mic["correo"]}'"
+            )
+            _password = self.cursor.fetchone()[0]
+
+            if _password != str(mic["contra1"]):
+                errors["contra1"].append("Contraseña equivocada")
+
+            # contraseña nueva
+            elif not re.match(r"^(?=.*[A-Z])(?=.*\d).{6,20}$", mic["contra2"]):
+                errors["contra2"].append(
+                    "Mínimo 6 caracteres, incluir mayúscula y número"
+                )
+
+            # validacion de nueva contraseña
+            elif mic["contra2"] != mic["contra3"]:
+                errors["contra3"].append("Contraseñas no coinciden")
 
         return errors
 
     def mic_changes(self, user, placas, post):
 
-        _c = [
-            user[2] != post["nombre"],
-            user[4] != post["dni"],
-            user[5] != post["celular"],
-            sorted([i for i in (post["placa1"], post["placa2"], post["placa3"]) if i])
-            != sorted(placas),
-        ]
+        changes = ""
 
-        return any(_c)
+        # celular ha cambiado
+        if user[5] != post["celular"]:
+            changes += "Celular actualizado. "
+
+        # alguna placa ha cambiado
+        if sorted(
+            [i for i in (post["placa1"], post["placa2"], post["placa3"]) if i]
+        ) != sorted(placas):
+            changes += "Placas actualizadas. "
+
+        # contraseña ha cambiado
+        if len(post["contra1"]) > 0 and str(post["contra2"]) != user[11]:
+            changes += "Contraseña actualizada. "
+
+        return changes
 
     def update_password(self, correo, password, db):
         cmd = f"UPDATE members SET Password = '{password}' WHERE Correo = '{correo}'"

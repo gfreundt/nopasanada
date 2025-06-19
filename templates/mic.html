@@ -7,15 +7,18 @@
 {% endblock %}
 
 {% block content %}
+
 <!-- Flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+        <!-- {% for message in messages %} -->
+            {% for category, msg in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        <!-- {% endfor %} -->
     {% endif %}
 {% endwith %}
 
@@ -67,7 +70,6 @@
                                 </div>
                             {% endif %}
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -114,7 +116,7 @@
 
                         <!-- Campo de placa 3 -->
                         <div class="form-group form-floating mb-3 position-relative">
-                            <input type="text" class="form-control {% if errors.get('placa3') %} is-invalid {% endif %}" id="placa3" name="placa3" value="{{ placas[3] }}" placeholder="empty">
+                            <input type="text" class="form-control {% if errors.get('placa3') %} is-invalid {% endif %}" id="placa3" name="placa3" value="{{ placas[2] }}" placeholder="empty">
                             <label for="placa3">Placa</label>
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0" onclick="document.getElementById('placa3').value = ''" title="Borrar">
                                 <i class="bi bi-x-circle-fill text-danger fs-5"></i>
@@ -122,6 +124,57 @@
                             {% if errors.get("placa3") %}
                             <div class="mt-2">
                                 {% for error in errors.placa3 %}
+                                    <small class="text-danger">{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seccion Mi Contraseña -->
+            <div class="col-4 p-4">
+                <div class="card mb-3">
+                    <div class="card-header text-white" style="background-color: #2196f3">
+                        <h2 class="h5 mb-0">Mi Contraseña</h2>
+                    </div>
+                    <div class="card body p-3">
+
+                        <!-- Campo de contraseña actual -->
+                        <div class="form-group form-floating mb-3 position-relative">
+                            <input type="password" class="form-control {% if errors.get('placa1') %} is-invalid {% endif %}" id="contra1" name="contra1" value="" placeholder="empty">
+                            <label for="contra1">Contraseña actual</label>                            
+                            {% if errors.get("contra1") %}
+                            <div class="mt-2">
+                                {% for error in errors.contra1 %}
+                                    <small class="text-danger">{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo de nueva contraseña -->
+                        <div class="form-group form-floating mb-3 position-relative">
+                            <input type="text" class="form-control {% if errors.get('contra2') %} is-invalid {% endif %}" id="contra2" name="contra2" value="" placeholder="empty">
+                            <label for="contra2">Nueva contraseña</label>                            
+                            {% if errors.get("contra2") %}
+                            <div class="mt-2">
+                                {% for error in errors.contra2 %}
+                                    <small class="text-danger">{{ error }}</small><br>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo de confirmacion de contraseña -->
+                        <div class="form-group form-floating mb-3 position-relative">
+                            <input type="text" class="form-control {% if errors.get('contra3') %} is-invalid {% endif %}" id="contra3" name="contra3" value="" placeholder="empty">
+                            <label for="contra3">Confirmar contraseña</label>                            
+                            {% if errors.get("contra3") %}
+                            <div class="mt-2">
+                                {% for error in errors.contra3 %}
                                     <small class="text-danger">{{ error }}</small><br>
                                 {% endfor %}
                             </div>
