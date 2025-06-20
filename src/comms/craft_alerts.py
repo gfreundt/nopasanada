@@ -98,7 +98,7 @@ def compose_message(
     elif tipo_alerta == "SOAT":
         _t = f"SOAT para placa {placa}"
     elif tipo_alerta == "SATIMP":
-        _t = f"Impuesto Vehicular SAT Lima para placa {placa}"
+        _t = f"Impuesto Vehicular SAT Lima {placa}"
 
     texto_alerta = f"Tu {_t} {"ha vencido" if vencido else "está cerca de vencer"} el {fecha_hasta}."
 
