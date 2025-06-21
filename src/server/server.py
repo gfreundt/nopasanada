@@ -390,7 +390,7 @@ class UI:
                                 NombreCompleto = '{form_response["nombre"]}',
                                 DocNum = '{form_response["dni"]}',
                                 Celular = '{form_response["celular"]}',
-                                ForceMsg = f'{1 if "Placas" in changes_made else 0}'
+                                ForceMsg = '{1 if "Placas" in changes_made else 0}'
                                 WHERE IdMember = {session['user'][0]}"""
                     )
 

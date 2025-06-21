@@ -1,14 +1,12 @@
 from flask import Flask, render_template, jsonify, redirect
 import threading
 from copy import deepcopy as copy
-from pprint import pprint
 import os
 from datetime import datetime as dt
 import requests
 import schedule
 from ..utils import get_local_ip
 from src.nopasanada import nopasanada
-from datetime import datetime as dt
 
 
 class Dashboard:
