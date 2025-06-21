@@ -165,7 +165,7 @@ class UI:
 
                 # write new record in members table and create record in last update table
                 self.db.cursor.execute(
-                    f"INSERT INTO members VALUES ({rec},'{cod}','{nom}','DNI','{dni}','{cel}','{cor}',0,0,'{dat}',0,'{pwd}')"
+                    f"INSERT INTO members VALUES ({rec},'{cod}','{nom}','DNI','{dni}','{cel}','{cor}',0,0,'{dat}',0,'{pwd}',0)"
                 )
                 self.db.cursor.execute(
                     f"INSERT INTO membersLastUpdate VALUES ({rec},'{ph}','{ph}',{ph},'{ph}','{ph}','{ph}','{ph}')"
@@ -386,8 +386,11 @@ class UI:
                 else:
                     # update member information
                     self.db.cursor.execute(
-                        f"""    UPDATE members SET NombreCompleto = '{form_response["nombre"]}',
-                                DocNum = '{form_response["dni"]}', Celular = '{form_response["celular"]}'
+                        f"""    UPDATE members SET
+                                NombreCompleto = '{form_response["nombre"]}',
+                                DocNum = '{form_response["dni"]}',
+                                Celular = '{form_response["celular"]}',
+                                ForceMsg = f'{1 if "Placas" in changes_made else 0}'
                                 WHERE IdMember = {session['user'][0]}"""
                     )
 

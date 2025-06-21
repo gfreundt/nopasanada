@@ -1,4 +1,6 @@
 import os
+import shutil
+from datetime import datetime as dt
 
 
 def pre_maint(db_cursor):
@@ -10,13 +12,12 @@ def pre_maint(db_cursor):
 
 
 def post_maint(db_cursor):
-    # extract text data from soat images
 
     # review: duplicate placas
-    cmd = """   DELETE FROM '$review';
-                    INSERT INTO '$review' 
-                        SELECT NULL, Placa, "Placa Duplicada", NULL FROM placas GROUP BY Placa HAVING COUNT(*) > 1;
-          """
+    cmd = """ DELETE FROM '$review';
+                INSERT INTO '$review' 
+                    SELECT NULL, Placa, "Placa Duplicada", NULL FROM placas GROUP BY Placa HAVING COUNT(*) > 1;
+            """
     db_cursor.executescript(cmd)
 
     # review: placas with no associated member
@@ -25,4 +26,33 @@ def post_maint(db_cursor):
             """
     db_cursor.executescript(cmd)
 
+    # manage the backups
+    target_path = os.path.join("data", "backups")
+
+    for filename in os.listdir(target_path):
+        num = int(filename[2:4])
+        if num == 8:
+            os.remove(os.path.join(target_path, filename))
+            continue
+        new_filename = f"{filename[:2]}{num+1:02d}{filename[4:]}"
+        os.rename(
+            os.path.join(target_path, filename),
+            os.path.join(target_path, new_filename),
+        )
+
+        print(filename, new_filename)
+
+    _date = dt.strftime(dt.now(), "%Y-%m-%d %H;%M;%S")
+    shutil.copy(
+        os.path.join("data", "members.db"),
+        os.path.join(target_path, f"m-00 [{_date}].db"),
+    )
+
     # TODO: eliminate all placas with IdMember_FK = 0 and LastUpdates old
+    # TODO: extract text data from soat images
+
+
+def post_maint_send(db_cursor):
+
+    # turns off all flags for forced messages
+    db_cursor.execute("UPDATE members SET ForceMsg = 0")

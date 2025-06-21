@@ -20,8 +20,8 @@ def nopasanada(dash, db, cmds):
     maintenance.pre_maint(db.cursor)
 
     # update tables: users that require monthly message and users that require alert
-    get_recipients.need_message(db.cursor)
     get_recipients.need_alert(db.cursor)
+    get_recipients.need_message(db.cursor)
 
     # get all users and placas that need to be updated
     all_updates = get_records_to_update.get_records(db.cursor)
@@ -32,8 +32,12 @@ def nopasanada(dash, db, cmds):
     # scrape information on records that need to be updated
     if "update" in cmds:
         gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
+        # after update re-run alerts in case old information has been updated
+        get_recipients.need_alert(db.cursor)
     elif "update-threads" in cmds:
         gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
+        # after update re-run alerts in case old information has been updated
+        get_recipients.need_alert(db.cursor)
 
     # craft messages and alerts, save them to outbound folder
     if "comms" in cmds:
@@ -44,6 +48,8 @@ def nopasanada(dash, db, cmds):
     if "send" in cmds:
         print("sending")
         send_messages.send(db, dash, max=16)
+        # perform post-maintenance that only happens if sent emails
+        maintenance.post_maint_send(db.cursor)
 
     # perform post-maintenance
     maintenance.post_maint(db.cursor)
