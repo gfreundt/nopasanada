@@ -2,7 +2,6 @@ import time
 import io
 import urllib
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
 from PIL import Image
 from ..utils import ChromeUtils
 

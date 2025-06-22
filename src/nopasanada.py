@@ -13,7 +13,7 @@ from src.maintenance import maintenance
 
 def nopasanada(dash, db, cmds):
     """Program entry point. Executes actions depending on arguments ran at prompt.
-    Valid cmds: 'update', 'comms', 'send'
+    Valid cmds: 'update', 'update-threads', 'comms', 'send'
     """
 
     # perform pre-maintenance

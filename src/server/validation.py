@@ -50,7 +50,7 @@ class FormValidate:
 
             # nombre
             if len(reg["nombre"]) < 5:
-                errors["nombre"].append("Nombre debe tener mínimo 5 dígitos")
+                errors["nombre"].append("Nombre debe tener mínimo 5 letras")
 
             # dni
             if not re.match(r"^[0-9]{8}$", reg["dni"]):
@@ -147,16 +147,38 @@ class FormValidate:
             "contra3": [],
         }
 
-        # celular
+        # nombre
+        if len(mic["nombre"]) < 5:
+            errors["nombre"].append("Nombre debe tener mínimo 5 letras")
+
+        # celular: formato correcto (9 digitos)
         if not re.match(r"^[0-9]{9}$", mic["celular"]):
             errors["celular"].append("Ingrese un celular válido")
 
-        # placas: dos letras y cuatro números, o tres letras y tres números, sin guion
+        # celular: no se esta duplicando con otro celular de la base de datos (no necesario revisar si hay error previo)
+        else:
+            self.cursor.execute(
+                f"SELECT Celular FROM members WHERE Celular = '{mic["celular"]}' AND IdMember != (select IdMember FROM MEMBERS WHERE DocNum='{mic["dni"]}')"
+            )
+            if self.cursor.fetchone():
+                errors["celular"].append("Celular ya está asociado con otra cuenta.")
+
+        # placas
         for p in range(1, 4):
-            if mic[f"placa{p}"] and not re.match(
-                r"^[A-Z][A-Z0-9]{2}\d{3}$", mic[f"placa{p}"]
-            ):
-                errors[f"placa{p}"].append("Usar un formato válido")
+
+            _index = f"placa{p}"
+
+            # dos letras y cuatro números, o tres letras y tres números, sin guion
+            if mic[_index] and not re.match(r"^[A-Z][A-Z0-9]{2}\d{3}$", mic[_index]):
+                errors[_index].append("Usar un formato válido")
+
+            # no se esta duplicando con otra placa de la base de datos (no necesario revisar si hay error previo)
+            else:
+                self.cursor.execute(
+                    f"SELECT Placa FROM placas WHERE Placa = '{mic[_index]}' AND IdMember_FK != 0 AND IdMember_FK != (select IdMember FROM MEMBERS WHERE DocNum='{mic["dni"]}')"
+                )
+                if self.cursor.fetchone():
+                    errors[_index].append("Placa ya está asociada con otra cuenta.")
 
         # revisar solo si se ingreso algo en el campo de contraseña actual
         if len(mic["contra1"]) > 0:
@@ -185,6 +207,10 @@ class FormValidate:
     def mic_changes(self, user, placas, post):
 
         changes = ""
+
+        # nombre ha cambiado
+        if user[2] != post["nombre"]:
+            changes += "Nombre actualizado. "
 
         # celular ha cambiado
         if user[5] != post["celular"]:

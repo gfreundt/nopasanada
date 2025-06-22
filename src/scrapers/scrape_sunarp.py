@@ -1,8 +1,7 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import time
 from PIL import Image
-import io
-import urllib
 import os
 import numpy as np
 from statistics import mean
@@ -32,45 +31,51 @@ def browser(placa):
             "https://consultavehicular.sunarp.gob.pe/consulta-vehicular/inicio"
         )
         time.sleep(5)
-        retry_captcha = False
 
-        # inner loop to restart in case captcha is not ok
+        # enter placa data into field
+        webdriver.find_element(By.ID, "nroPlaca").send_keys(placa)
+        time.sleep(0.5)
+
+        # loop to restart process in case captcha is not correct
         while True:
 
-            # get captcha in string format
-            captcha_txt = ""
-            while not captcha_txt:
-                if retry_captcha:
-                    webdriver.refresh()
-                    time.sleep(1)
-                # capture captcha image from webpage and save
-                _path = os.path.join("static", "captcha_sunarp.png")
-                _img = webdriver.find_element(By.ID, "image")
-                with open(_path, "wb+") as file:
-                    file.write(_img.screenshot_as_png)
-                captcha_txt = use_truecaptcha(_path)["result"]
-                retry_captcha = True
+            # capture captcha image from webpage and save
+            _path = os.path.join("static", "captcha_sunarp.png")
+            with open(_path, "wb+") as file:
+                file.write(webdriver.find_element(By.ID, "image").screenshot_as_png)
+            captcha_txt = use_truecaptcha(_path)["result"]
+            print("---------", captcha_txt)
 
-            # enter data into fields and run
-            webdriver.find_element(By.ID, "nroPlaca").send_keys(placa)
+            # clear captcha field and enter captcha text
+            webdriver.find_element(By.ID, "codigoCaptcha").send_keys(
+                Keys.BACKSPACE * 6 + captcha_txt
+            )
             time.sleep(0.5)
-            webdriver.find_element(By.ID, "codigoCaptcha").send_keys(captcha_txt)
-            time.sleep(0.5)
+
+            # click on "Realizar Busqueda"
             webdriver.find_element(
                 By.XPATH,
                 "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/form/fieldset/nz-form-item[3]/nz-form-control/div/div/div/button",
             ).click()
             time.sleep(1)
 
-            # if captcha is not correct, restart inner loop;
+            # if captcha is not correct, refresh captcha and try again
             _alerta = webdriver.find_elements(By.ID, "swal2-html-container")
             if _alerta and "correctamente" in _alerta[0].text:
+                print("************ refresh")
+                # click salir de la alerta
                 webdriver.find_element(
                     By.XPATH, "/html/body/div/div/div[6]/button[1]"
                 ).click()
+                # click nuevo captcha
+                # webdriver.find_element(
+                #     By.XPATH,
+                #     "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/form/fieldset/nz-form-item[2]/table/tr/td[2]/a",
+                # ).click()
+                time.sleep(2)
                 continue
 
-            # if no data found, return None
+            # if captcha correct but no image found, return False
             elif _alerta and "error" in _alerta[0].text:
                 webdriver.find_element(
                     By.XPATH, "/html/body/div/div/div[6]/button[1]"
@@ -80,9 +85,10 @@ def browser(placa):
                 return False
 
             # no error... continue
-            else:
-                break
+            print("breaj!!!!!!")
+            break
 
+        # wait up to 10 seconds for image to load
         time_start = time.perf_counter()
         _card_image = None
         while not _card_image and time.perf_counter() - time_start < 10:
@@ -91,24 +97,16 @@ def browser(placa):
                 By.XPATH,
                 "/html/body/app-root/nz-content/div/app-inicio/app-vehicular/nz-layout/nz-content/div/nz-card/div/app-form-datos-consulta/div/img",
             )
-            webdriver.refresh()
             time.sleep(0.5)
 
-        # no image found in 10 sec, restart outer loop
+        # if image fails to load, return False
         if not _card_image:
-            continue
+            return False
 
         # grab image and save in file, return succesful
         base64_string = _card_image[0].get_attribute("src")[21:]
         output_path = os.path.join("data", "images", f"SUNARP_{placa}.png")
         base64_to_image(base64_string, output_path)
-
-        # # save image in file
-        # _img_path = os.path.abspath(
-        #     os.path.join("data", "images", f"SUNARP_{placa}.png")
-        # )
-        # with open(_img_path, "wb") as file:
-        #     file.write(_card_image[0].screenshot_as_png)
 
         # press boton to start over
         time.sleep(1)
@@ -120,56 +118,3 @@ def browser(placa):
 
         webdriver.quit()
         return True
-
-
-def process_captcha(img, ocr):
-
-    # split image into six pieces and run OCR to each
-    img.save(os.path.join("static", "sunarp_temp.jpg"))
-
-    WHITE = np.asarray((255, 255, 255, 255))
-    BLACK = np.asarray((0, 0, 0, 0))
-
-    img_object = Image.open(os.path.join("static", "sunarp_temp.jpg"))
-
-    original_img = np.asarray(img_object)
-    original_img = np.asarray(
-        [[WHITE if mean(i) > 165 else BLACK for i in j] for j in original_img],
-        dtype=np.uint8,
-    )
-
-    a = len(original_img)
-    b = len(original_img[1])
-
-    h = np.full((b, a), 0)
-    for x in range(len(original_img)):
-        for y in range(len(original_img[0])):
-            h[y][x] = int(original_img[x][y][0])
-
-    stopx = []
-    delta = -2
-    check_for_next = False
-    for x in range(180):
-        if all([i == 0 for i in h[x]]) is check_for_next:
-            stopx.append(x + delta)
-            check_for_next = not check_for_next
-            delta = delta * -1
-
-    if len(stopx) % 2 == 1:
-        stopx.append(179)
-
-    phrase = ""
-    for k in range(len(stopx) // 2):
-        i = img_object.crop((stopx[2 * k], 0, stopx[2 * k + 1], 60))
-        fn = os.path.join("static", f"temp{k}.jpg")
-        i.save(fn)
-        c = ocr.readtext(fn, text_threshold=0.4)
-        if c:
-            phrase += c[0][1]
-
-    # ocr text correction
-    phrase.replace("€", "C")
-
-    print(phrase)
-
-    return phrase.upper() if len(phrase) == 6 else ""

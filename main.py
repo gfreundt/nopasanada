@@ -84,6 +84,9 @@ def main():
     if "NOW" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms"])
 
+    if "PLUS" in sys.argv:
+        nopasanada(dash, db, cmds=["update-threads", "comms"])
+
     if "SEND" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms", "send"])
 

@@ -10,6 +10,7 @@ import os
 from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
 from ..utils import revisar_symlinks, get_local_ip
+from src.utils import Email
 
 
 # TODO: fix last two to show correct format
@@ -30,6 +31,11 @@ class UI:
         self.dash = dash
         self.validacion = FormValidate(db=self.db)
         self.users = UserData(db=self.db)
+
+        # activate send account
+        self.email = Email(
+            from_account="info@nopasanadape.com", password=os.environ["ZOHO-1-PWD"]
+        )
 
         # initialize Flask app
         BASE_PATH = os.path.abspath(os.curdir)
@@ -118,9 +124,16 @@ class UI:
                         for _ in range(4)
                     ]
                 )
-                print("@@@@@", session["codigo_generado"])
+                print("-------- REG ---------->", session["codigo_generado"])
+                response = self.email.send_email(
+                    self.craft_code_message(
+                        code=session["codigo_generado"],
+                        email_address=session["registration_attempt"]["correo"],
+                    )
+                )
+
                 self.dash.log(
-                    usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}"
+                    usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}. Resultado: {response}"
                 )
 
                 return redirect("reg-2")
@@ -213,9 +226,16 @@ class UI:
                         for _ in range(4)
                     ]
                 )
-                print("@@@@@", session["codigo_generado"])
+                print("-------- REC ---------->", session["codigo_generado"])
+                response = self.email.send_email(
+                    self.craft_code_message(
+                        code=session["codigo_generado"],
+                        email_address=session["recovery_attempt"]["correo"],
+                    )
+                )
+
                 self.dash.log(
-                    usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}"
+                    usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}. Resultado: {response}"
                 )
 
                 return redirect("rec-2")
@@ -249,9 +269,7 @@ class UI:
                     f"UPDATE members SET Password = '{pwd}' WHERE Correo = '{cor}'"
                 )
                 self.db.conn.commit()
-                self.dash.log(
-                    usuario=f"Recuperacion ok. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
-                )
+                self.dash.log(usuario="Recuperacion ok.")
 
                 # clear session data (back to login) and reload db to include new record
                 session.clear()
@@ -261,9 +279,7 @@ class UI:
 
             else:
 
-                self.dash.log(
-                    usuario=f"Recuperacion ERROR. {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
-                )
+                self.dash.log(usuario="Recuperacion ERROR.")
 
         # render form for user to fill (first time or returned with errors)
         if "password1" in form_response:
@@ -450,6 +466,15 @@ class UI:
         )
         session.clear()
         return redirect("log")
+
+    def craft_code_message(self, code, email_address):
+        msg = {
+            "to": email_address,
+            "from": self.email.from_account,
+            "subject": "Codigo Unico de Validacion",
+            "html_content": f"<b>{code}</b>",
+        }
+        return msg
 
     def run(self):
         print(f" > SERVER RUNNING ON: http://{get_local_ip()}:5000")

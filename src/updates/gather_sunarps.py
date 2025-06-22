@@ -18,9 +18,6 @@ def gather(db_cursor, db_conn, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR
-    ocr = easyocr.Reader(["es"], gpu=False)
-
     # iterate on every placa and write to database
     for counter, (id_placa, placa) in enumerate(update_data, start=1):
 
@@ -61,7 +58,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # delete all old records from placa
                 db_cursor.execute(
-                    f"DELETE FROM sunarps WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE Placa = '{placa}')"
+                    f"DELETE FROM sunarps WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE ImgFilename = '{_img_filename}')"
                 )
 
                 # insert new record into database
@@ -80,7 +77,7 @@ def gather(db_cursor, db_conn, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
+            except Exception:
                 retry_attempts += 1
                 dash.log(
                     card=CARD,

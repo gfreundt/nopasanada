@@ -28,10 +28,10 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
     gather_sunarps.gather(db_cursor, db_conn, dash, all_updates["sunarps"])
     gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
 
-    # manual gathering
+    # # manual gathering
     gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
 
-    # in development
+    # # in development
     gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
     gather_jnemulta.gather(db_cursor, dash, all_updates["jnemultas"])
     gather_jneafil.gather(db_cursor, dash, all_updates["jneafils"])
@@ -46,11 +46,19 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
 def gather_threads(db_conn, db_cursor, dash, all_updates):
 
-    dash.log(general_status="Activo")
+    dash.log(general_status=("Activo", 1))
 
     threads = []
 
-    # auto gathering
+    # requires manual captcha input (might timeout)
+    threads.append(
+        Thread(
+            target=gather_satmuls.gather,
+            args=(db_conn, db_cursor, dash, all_updates["satmuls"]),
+        )
+    )
+
+    # do not require manual captcha input
     threads.append(
         Thread(
             target=gather_brevetes.gather,
@@ -93,18 +101,32 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
             args=(db_conn, db_cursor, dash, all_updates["soats"]),
         )
     )
+    threads.append(
+        Thread(
+            target=gather_sunats.gather,
+            args=(db_cursor, dash, all_updates["sunats"]),
+        )
+    )
+    threads.append(
+        Thread(
+            target=gather_jnemulta.gather,
+            args=(db_cursor, dash, all_updates["jnemultas"]),
+        )
+    )
+    threads.append(
+        Thread(
+            target=gather_jneafil.gather,
+            args=(db_cursor, dash, all_updates["jneafils"]),
+        )
+    )
 
     # start all threads with a 2 second gap to avoid webdriver conflict
     for thread in threads:
         thread.start()
         time.sleep(2)
 
-    # manual gathering (might not proceed because of timeout)
-    gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
-
-    # wait for all active threads to finish in case manual gathering finishes before auto
+    # wait for all active threads to finish
     while any([i.is_alive() for i in threads]):
-        print("waiting threads")
         time.sleep(10)
 
     # commit all changes to database

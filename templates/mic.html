@@ -46,16 +46,16 @@
                             <label for="correo">Correo</label>
                         </div>
 
-                        <!-- Campo de nombre -->
-                        <div class="form-group form-floating mb-3">
-                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ user[2] }}" placeholder="empty" readonly>
-                            <label for="nombre">Nombre</label>
-                        </div>
-
                         <!-- Campo de DNI -->
                         <div class="form-group form-floating mb-3">
                             <input type="text" class="form-control" id="dni" name="dni" value="{{ user[4] }}" placeholder="empty" readonly>
                             <label for="dni">DNI</label>
+                        </div>
+
+                        <!-- Campo de nombre -->
+                        <div class="form-group form-floating mb-3">
+                            <input type="text" class="form-control {% if errors.get('nombre') %} is-invalid {% endif %}" id="nombre" name="nombre" value="{{ user[2] }}" placeholder="empty">
+                            <label for="nombre">Nombre</label>
                         </div>
 
                         <!-- Campo de celular -->
@@ -70,6 +70,7 @@
                                 </div>
                             {% endif %}
                         </div>
+                        
                     </div>
                 </div>
             </div>

@@ -40,8 +40,6 @@ def post_maint(db_cursor):
             os.path.join(target_path, new_filename),
         )
 
-        print(filename, new_filename)
-
     _date = dt.strftime(dt.now(), "%Y-%m-%d %H;%M;%S")
     shutil.copy(
         os.path.join("data", "members.db"),
