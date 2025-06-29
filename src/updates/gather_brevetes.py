@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 import easyocr
 import logging
-from ..utils import date_to_db_format, log_action_in_db
+from ..utils import date_to_db_format
 from src.scrapers import scrape_brevete
 
 
@@ -106,12 +106,6 @@ def gather(db_cursor, db_conn, dash, update_data):
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
-                )
-
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="brevetes", idMember=id_member)
-                log_action_in_db(
-                    db_cursor, table_name="mtcPapeletas", idMember=id_member
                 )
 
                 # no errors - next member

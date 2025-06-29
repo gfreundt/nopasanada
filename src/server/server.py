@@ -9,8 +9,9 @@ import os
 
 from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
-from ..utils import revisar_symlinks, get_local_ip
-from src.utils import Email
+from ..utils import get_local_ip
+
+from src.comms import send_code_message
 
 
 # TODO: fix last two to show correct format
@@ -31,11 +32,6 @@ class UI:
         self.dash = dash
         self.validacion = FormValidate(db=self.db)
         self.users = UserData(db=self.db)
-
-        # activate send account
-        self.email = Email(
-            from_account="info@nopasanadape.com", password=os.environ["ZOHO-1-PWD"]
-        )
 
         # initialize Flask app
         BASE_PATH = os.path.abspath(os.curdir)
@@ -125,15 +121,14 @@ class UI:
                     ]
                 )
                 print("-------- REG ---------->", session["codigo_generado"])
-                response = self.email.send_email(
-                    self.craft_code_message(
-                        code=session["codigo_generado"],
-                        email_address=session["registration_attempt"]["correo"],
-                    )
+                send_code_message.send_code(
+                    codigo=session["codigo_generado"],
+                    correo=session["registration_attempt"]["correo"],
+                    nombre=session["registration_attempt"]["nombre"],
                 )
 
                 self.dash.log(
-                    usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}. Resultado: {response}"
+                    usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}."
                 )
 
                 return redirect("reg-2")
@@ -174,18 +169,19 @@ class UI:
                     "SELECT IdMember FROM members ORDER BY IdMember DESC"
                 )
                 rec = int(self.db.cursor.fetchone()[0]) + 1
-                ph = "2020-01-01"
 
                 # write new record in members table and create record in last update table
                 self.db.cursor.execute(
                     f"INSERT INTO members VALUES ({rec},'{cod}','{nom}','DNI','{dni}','{cel}','{cor}',0,0,'{dat}',0,'{pwd}',0)"
                 )
+                # create blank record and add new member ID
+                self.db.cursor.execute("INSERT INTO membersLastUpdate DEFAULT VALUES")
                 self.db.cursor.execute(
-                    f"INSERT INTO membersLastUpdate VALUES ({rec},'{ph}','{ph}',{ph},'{ph}','{ph}','{ph}','{ph}')"
+                    f"UPDATE membersLastUpdate SET IdMember_FK = {rec} WHERE IdMember_FK IS NULL"
                 )
                 self.db.conn.commit()
                 self.dash.log(
-                    usuario=f"Nuevo Registro Completo. {rec} | {cod} | {nom} | {dni} | {cel} | {cor} | {dat} | {pwd}'"
+                    usuario=f"Nuevo Registro Completo. {rec} | {cod} | {nom} | {dni} | {cel} | {cor} | {dat} | {pwd}"
                 )
 
                 # clear session data (back to login) and reload db to include new record
@@ -227,15 +223,14 @@ class UI:
                     ]
                 )
                 print("-------- REC ---------->", session["codigo_generado"])
-                response = self.email.send_email(
-                    self.craft_code_message(
-                        code=session["codigo_generado"],
-                        email_address=session["recovery_attempt"]["correo"],
-                    )
+                send_code_message.send_code(
+                    codigo=session["codigo_generado"],
+                    correo=session["registration_attempt"]["correo"],
+                    nombre=session["registration_attempt"]["nombre"],
                 )
 
                 self.dash.log(
-                    usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}. Resultado: {response}"
+                    usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}."
                 )
 
                 return redirect("rec-2")
@@ -466,15 +461,6 @@ class UI:
         )
         session.clear()
         return redirect("log")
-
-    def craft_code_message(self, code, email_address):
-        msg = {
-            "to": email_address,
-            "from": self.email.from_account,
-            "subject": "Codigo Unico de Validacion",
-            "html_content": f"<b>{code}</b>",
-        }
-        return msg
 
     def run(self):
         print(f" > SERVER RUNNING ON: http://{get_local_ip()}:5000")

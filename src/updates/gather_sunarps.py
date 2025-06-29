@@ -1,7 +1,5 @@
 from datetime import datetime as dt
-from ..utils import log_action_in_db
 from src.scrapers import scrape_sunarp
-import easyocr
 
 
 def gather(db_cursor, db_conn, dash, update_data):
@@ -70,8 +68,7 @@ def gather(db_cursor, db_conn, dash, update_data):
                     f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE IdPlaca = '{id_placa}'"
                 )
 
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="sunarps", idMember=id_placa)
+                # skip to next record
                 break
 
             except KeyboardInterrupt:

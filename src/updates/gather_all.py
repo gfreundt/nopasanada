@@ -19,21 +19,21 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
     dash.log(general_status=("Activo", 1))
 
-    # auto gathering
-    gather_brevetes.gather(db_cursor, db_conn, dash, all_updates["brevetes"])
-    gather_revtecs.gather(db_cursor, dash, all_updates["revtecs"])
-    gather_sutrans.gather(db_cursor, dash, all_updates["sutrans"])
-    gather_satimps.gather(db_cursor, dash, all_updates["satimpCodigos"])
-    gather_recvehic.gather(db_cursor, db_conn, dash, all_updates["recvehic"])
-    gather_sunarps.gather(db_cursor, db_conn, dash, all_updates["sunarps"])
-    gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
+    # # auto gathering
+    # gather_brevetes.gather(db_cursor, db_conn, dash, all_updates["brevetes"])
+    # gather_revtecs.gather(db_cursor, dash, all_updates["revtecs"])
+    # gather_sutrans.gather(db_cursor, dash, all_updates["sutrans"])
+    # gather_satimps.gather(db_cursor, dash, all_updates["satimpCodigos"])
+    # gather_recvehic.gather(db_cursor, db_conn, dash, all_updates["recvehic"])
+    # gather_sunarps.gather(db_cursor, db_conn, dash, all_updates["sunarps"])
+    # gather_soats.gather(db_conn, db_cursor, dash, all_updates["soats"])
 
-    # # manual gathering
-    gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
+    # # # manual gathering
+    # gather_satmuls.gather(db_conn, db_cursor, dash, all_updates["satmuls"])
 
-    # # in development
-    gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
-    gather_jnemulta.gather(db_cursor, dash, all_updates["jnemultas"])
+    # # # in development
+    # gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
+    # gather_jnemulta.gather(db_cursor, dash, all_updates["jnemultas"])
     gather_jneafil.gather(db_cursor, dash, all_updates["jneafils"])
 
     # commit all changes to database

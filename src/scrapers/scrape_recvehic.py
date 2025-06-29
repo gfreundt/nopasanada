@@ -54,8 +54,9 @@ def browser(doc_num):
         time.sleep(1)
 
         # if captcha is not correct, refresh and restart cycle, if no data found, return blank
-        _alerta = webdriver.find_elements(By.ID, "AlertMessage")
+        _alerta = webdriver.find_elements(By.ID, "idxAlertmensaje")
         if _alerta and "ingresado" in _alerta[0].text:
+            print("111111111111")
             # click on "Cerrar" to close pop-up
             webdriver.find_element(
                 By.XPATH, "/html/body/div[5]/div/div/div[2]/button"
@@ -65,14 +66,11 @@ def browser(doc_num):
             webdriver.refresh()
             continue
         elif _alerta and "PERSONA" in _alerta[0].text:
-            # click on "Ok" to close pop-up
-            webdriver.find_element(
-                By.XPATH, "/html/body/div[5]/div/div/div[2]/button"
-            ).click()
-            time.sleep(1)
+            print("22222222222")
             webdriver.quit()
             return -1
         else:
+            print("333333333333333")
             break
 
     # click on download button
@@ -81,7 +79,7 @@ def browser(doc_num):
         b[0].click()
     except Exception:
         webdriver.quit()
-        return ""
+        return -1
 
     # wait max 10 sec while file is downloaded
     count = 0

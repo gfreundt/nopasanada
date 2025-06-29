@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from ..utils import date_to_db_format, log_action_in_db
+from ..utils import date_to_db_format
 from src.scrapers import scrape_satmul
 
 
@@ -61,9 +61,6 @@ def gather(db_conn, db_cursor, dash, update_data):
                 db_cursor.execute(
                     f"UPDATE placas SET LastUpdateSATMUL = '{_now}' WHERE Placa = '{placa}'"
                 )
-
-                # register action
-                log_action_in_db(db_cursor, table_name="satmuls", idPlaca=id_placa)
 
                 # update dashboard with progress and last update timestamp
                 dash.log(

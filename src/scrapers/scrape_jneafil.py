@@ -1,12 +1,13 @@
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
 import time
 import os
+from PIL import Image
+from io import BytesIO
 from ..utils import ChromeUtils, use_truecaptcha
 
 
 def browser(doc_num):
-    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
     webdriver.get("https://sroppublico.jne.gob.pe/Consulta/Afiliado")
     time.sleep(1.5)
 
@@ -18,8 +19,7 @@ def browser(doc_num):
         _img = webdriver.find_element(
             By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
         )
-
-        _path = os.path.join("static", "jneafil.png")
+        _path = os.path.join("static", "captcha_jneafil.png")
 
         with open(_path, "wb+") as file:
             file.write(_img.screenshot_as_png)
@@ -28,52 +28,49 @@ def browser(doc_num):
 
         # enter data into fields and run
         webdriver.find_element(By.ID, "DNI").send_keys(doc_num)
-        time.sleep(0.2)
-        webdriver.find_element(By.XPATH, "").send_keys(captcha_txt)
-        time.sleep(0.2)
-        webdriver.find_element(By.XPATH, "").click()
+        time.sleep(0.5)
+        webdriver.find_element(
+            By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/input"
+        ).send_keys(captcha_txt["result"])
+        time.sleep(0.5)
+        webdriver.find_element(
+            By.XPATH, "/html/body/div[1]/form/div/div[3]/button"
+        ).click()
+        time.sleep(3)
 
-        # if no pendings, return empty dictionary
-        if "pendientes" in _alerta:
-            webdriver.quit()
-            return {}
-        else:
+        # if no error in captcha, continue
+        _alert = webdriver.find_element(By.XPATH, "/html/body/div[1]/div[2]")
+        if "vencido" not in _alert.text:
             break
 
-    # get responses and package into list of dictionaries
-    data_index = (
-        "documento",
-        "tipo",
-        "fecha_documento",
-        "codigo_infraccion",
-        "clasificacion",
-    )
-    response = []
-    pos1 = 2
-    _xpath_partial = f"/html/body/form/div[3]/div[3]/div/table/tbody/"
+        # otherwise, refresh captcha and restart loop
+        webdriver.find_element(
+            By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[2]/i"
+        ).click()
+        time.sleep(1)
 
-    # loop on all documentos
-    while webdriver.find_elements(By.XPATH, _xpath_partial + f"tr[{pos1}]/td[1]"):
-        item = {}
+    # grab "Historial de Afiliacion"
+    _historial = webdriver.find_element(By.ID, "divMsjHistAfil")
 
-        # loop on all items in documento
-        for pos2, data_unit in enumerate(data_index, start=1):
-            item.update(
-                {
-                    data_unit: webdriver.find_element(
-                        By.XPATH,
-                        _xpath_partial + f"tr[{pos1}]/td[{pos2}]",
-                    ).text
-                }
-            )
+    if "Ninguno" in _historial.text:
+        return ""
 
-        # append dictionary to list
-        response.append(item)
-        pos1 += 1
+    else:
+        # store in memory buffer
+        _img_buffer = BytesIO()
+        _img_buffer.write(webdriver.get_screenshot_as_png())
 
-    # last item is garbage, remove from response
-    response.pop()
+        # crop image
+        img = Image.open(_img_buffer)
+        img.show()
+        time.sleep(10)
+        _img_cropped = img.crop((61, 514, 1814, 1700))
 
-    # succesful, return list of dictionaries
-    webdriver.quit()
-    return response
+        # save cropped image
+        _filename = f"JNE_Afil_{doc_num}.png"
+        _img_cropped.save(os.path.join("data", "images", _filename))
+
+        # close webdrive
+        webdriver.quit()
+
+        return _filename

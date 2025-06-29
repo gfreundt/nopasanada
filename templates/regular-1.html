@@ -13,11 +13,10 @@
 
 <body style="color: black; font-family: Arial, Helvetica, sans-serif">
     <p>Hola {{nombre_usuario}},</p>
-    <p><strong>No Pasa Nada PE</strong> te manda su nuevo boletín mensual con toda tu información actualizada.</p>
-    <p>Estamos dando los toques finales para date acceso a tu portal privado, donde podrás actualizar tus placas, tus datos de contacto o, si lo prefieres, darte de baja del servicio.</p>
-    <p>En la siguiente edicion expandiremos la información que te mandamos.</p>
-    <p>Como siempre, antes cualquier duda no dudes en escribirnos a <a href="info@nopasanadape.com"> info@nopasanadape.com</a>.</p>
-    <br>
+    <p>Queremos contarte que Servicio de Alertas Perú ha evolucionado y ahora somos <strong>No Pasa Nada PE</strong>.</p> 
+    <p>Este es nuestro <strong>primer boletín mensual</strong>, con toda tu información actualizada.</p>
+    <p>Muy pronto recibirás otro correo con los datos de acceso a tu portal privado, donde podrás actualizar tus placas, tus datos de contacto o, si lo prefieres, darte de baja del servicio.</p>
+    
     {% if lista_placas|length <= 6 %}
     <p>La placa que tienes registrada es: <strong>{{lista_placas}}</strong>.</p>
     {% else %}
@@ -506,9 +505,7 @@
         </tbody>
     </table>
 
-    <p>Gracias por seguir confiando en nosotros,</p>
-    <br>
-    <strong>El equipo de No Pasa Nada PE</strong></p>
+    <p>Atentamente,<br><strong>El equipo de No Pasa Nada PE</strong></p>
 
     <p style="font-size:x-small; color:#c5c9c9">
         {{codigo_correo}}

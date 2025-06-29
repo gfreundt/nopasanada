@@ -9,7 +9,6 @@ from selenium.webdriver.chrome.service import Service
 import subprocess
 import requests
 import json
-import speech_recognition
 import ctypes
 import pypdfium2.raw as pdfium
 import math
@@ -224,45 +223,6 @@ class PDFUtils:
             return True
         except Exception:
             return False
-
-
-class SpeechUtils:
-
-    def __init__(self):
-        self.speech_driver_errors = 0
-
-    def clean_military_alphabet(self, text):
-        with open(os.path.join("static", "military_alphabet.txt")) as file:
-            ma_index = [i.strip() for i in file.readlines()]
-            for word in ma_index:
-                text = text.replace(word, word[0])
-        return text
-
-    def get_speech(self, use_military_alphabet=True, max_driver_errors=5, timeout=10):
-        while True:
-            try:
-                with speech_recognition.Microphone() as mic:
-                    self.speech = speech_recognition.Recognizer()
-                    self.speech.adjust_for_ambient_noise(mic, duration=0.2)
-                    _audio = self.speech.listen(mic, timeout=timeout)
-                    text = self.speech.recognize_google(_audio)
-
-                # clean military alphabet letters
-                if use_military_alphabet:
-                    text = self.clean_military_alphabet(text.lower())
-
-                return text
-
-            except speech_recognition.WaitTimeoutError:
-                print("[ SPEECH RECOGNITION TIMEOUT ]")
-                return "$$TIMEOUT$$"
-
-            except:
-                if self.speech_driver_errors < max_driver_errors:
-                    self.speech = speech_recognition.Recognizer()
-                    self.speech_driver_errors += 1
-                else:
-                    return None
 
 
 class Email:

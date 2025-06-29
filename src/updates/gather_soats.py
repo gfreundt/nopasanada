@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 from copy import deepcopy as copy
 from src.updates import soat_image_generator
-from ..utils import date_to_db_format, log_action_in_db, use_truecaptcha
+from ..utils import date_to_db_format, use_truecaptcha
 from src.scrapers import scrape_soat
 import os
 
@@ -114,9 +114,6 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                     db_cursor.execute(
                         f"UPDATE placas SET LastUpdateSOAT = '{_now}' WHERE IdPlaca = '{id_placa}'"
                     )
-
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="soats", idPlaca=id_placa)
 
                 # update dashboard with progress and last update timestamp
                 dash.log(

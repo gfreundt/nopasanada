@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 import easyocr
 import logging
-from ..utils import date_to_db_format, log_action_in_db
+from ..utils import date_to_db_format
 from src.scrapers import scrape_revtec
 
 
@@ -76,8 +76,7 @@ def gather(db_cursor, dash, update_data):
                 db_cursor.execute(f"INSERT INTO revtecs VALUES {tuple(_values)}")
                 dash.log(action=f"[ REVTECS ] {"|".join([str(i) for i in _values])}")
 
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="revtec", idPlaca=id_placa)
+                # skip to next record
                 break
 
             except KeyboardInterrupt:

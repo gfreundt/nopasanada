@@ -1,5 +1,4 @@
 from datetime import datetime as dt
-from ..utils import log_action_in_db
 from src.scrapers import scrape_satimp
 import easyocr
 import logging
@@ -82,19 +81,9 @@ def gather(db_cursor, dash, update_data):
                             action=f"[ SATIMPS ] {"|".join([str(i) for i in _values])}"
                         )
 
-                        # register action and log
-                        log_action_in_db(
-                            db_cursor, table_name="satimpDeudas", idMember=id_member
-                        )
-
                 # update memberLastUpdate table with last update information
                 db_cursor.execute(
                     f"UPDATE membersLastUpdate SET LastUpdateImpSAT = '{_now}' WHERE IdMember_FK = '{id_member}'"
-                )
-
-                # register action
-                log_action_in_db(
-                    db_cursor, table_name="satimpCodigos", idMember=id_member
                 )
 
                 # update dashboard with progress and last update timestamp

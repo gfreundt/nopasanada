@@ -67,6 +67,9 @@ class Dashboard:
             if len(self.data["bottom_left"]) > 30:
                 self.data["bottom_left"].pop(0)
             # write to permanent log in database
+            print(
+                f"INSERT INTO log VALUES ('USUARIO', '{kwargs["usuario"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
+            )
             cmd = f"INSERT INTO log VALUES ('USUARIO', '{kwargs["usuario"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
             self.db.cursor.execute(cmd)
         if "kpis" in kwargs:
@@ -125,11 +128,11 @@ class Dashboard:
             return jsonify(self.data)
 
     def launch_gather_comm(self):
-        nopasanada(self, self.db, cmds=["update", "comms"])
+        nopasanada(self, self.db, cmds=["update-threads", "comms"])
         return redirect("/")
 
     def launch_gather_send(self):
-        nopasanada(self, self.db, cmds=["update", "comms", "send"])
+        nopasanada(self, self.db, cmds=["update-threads", "comms", "send"])
         return redirect("/")
 
     def run(self):

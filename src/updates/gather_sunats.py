@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from ..utils import date_to_db_format, log_action_in_db
+from ..utils import date_to_db_format
 from src.scrapers import scrape_sunat
 
 
@@ -59,8 +59,7 @@ def gather(db_cursor, dash, update_data):
 
                 dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="sunats", idMember=id_member)
+                # skip to next record
                 break
 
             except KeyboardInterrupt:

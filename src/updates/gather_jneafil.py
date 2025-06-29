@@ -1,5 +1,4 @@
 from datetime import datetime as dt
-from ..utils import date_to_db_format, log_action_in_db
 from src.scrapers import scrape_jneafil
 
 
@@ -27,12 +26,12 @@ def gather(db_cursor, dash, update_data):
                 dash.log(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
-                sunat_response = scrape_jneafil.browser(doc_tipo, doc_num)
+                jne_response = scrape_jneafil.browser(doc_num)
 
                 # update memberLastUpdate table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")
                 db_cursor.execute(
-                    f"UPDATE membersLastUpdate SET LastUpdateSunat = '{_now}' WHERE IdMember_FK = {id_member}"
+                    f"UPDATE membersLastUpdate SET LastUpdateJNEAfil = '{_now}' WHERE IdMember_FK = {id_member}"
                 )
 
                 # update dashboard with progress and last update timestamp
@@ -42,36 +41,30 @@ def gather(db_cursor, dash, update_data):
                     lastUpdate=dt.now(),
                 )
 
-                if not sunat_response:
-                    break
-
-                # adjust date to match db format (YYYY-MM-DD)
-                new_record_dates_fixed = date_to_db_format(data=sunat_response)
-
-                # add foreign key and current date to scraper response
-                _values = [id_member] + new_record_dates_fixed + [_now]
+                # add foreign key, True/False flag and current date to scraper response
+                _values = [id_member, bool(jne_response), jne_response, _now]
 
                 # delete all old records from member
-                db_cursor.execute(f"DELETE FROM sunats WHERE IdMember_FK = {id_member}")
+                db_cursor.execute(
+                    f"DELETE FROM JNEAfiliacion WHERE IdMember_FK = {id_member}"
+                )
 
                 # insert gathered record of member
-                db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
+                db_cursor.execute(f"INSERT INTO JNEAfiliacion VALUES {tuple(_values)}")
+                dash.log(action=f"[ JNE Afil ] {"|".join([str(i) for i in _values])}")
 
-                dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
-
-                # register action and skip to next record
-                log_action_in_db(db_cursor, table_name="sunats", idMember=id_member)
+                # next record
                 break
 
             except KeyboardInterrupt:
                 quit()
 
-            except Exception:
-                retry_attempts += 1
-                dash.log(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
+            #     )
 
     # log last action
     dash.log(
