@@ -39,6 +39,7 @@ class Dashboard:
         )
 
         self.set_initial_data()
+        self.update_kpis()
 
     def log(self, **kwargs):
 
@@ -72,8 +73,9 @@ class Dashboard:
             )
             cmd = f"INSERT INTO log VALUES ('USUARIO', '{kwargs["usuario"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
             self.db.cursor.execute(cmd)
-        if "kpis" in kwargs:
-            print(kwargs["kpis"])
+
+        # any time there is an action, update kpis
+        self.update_kpis()
 
     def set_initial_data(self):
         empty_card = {
@@ -92,36 +94,34 @@ class Dashboard:
             "bottom_right": [],
         }
 
-    def dashboard(self):
-        return render_template("dashboard.html", data=self.data)
-
     def update_remaining_time(self):
         delta = schedule.next_run("update") - dt.now()
         hours, remainder = divmod(int(delta.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         self.log(general_status=(f"- {hours:02} : {minutes:02} : {seconds:02}", 1))
 
-    def update_db_stats(self, db):
+    def update_kpis(self):
         # get number of users
-        db.cursor.execute("SELECT COUNT( ) FROM members")
-        response = {"users": db.cursor.fetchone()[0]}
+        self.db.cursor.execute("SELECT COUNT( ) FROM members")
+        self.data.update({"kpi_members": self.db.cursor.fetchone()[0]})
 
         # get number of placas
-        db.cursor.execute("SELECT COUNT( ) FROM placas")
-        response.update({"placas": db.cursor.fetchone()[0]})
+        self.db.cursor.execute("SELECT COUNT( ) FROM placas")
+        self.data.update({"kpi_placas": self.db.cursor.fetchone()[0]})
 
         # get balance left in truecaptcha
         try:
             url = r"https://api.apiTruecaptcha.org/one/hello?method=get_all_user_data&userid=gabfre%40gmail.com&apikey=UEJgzM79VWFZh6MpOJgh"
             r = requests.get(url)
-            response.update(
-                {"truecaptcha_balance": r.json()["data"]["get_user_info"][4]["value"]}
+            self.data.update(
+                {
+                    "kpi_truecaptcha_balance": r.json()["data"]["get_user_info"][4][
+                        "value"
+                    ]
+                }
             )
         except ConnectionError:
-            response.update({"truecaptcha_balance": "N/A"})
-
-        # update dashboard
-        self.log(kpis=response)
+            self.data.update({"truecaptcha_balance": "N/A"})
 
     def get_data(self):
         with self.data_lock:
@@ -134,6 +134,9 @@ class Dashboard:
     def launch_gather_send(self):
         nopasanada(self, self.db, cmds=["update-threads", "comms", "send"])
         return redirect("/")
+
+    def dashboard(self):
+        return render_template("dashboard.html", data=self.data)
 
     def run(self):
         print(f"MONITOR RUNNING ON: http://{get_local_ip()}:7000")
