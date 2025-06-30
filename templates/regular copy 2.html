@@ -507,64 +507,6 @@
         </tbody>
     </table>
 
-    <h2>🗂️ Estado DNI en SUNAT</h2>
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-        <thead>
-            <tr>
-                <th colspan="2" style="background-color: #003b6d; color: white; padding: 10px; text-align: center; font-weight: bold;">
-                    Estado del DNI en SUNAT
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Número de RUC</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.ruc}}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Tipo de Contribuyente</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.tipo_contribuyente}}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Fecha de Inscripción</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.fecha_inscripcion}}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Estado</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.estado}}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Condición</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.condicion}}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Fecha de Inicio de Actividades</td>
-                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{sunat.fecha_inicio_actividades}}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h2>🗳️ Afiliación a Partidos Políticos</h2>
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-        <thead>
-            <tr>
-                <th colspan="1" style="background-color: #003b6d; color: white; padding: 10px; text-align: center; font-weight: bold;">
-                    Información de Afiliación a Partidos Políticos en el Jurado Nacional de Elecciones
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if jne_afiliacion %}
-            <tr>
-                <td style="color:red; padding: 8px; border: 1px solid #ddd; text-align: center; width: 40%;">SE ENCONTRÓ información de afiliación a partidos políticos (ver documento adjunto).</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td style="color: green; padding: 8px; border: 1px solid #ddd; text-align: center; width: 40%;">NO SE ENCONTRÓ información de afiliación a partidos políticos.</td>
-            </tr>
-            {% endif %}
-        </tbody>
-    </table>    
     
     <p style="font-size:x-small; color:#c5c9c9">
         {{codigo_correo}}

@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 import time
 import os
-from ..utils import ChromeUtils
+from src.utils.chromedriver import ChromeUtils
 
 
 class Soat:

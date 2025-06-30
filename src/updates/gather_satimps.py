@@ -89,6 +89,7 @@ def gather(db_cursor, dash, update_data):
                 # update dashboard with progress and last update timestamp
                 dash.log(
                     card=CARD,
+                    status=1,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
                 )

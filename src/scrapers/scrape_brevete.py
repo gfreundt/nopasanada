@@ -6,7 +6,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from PIL import Image
-from ..utils import ChromeUtils
+from src.utils.chromedriver import ChromeUtils
 
 
 def browser(doc_num, ocr):

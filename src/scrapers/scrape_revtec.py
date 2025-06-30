@@ -3,13 +3,17 @@ import io
 import urllib
 from selenium.webdriver.common.by import By
 from PIL import Image
-from ..utils import ChromeUtils
+from src.utils.chromedriver import ChromeUtils
 
 
 def browser(ocr, placa):
     webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
     webdriver.get("https://portal.mtc.gob.pe/reportedgtt/form/frmconsultaplacaitv.aspx")
     time.sleep(3)
+
+    # test for 404
+    if "HTTP 404" in webdriver.page_source:
+        return 404
 
     retry_captcha = False
     while True:

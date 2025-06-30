@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 import time
-from ..utils import ChromeUtils
+from src.utils.chromedriver import ChromeUtils
 
 
 def browser(placa):
@@ -64,7 +64,7 @@ def browser(placa):
     )
     response = []
     pos1 = 2
-    _xpath_partial = f"/html/body/form/div[3]/div[3]/div/table/tbody/"
+    _xpath_partial = "/html/body/form/div[3]/div[3]/div/table/tbody/"
 
     # loop on all documentos
     while webdriver.find_elements(By.XPATH, _xpath_partial + f"tr[{pos1}]/td[1]"):

@@ -5,7 +5,7 @@ import os
 from datetime import datetime as dt
 import requests
 import schedule
-from ..utils import get_local_ip
+from src.utils.utils import get_local_ip
 from src.nopasanada import nopasanada
 
 

@@ -1,7 +1,7 @@
 import os
 from threading import Thread
 from jinja2 import Environment, FileSystemLoader
-from src.utils import Email
+from src.utils.email import Email
 
 
 def send_code(codigo, correo, nombre):

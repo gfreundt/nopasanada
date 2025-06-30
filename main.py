@@ -13,6 +13,7 @@ from src.monitor import monitor
 
 # reduce Flask output to command line
 logging.getLogger("werkzeug").disabled = True
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 class Context:
@@ -53,6 +54,7 @@ class Database:
 
 
 def run_at_exit(dash, db):
+    print("Running on Empty")
     # ensure dashboard shows disconnected when code ends
     dash.log(general_status=("Desconectado", 3))
     time.sleep(3)
@@ -115,4 +117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    time.sleep(1800)

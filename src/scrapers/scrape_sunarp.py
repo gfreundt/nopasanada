@@ -1,12 +1,10 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
-from PIL import Image
 import os
-import numpy as np
-from statistics import mean
 
-from ..utils import ChromeUtils, use_truecaptcha, base64_to_image
+from src.utils.chromedriver import ChromeUtils
+from src.utils.utils import use_truecaptcha, base64_to_image
 
 
 def browser(placa):

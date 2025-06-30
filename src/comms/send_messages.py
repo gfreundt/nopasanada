@@ -1,6 +1,6 @@
 import os
 from bs4 import BeautifulSoup
-from src.utils import Email
+from src.utils.email import Email
 from datetime import datetime as dt
 
 

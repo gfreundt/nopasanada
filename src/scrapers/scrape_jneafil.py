@@ -3,7 +3,8 @@ import time
 import os
 from PIL import Image
 from io import BytesIO
-from ..utils import ChromeUtils, use_truecaptcha
+from src.utils.chromedriver import ChromeUtils
+from src.utils.utils import use_truecaptcha
 
 
 def browser(doc_num):
@@ -62,8 +63,6 @@ def browser(doc_num):
 
         # crop image
         img = Image.open(_img_buffer)
-        img.show()
-        time.sleep(10)
         _img_cropped = img.crop((61, 514, 1814, 1700))
 
         # save cropped image

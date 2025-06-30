@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import Select
 import time
-from ..utils import ChromeUtils
+from src.utils.chromedriver import ChromeUtils
 
 
 def browser(placa):
@@ -41,14 +41,14 @@ def browser(placa):
     timeout_start = time.time()
     while webdriver.find_elements(By.ID, "ctl00_cplPrincipal_txtPlaca"):
         if time.time() - timeout_start > TIMEOUT:
-            print("timeout")
+            webdriver.quit()
             return -1
         time.sleep(0.5)
         e = webdriver.find_elements(By.ID, "ctl00_cplPrincipal_CaptchaContinue")
         if e:
             try:
                 e[0].click()
-            except:
+            except Exception:
                 pass
 
     time.sleep(2)

@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from ..utils import date_to_db_format
+from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_satmul
 
 
@@ -35,7 +35,7 @@ def gather(db_conn, db_cursor, dash, update_data):
                     dash.log(
                         card=CARD,
                         title="Multas SAT Lima",
-                        status=0,
+                        status=2,
                         text="Timeout (usuario)",
                         lastUpdate=dt.now(),
                     )

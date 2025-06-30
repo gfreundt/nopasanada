@@ -332,18 +332,35 @@ def compose_message(
     _m = db_cursor.fetchone()
     if _m:
         _sunats = {
-            "ruc": _m[2],
-            "tipo_contribuyente": _m[3],
-            "nombre_comercial": _m[5],
-            "fecha_inscripcion": _m[6],
-            "fecha_inicio_actividades": _m[10],
-            "estado": _m[7],
-            "condicion": _m[8],
+            "ruc": _m[1],
+            "tipo_contribuyente": _m[2],
+            "fecha_inscripcion": _m[5],
+            "fecha_inicio_actividades": _m[9],
+            "estado": _m[6],
+            "condicion": _m[7],
         }
     else:
         _sunats = []
 
-    _info.update({"sunats": _sunats})
+    _info.update({"sunat": _sunats})
+
+    # add JNE Afiliacion information
+    db_cursor.execute(
+        f"SELECT * FROM jneAfiliacion WHERE IdMember_FK = {member[0]} ORDER BY LastUpdate DESC"
+    )
+    _m = db_cursor.fetchone()
+    if _m and _m[1]:
+        _jneafil = True
+        # add image to attachment list
+        _img_path = os.path.abspath(os.path.join("data", "images", _m[2]))
+        if os.path.isfile(_img_path):
+            _attachments.append(str(_img_path))
+            _attach_txt.append("Afiliación a Partidos Políticos")
+            _msgrecords.append(15)
+    else:
+        _jneafil = False
+
+    _info.update({"jne_afiliacion": _jneafil})
 
     # add text list of Attachments or "Ninguno" if empty
     _info.update({"adjuntos": _attach_txt if _attach_txt else ["Ninguno"]})

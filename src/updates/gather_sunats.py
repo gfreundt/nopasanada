@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from ..utils import date_to_db_format
+from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_sunat
 
 
@@ -42,8 +42,15 @@ def gather(db_cursor, dash, update_data):
                     lastUpdate=dt.now(),
                 )
 
-                if not sunat_response:
+                # delete all old records from member
+                db_cursor.execute(f"DELETE FROM sunats WHERE IdMember_FK = {id_member}")
+
+                # response ok, no information available
+                if sunat_response == -1:
+                    dash.log(action=f"[ SUNATS ] Sin informacion para DNI {doc_num}.")
                     break
+
+                # response ok, information available
 
                 # adjust date to match db format (YYYY-MM-DD)
                 new_record_dates_fixed = date_to_db_format(data=sunat_response)
@@ -51,12 +58,8 @@ def gather(db_cursor, dash, update_data):
                 # add foreign key and current date to scraper response
                 _values = [id_member] + new_record_dates_fixed + [_now]
 
-                # delete all old records from member
-                db_cursor.execute(f"DELETE FROM sunats WHERE IdMember_FK = {id_member}")
-
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
-
                 dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
                 # skip to next record
@@ -65,12 +68,12 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
-                retry_attempts += 1
-                dash.log(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
+            #     )
 
     # log last action
     dash.log(

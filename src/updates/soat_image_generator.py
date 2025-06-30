@@ -2,7 +2,7 @@ import os
 from datetime import datetime as dt
 from PIL import Image, ImageDraw, ImageFont
 
-from ..utils import PDFUtils
+from src.utils.pdf import PDFUtils
 
 
 def generate(db_cursor, id_placa, data):

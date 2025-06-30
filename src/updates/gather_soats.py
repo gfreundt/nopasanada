@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 from copy import deepcopy as copy
 from src.updates import soat_image_generator
-from ..utils import date_to_db_format, use_truecaptcha
+from src.utils.utils import date_to_db_format, use_truecaptcha
 from src.scrapers import scrape_soat
 import os
 

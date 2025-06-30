@@ -2,7 +2,8 @@ import os
 import shutil
 from selenium.webdriver.common.by import By
 import time
-from ..utils import ChromeUtils, use_truecaptcha
+from src.utils.chromedriver import ChromeUtils
+from src.utils.utils import use_truecaptcha
 
 
 def browser(doc_num):
@@ -18,7 +19,7 @@ def browser(doc_num):
         os.remove(from_path)
 
     # start browser, navigate to url
-    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
     webdriver.get("https://recordconductor.mtc.gob.pe/")
 
     # outer loop: in case captcha is not accepted by webpage, try with a new one

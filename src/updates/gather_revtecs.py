@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 import easyocr
 import logging
-from ..utils import date_to_db_format
+from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_revtec
 
 
@@ -35,6 +35,16 @@ def gather(db_cursor, dash, update_data):
 
                 # send request to scraper
                 revtec_response = scrape_revtec.browser(ocr=ocr, placa=placa)
+
+                # webpage is down: stop gathering and show error in dashboard
+                if revtec_response == 404:
+                    dash.log(
+                        card=CARD,
+                        status=2,
+                        text="MTC offline",
+                        lastUpdate=dt.now(),
+                    )
+                    return
 
                 # update placas table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")

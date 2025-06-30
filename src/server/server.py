@@ -9,7 +9,7 @@ import os
 
 from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
-from ..utils import get_local_ip
+from src.utils.utils import get_local_ip
 
 from src.comms import send_code_message
 
