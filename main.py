@@ -13,7 +13,6 @@ from src.monitor import monitor
 
 # reduce Flask output to command line
 logging.getLogger("werkzeug").disabled = True
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 class Context:
