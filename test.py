@@ -1,15 +1,1 @@
-from flask import Flask, request
-
-app = Flask(__name__)
-
-
-@app.route("/search")
-def search():
-    # To get all query parameters as a dictionary
-    all_params = request.args.to_dict()
-
-    return f"All params: {all_params}"
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+https://accounts.zoho.com/oauth/v2/auth?1000.400ELE5I2WU72H931RQI8HTIY2Y30E&response_type==code&redirect_uri=https://www.nopasanadape.com/redirect&scope=ZohoMail.accounts.READ&access_type=online
