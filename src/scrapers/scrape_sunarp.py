@@ -5,6 +5,7 @@ import os
 
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha, base64_to_image
+from src.utils.constants import NETWORK_PATH
 
 
 def browser(placa):
@@ -38,7 +39,7 @@ def browser(placa):
         while True:
 
             # capture captcha image from webpage and save
-            _path = os.path.join("static", "captcha_sunarp.png")
+            _path = os.path.join(NETWORK_PATH, "static", "captcha_sunarp.png")
             with open(_path, "wb+") as file:
                 file.write(webdriver.find_element(By.ID, "image").screenshot_as_png)
             captcha_txt = use_truecaptcha(_path)["result"]

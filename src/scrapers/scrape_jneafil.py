@@ -5,6 +5,7 @@ from PIL import Image
 from io import BytesIO
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
+from src.utils.constants import NETWORK_PATH
 
 
 def browser(doc_num):
@@ -20,7 +21,7 @@ def browser(doc_num):
         _img = webdriver.find_element(
             By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
         )
-        _path = os.path.join("static", "captcha_jneafil.png")
+        _path = os.path.join(NETWORK_PATH, "temp", "captcha_jneafil.png")
 
         with open(_path, "wb+") as file:
             file.write(_img.screenshot_as_png)

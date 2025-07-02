@@ -4,6 +4,7 @@ from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import Select
 import time
 from src.utils.chromedriver import ChromeUtils
+from src.utils.constants import NETWORK_PATH
 
 
 def browser(placa):
@@ -105,6 +106,7 @@ def browser(placa):
         # image found, grab image and save in file,
         else:
             img_filename = os.path.join(
+                NETWORK_PATH,
                 "data",
                 "images",
                 f"SATMUL_{placa.upper()}.png",

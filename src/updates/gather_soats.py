@@ -3,6 +3,7 @@ from copy import deepcopy as copy
 from src.updates import soat_image_generator
 from src.utils.utils import date_to_db_format, use_truecaptcha
 from src.scrapers import scrape_soat
+from src.utils.constants import NETWORK_PATH
 import os
 
 
@@ -40,16 +41,9 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                 scraper.get_captcha()
 
                 # use saved temp file and external OCR to solve captcha
-                captcha = use_truecaptcha(os.path.join("static", "captcha_soat.png"))[
-                    "result"
-                ]
-
-                # # send to manual captcha solving (typed or speech)
-                # if gui_option == "TYPED":
-                #     pass
-                #     # captcha = soat_gui_typed(canvas)
-                # elif gui_option == "SPEECH":
-                #     captcha = soat_gui_speech.get_captcha()
+                captcha = use_truecaptcha(
+                    os.path.join(NETWORK_PATH, "temp", "captcha_soat.png")
+                )["result"]
 
                 # captcha timeout - manual user not there to enter captcha, skip process
                 if captcha == -1:

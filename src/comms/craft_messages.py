@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from jinja2 import Environment, FileSystemLoader
 import uuid
 from src.comms import create_within_expiration
+from src.utils.constants import NETWORK_PATH
 
 
 def craft(db_cursor, dash):
@@ -52,7 +53,9 @@ def craft(db_cursor, dash):
 
     # save crafted messages as HTML in outbound folder
     for message in messages:
-        _file_path = os.path.join("outbound", f"message_{str(uuid.uuid4())[-6:]}.html")
+        _file_path = os.path.join(
+            NETWORK_PATH, "outbound", f"message_{str(uuid.uuid4())[-6:]}.html"
+        )
         with open(_file_path, "w", encoding="utf-8") as file:
             file.write(message)
 

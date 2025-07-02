@@ -152,6 +152,7 @@ class Dashboard:
         return redirect("/")
 
     def redirect(self):
+        """OAuth for Zoho Mail"""
         all_params = request.args.to_dict()
         print(
             f"Code: {all_params['code']}, Location: {all_params['location']}, Server: {all_params['accounts-server']}"

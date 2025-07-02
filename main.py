@@ -1,6 +1,5 @@
 import time
 import sqlite3
-import os
 import sys
 import logging
 import schedule
@@ -10,16 +9,11 @@ import atexit
 from src.nopasanada import nopasanada
 from src.server import server
 from src.monitor import monitor
+from src.utils.constants import DB_LOCAL_PATH, DB_NETWORK_PATH
+
 
 # reduce Flask output to command line
 logging.getLogger("werkzeug").disabled = True
-
-
-class Context:
-
-    def __init__(self):
-        self.email_password = os.environ["ZOHO-1-PWD"]
-        self.test = False
 
 
 class Database:
@@ -31,18 +25,13 @@ class Database:
     def start(self, dev=True):
         """Connect to database. Network database preferred. Fallback is local database."""
 
-        SQLDB_LOCAL = os.path.join("data", "members.db")
-        SQLDB_NETWORK = os.path.join(
-            r"\\192.168.68.110\d\pythonCode\nopasanada\data\members.db"
-        )
-
         # attempt tp connect to network production database, default to local if not possible
         try:
-            self.conn = sqlite3.connect(SQLDB_NETWORK, check_same_thread=False)
+            self.conn = sqlite3.connect(DB_NETWORK_PATH, check_same_thread=False)
             print("Network Database Connected")
         except sqlite3.Error:
             if dev:
-                self.conn = sqlite3.connect(SQLDB_LOCAL, check_same_thread=False)
+                self.conn = sqlite3.connect(DB_LOCAL_PATH, check_same_thread=False)
                 print("LOCAL Database Connected")
             else:
                 raise "Cannot Connect to Network DB"
@@ -68,9 +57,6 @@ def run_at_exit(dash, db):
 
 
 def main():
-
-    # start environment information
-    context = Context()
 
     # connect to database
     db = Database(dev=False)

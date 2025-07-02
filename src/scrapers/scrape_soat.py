@@ -3,6 +3,7 @@ from selenium.common.exceptions import *
 import time
 import os
 from src.utils.chromedriver import ChromeUtils
+from src.utils.constants import NETWORK_PATH
 
 
 class Soat:
@@ -21,7 +22,7 @@ class Soat:
         )
 
         with open(
-            os.path.join("static", "captcha_soat.png"),
+            os.path.join(NETWORK_PATH, "temp", "captcha_soat.png"),
             "wb+",
         ) as file:
             file.write(_img.screenshot_as_png)

@@ -2,6 +2,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime as dt
 import uuid
+from src.utils.constants import NETWORK_PATH
 
 
 def craft(db_cursor, dash):
@@ -39,7 +40,7 @@ def craft(db_cursor, dash):
         if alert:
             # write in outbound folder
             with open(
-                os.path.join(os.curdir, "outbound", f"alert_{k:03d}.html"),
+                os.path.join(NETWORK_PATH, "outbound", f"alert_{k:03d}.html"),
                 "w",
                 encoding="utf-8",
             ) as file:

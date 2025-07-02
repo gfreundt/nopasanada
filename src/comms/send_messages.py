@@ -1,7 +1,8 @@
 import os
+from datetime import datetime as dt
 from bs4 import BeautifulSoup
 from src.utils.email import Email
-from datetime import datetime as dt
+from src.utils.constants import NETWORK_PATH
 
 
 def send(db, dash, max=9999):
@@ -38,7 +39,9 @@ def send(db, dash, max=9999):
             break
 
         # open files and find all relevant elements
-        with open(os.path.join("outbound", html_file), "r", encoding="utf-8") as file:
+        with open(
+            os.path.join(NETWORK_PATH, "outbound", html_file), "r", encoding="utf-8"
+        ) as file:
             data = file.read()
             soup = BeautifulSoup(data, features="lxml")
 
@@ -80,7 +83,7 @@ def send(db, dash, max=9999):
             db.cursor.execute(
                 f"SELECT * FROM mensajes WHERE HashCode = '{msg['hashcode']}'"
             )
-            _idmensaje = db.cursor.fetchone()[0]
+            _idmensaje = db.cursor.fetchone()["IdMensaje"]
 
             # register all message types included in message in mensajeContenidos table
             for msg_type in msg["msgTypes"]:

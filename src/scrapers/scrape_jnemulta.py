@@ -4,6 +4,7 @@ import time
 import os
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
+from src.utils.constants import NETWORK_PATH
 
 
 def browser(doc_num):
@@ -20,7 +21,7 @@ def browser(doc_num):
             By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
         )
 
-        _path = os.path.join("static", "jneafil.png")
+        _path = os.path.join(NETWORK_PATH, "temp", "jneafil.png")
 
         with open(_path, "wb+") as file:
             file.write(_img.screenshot_as_png)
