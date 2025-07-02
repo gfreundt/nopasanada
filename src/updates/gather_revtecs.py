@@ -24,7 +24,7 @@ def gather(db_cursor, dash, update_data):
     ocr = easyocr.Reader(["es"], gpu=False)
 
     # iterate on all records that require updating and get scraper results
-    for counter, (id_placa, placa) in enumerate(update_data, start=1):
+    for counter, placa in enumerate(update_data, start=1):
 
         retry_attempts = 0
         # loop to catch scraper errors and retry limited times
@@ -69,11 +69,12 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # add foreign key and current date to scraper response
-                _values = [id_placa] + new_record_dates_fixed + [_now]
+                _values = [999] + new_record_dates_fixed + [_now]
 
                 # delete all old records from placa
+
                 db_cursor.execute(
-                    f"DELETE FROM revtecs WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE Placa = '{placa}')"
+                    f"DELETE FROM revtecs WHERE PlacaValidate = (SELECT Placa FROM placas WHERE Placa = '{placa}')"
                 )
 
                 # insert new record into database

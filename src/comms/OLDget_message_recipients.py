@@ -11,7 +11,7 @@ def recipients(db_cursor):
                 """
 
     db_cursor.execute(cmd)
-    welcome_recipients = [i[0] for i in db_cursor.fetchall()]
+    welcome_recipients = [i["IdMember"] for i in db_cursor.fetchall()]
 
     # 2. generate REGULAR list (records with previous REGULAR or BIENVENIDA email at least 1 month ago)
     cmd = """SELECT IdMember FROM members

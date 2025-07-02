@@ -36,11 +36,8 @@ def gather(db_cursor, db_conn, dash, update_data):
                     lastUpdate=dt.now(),
                 )
 
-                # correct captcha, no image for placa - enter update attempt to review database, next placa
+                # correct captcha, no image for placa - next placa
                 if not response:
-                    db_cursor.execute(
-                        f"INSERT INTO '$review' (IdPlaca_FK, Reason) VALUES ({id_placa}, 'SUNARP')"
-                    )
                     break
 
                 # if there is data in response, enter into database, go to next placa
@@ -56,7 +53,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # delete all old records from placa
                 db_cursor.execute(
-                    f"DELETE FROM sunarps WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE ImgFilename = '{_img_filename}')"
+                    f"DELETE FROM sunarps WHERE PlacaValidate = (SELECT Placa FROM placas WHERE ImgFilename = '{_img_filename}')"
                 )
 
                 # insert new record into database
@@ -65,7 +62,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # update placas table with last update information
                 db_cursor.execute(
-                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE IdPlaca = '{id_placa}'"
+                    f"UPDATE placas SET LastUpdateSUNARP = '{_now}' WHERE Placa = '{placa}'"
                 )
 
                 # skip to next record

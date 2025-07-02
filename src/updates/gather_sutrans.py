@@ -34,7 +34,7 @@ def gather(db_cursor, dash, update_data):
 
                 # if no error in scrape, erase any prior records of this placa
                 db_cursor.execute(
-                    f"DELETE FROM sutrans WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE Placa = '{placa}')"
+                    f"DELETE FROM sutrans WHERE PlacaValidate = '{placa}')"
                 )
 
                 # update placas table with last update information
@@ -56,7 +56,7 @@ def gather(db_cursor, dash, update_data):
                 # iterate on all multas
                 for response in sutran_response:
                     new_record_dates_fixed = date_to_db_format(data=response.values())
-                    _values = [id_placa] + new_record_dates_fixed + [_now]
+                    _values = [placa] + new_record_dates_fixed + [_now]
 
                     # insert gathered record of member
                     db_cursor.execute(f"INSERT INTO sutrans VALUES {tuple(_values)}")
@@ -70,12 +70,12 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
-                retry_attempts += 1
-                dash.log(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+            #     )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")

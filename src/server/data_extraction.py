@@ -45,7 +45,7 @@ class UserData:
 
         # add placas
         self.cursor.execute(f"SELECT * FROM placas WHERE IdMember_FK = {member}")
-        _info.update({"placas": [i[2] for i in self.cursor.fetchall()]})
+        _info.update({"placas": [i["Placa"] for i in self.cursor.fetchall()]})
 
         # add brevete information
         self.cursor.execute(
@@ -53,19 +53,19 @@ class UserData:
         )
         _m = self.cursor.fetchone()
         if _m:
-            _vigencia = int((dt.strptime(_m[6], "%Y-%m-%d") - dt.now()).days)
+            _vigencia = int((dt.strptime(_m["FechaHasta"], "%Y-%m-%d") - dt.now()).days)
             _info.update(
                 {
                     "brevete": {
-                        "numero": _m[2],
-                        "clase": _m[1],
-                        "formato": _m[3],
-                        "fecha_desde": _m[4],
-                        "fecha_hasta": _m[6],
-                        "restricciones": _m[5],
-                        "local": _m[7],
-                        "puntos": _m[8],
-                        "record": _m[9],
+                        "numero": _m["Numero"],
+                        "clase": _m["Clase"],
+                        "formato": _m["Tipo"],
+                        "fecha_desde": _m["FechaExp"],
+                        "fecha_hasta": _m["FechaHasta"],
+                        "restricciones": _m["Restricciones"],
+                        "local": _m["Centro"],
+                        "puntos": _m["Puntos"],
+                        "record": _m["Record"],
                         "vigencia": (
                             f"{_vigencia:,} días" if _vigencia > 0 else "Vencida"
                         ),
@@ -114,7 +114,7 @@ class UserData:
         # add SATMUL information
         _satmuls = []
         self.cursor.execute(
-            f"SELECT * FROM satmuls WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
+            f"SELECT * FROM satmuls WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
         )
         for _m in self.cursor.fetchall():
             _satmuls.append(
@@ -141,7 +141,7 @@ class UserData:
         # add SUTRAN information
         _sutran = []
         self.cursor.execute(
-            f"SELECT * FROM sutrans JOIN placas ON IdPlaca = IdPlaca_FK WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
+            f"SELECT * FROM sutrans JOIN placas ON Placa = PlacaValidate WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
         )
         for _m in self.cursor.fetchall():
             if _m:
@@ -177,7 +177,7 @@ class UserData:
         # add SOAT information
         _soats = []
         self.cursor.execute(
-            f"SELECT * FROM soats WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
+            f"SELECT * FROM soats WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
         )
         for _m in self.cursor.fetchall():
             _soats.append(
@@ -202,7 +202,7 @@ class UserData:
 
         # add REVTEC information
         self.cursor.execute(
-            f"SELECT * FROM revtecs WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
+            f"SELECT * FROM revtecs WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member}) ORDER BY LastUpdate DESC"
         )
         _revtecs = []
 
@@ -225,7 +225,7 @@ class UserData:
         _images = []
         self.cursor.execute(
             f"""SELECT * FROM sunarps
-                    WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member})
+                    WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member})
                 ORDER BY LastUpdate DESC"""
         )
         for _m in self.cursor.fetchall():

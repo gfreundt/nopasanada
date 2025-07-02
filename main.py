@@ -41,8 +41,14 @@ class Database:
             self.conn = sqlite3.connect(SQLDB_NETWORK, check_same_thread=False)
             print("Network Database Connected")
         except sqlite3.Error:
-            self.conn = sqlite3.connect(SQLDB_LOCAL, check_same_thread=False)
-            print("LOCAL Database Connected")
+            if dev:
+                self.conn = sqlite3.connect(SQLDB_LOCAL, check_same_thread=False)
+                print("LOCAL Database Connected")
+            else:
+                raise "Cannot Connect to Network DB"
+
+        # set query responses to sqlite row object
+        self.conn.row_factory = sqlite3.Row
 
         # create cursor object
         self.cursor = self.conn.cursor()

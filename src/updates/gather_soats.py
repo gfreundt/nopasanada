@@ -27,7 +27,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
     scraper = scrape_soat.Soat()
     # iterate on every placa and write to database
-    for counter, (id_placa, placa) in enumerate(update_data, start=1):
+    for counter, placa in enumerate(update_data, start=1):
 
         retry_attempts = 0
         # loop to catch scraper errors and retry limited times
@@ -97,13 +97,11 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                     _now = dt.now().strftime("%Y-%m-%d")
 
                     # insert data into table
-                    _values = (
-                        [id_placa] + list(new_record_dates_fixed) + [img_name] + [_now]
-                    )
+                    _values = [999] + list(new_record_dates_fixed) + [img_name] + [_now]
 
                     # delete all old records from member
                     db_cursor.execute(
-                        f"DELETE FROM soats WHERE IdPlaca_FK = (SELECT IdPlaca FROM placas WHERE Placa = '{placa}')"
+                        f"DELETE FROM soats WHERE PlacaValidate = (SELECT Placa FROM placas WHERE Placa = '{placa}')"
                     )
 
                     # insert gathered record of member
@@ -112,7 +110,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                     # update placas table with last update information
                     db_cursor.execute(
-                        f"UPDATE placas SET LastUpdateSOAT = '{_now}' WHERE IdPlaca = '{id_placa}'"
+                        f"UPDATE placas SET LastUpdateSOAT = '{_now}' WHERE Placa = '{placa}'"
                     )
 
                 # update dashboard with progress and last update timestamp

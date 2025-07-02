@@ -24,9 +24,12 @@ def need_message(db_cursor):
                             HAVING count(*) = 1);		
                             
                 -- Crear tabla temporal secundaria que lista las placas de usarios que necesitan mensajes
-                DROP TABLE IF EXISTS _necesitan_mensajes_placas;
-                CREATE TABLE _necesitan_mensajes_placas (IdPlaca_FK, Placa);
-                INSERT INTO _necesitan_mensajes_placas (IdPlaca_FK, Placa) select idplaca, placa from placas where IdMember_FK IN (SELECT IdMember_FK from _necesitan_mensajes_usuarios)
+                DELETE FROM _necesitan_mensajes_placas;
+
+                INSERT INTO _necesitan_mensajes_placas (Placa)
+                    SELECT Placa FROM placas
+                        WHERE IdMember_FK IN
+                            (SELECT IdMember_FK FROM _necesitan_mensajes_usuarios);
             """
 
     db_cursor.executescript(cmd)
@@ -41,13 +44,13 @@ def need_alert(db_cursor):
                 DELETE FROM _necesitan_alertas;
 
                 --- Incluir usuarios/placas con documentos en fecha de vencimiento en x dias exactos o 0-3 dias vencido.
-                INSERT INTO _necesitan_alertas (IdPlaca_FK, FechaHasta, TipoAlerta, Placa, IdMember_FK)
-                    SELECT idplaca_FK, FechaHasta, "SOAT", (SELECT Placa FROM placas WHERE IdPlaca = IdPlaca_FK), (SELECT IdMember_FK FROM placas WHERE IdPlaca = IdPlaca_FK) FROM soats
+                INSERT INTO _necesitan_alertas (FechaHasta, TipoAlerta, Placa, IdMember_FK)
+                    SELECT FechaHasta, "SOAT", (SELECT Placa FROM placas WHERE Placa = PlacaValidate), (SELECT IdMember_FK FROM placas WHERE Placa = PlacaValidate) FROM soats
                         WHERE 	DATE('now', 'localtime', '+5 days') = FechaHasta
                         OR 		(DATE('now', 'localtime', '0 days') >= FechaHasta
                                     AND DATE('now', 'localtime', '-3 days') <= FechaHasta)
                     UNION
-                    SELECT idplaca_FK, FechaHasta, "REVTEC", (SELECT Placa FROM placas WHERE IdPlaca = IdPlaca_FK), (SELECT IdMember_FK FROM placas WHERE IdPlaca = IdPlaca_FK) FROM revtecs
+                    SELECT FechaHasta, "REVTEC", (SELECT Placa FROM placas WHERE Placa = PlacaValidate), (SELECT IdMember_FK FROM placas WHERE Placa = PlacaValidate) FROM revtecs
                         WHERE 	DATE('now', 'localtime', '+15 days') = FechaHasta
                         OR 		DATE('now', 'localtime', '+7 days') = FechaHasta
                         OR 		(DATE('now', 'localtime', '0 days') >= FechaHasta

@@ -3,8 +3,6 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime as dt
 import uuid
 
-from pprint import pprint
-
 
 def craft(db_cursor, dash):
 
@@ -86,7 +84,7 @@ def compose_message(
         return
 
     # generate random email hash
-    email_id = f"{member[1]}|{str(uuid.uuid4())[-12:]}"
+    email_id = f"{member['CodMember']}|{str(uuid.uuid4())[-12:]}"
 
     _info = {}
 
@@ -104,7 +102,7 @@ def compose_message(
 
     _info.update(
         {
-            "nombre_usuario": member[2],
+            "nombre_usuario": member["NombreCompleto"],
             "codigo_correo": email_id,
             "titulo_alerta": titulo_alerta,
             "texto_alerta": texto_alerta,
@@ -113,11 +111,11 @@ def compose_message(
     )
 
     # meta data
-    _info.update({"to": member[6]})
+    _info.update({"to": member["Correo"]})
     _info.update({"bcc": "gabfre@gmail.com"})
     _info.update({"subject": f"{subject}"})
     _info.update({"msg_types": [msg_type]})
-    _info.update({"idMember": int(member[0])})
+    _info.update({"idMember": int(member["IdMember"])})
     _info.update({"timestamp": dt.now().strftime("%Y-%m-%d %H:%M:%S")})
     _info.update({"hashcode": f"{member[1]}|{str(uuid.uuid4())[-12:]}"})
     _info.update({"attachment_paths": []})

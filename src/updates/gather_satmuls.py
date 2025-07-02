@@ -51,7 +51,7 @@ def gather(db_conn, db_cursor, dash, update_data):
 
                     # delete all old records from member
                     db_cursor.execute(
-                        f"DELETE FROM satmuls WHERE IdPlaca_FK = '{id_placa}'"
+                        f"DELETE FROM satmuls WHERE PlacaValidate = '{placa}'"
                     )
 
                     # insert new record into database

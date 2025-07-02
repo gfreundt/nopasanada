@@ -2,8 +2,7 @@ def update_table(db_cursor):
     """Creates table with all members with SOAT, REVTEC, SUTRAN, SATMUL, BREVETE or SATIMP
     expired or expiring within 30 days."""
 
-    _cmd = f""" DROP TABLE IF EXISTS _expira30dias;
-                CREATE TABLE _expira30dias (IdMember, Placa, FechaHasta, TipoAlerta, Vencido);
+    _cmd = """  DELETE FROM _expira30dias;
 
                 -- Incluir usuarios que tienen multas vigentes o documentos por vencer dentro de 30 dias o ya vencidos
                 INSERT INTO _expira30dias (IdMember, FechaHasta, TipoAlerta)
@@ -28,16 +27,16 @@ def update_table(db_cursor):
                         JOIN (
                             SELECT * FROM placas 
                                 JOIN (
-                            SELECT idplaca_FK, FechaHasta, "SOAT" AS TipoAlerta FROM soats
+                            SELECT PlacaValidate, FechaHasta, "SOAT" AS TipoAlerta FROM soats
                                 WHERE DATE('now', 'localtime', '+30 days') >= FechaHasta
                                 UNION
-                            SELECT idplaca_FK, FechaHasta, "REVTEC" FROM revtecs
+                            SELECT PlacaValidate, FechaHasta, "REVTEC" FROM revtecs
                                 WHERE DATE('now', 'localtime', '+30 days') >= FechaHasta
                                 UNION 
-                            SELECT idplaca_FK, "", "SUTRAN" FROM sutrans
+                            SELECT PlacaValidate, "", "SUTRAN" FROM sutrans
                                 UNION 
-                            SELECT idplaca_FK, "", "SATMUL" FROM satmuls)
-                                ON idplaca = IdPlaca_FK)
+                            SELECT PlacaValidate, "", "SATMUL" FROM satmuls)
+                                ON Placa = PlacaValidate)
                         ON IdMember = IdMember_FK;
 
                                     

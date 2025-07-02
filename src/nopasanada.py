@@ -26,7 +26,7 @@ def nopasanada(dash, db, cmds):
     # get all users and placas that need to be updated
     all_updates = get_records_to_update.get_records(db.cursor)
 
-    # pprint(all_updates)
+    pprint(all_updates)
     pprint([f"{i}: {len(all_updates[i])}" for i in all_updates])
 
     # scrape information on records that need to be updated

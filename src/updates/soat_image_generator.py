@@ -25,7 +25,7 @@ def generate(db_cursor, id_placa, data):
         db_cursor.execute(
             f"""  SELECT Aseguradora, Certificado, FechaInicio, FechaHasta,
                                 PlacaValidate, Clase, Uso
-                                FROM soats WHERE IdPlaca_FK={id_placa}"""
+                                FROM soats WHERE PlacaValidate={placa}"""
         )
         data = db_cursor.fetchone()
 

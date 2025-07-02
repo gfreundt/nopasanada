@@ -1,5 +1,5 @@
 import os
-from datetime import datetime as dt, timedelta as td
+from datetime import datetime as dt
 from jinja2 import Environment, FileSystemLoader
 import uuid
 from src.comms import create_within_expiration
@@ -24,11 +24,11 @@ def craft(db_cursor, dash):
     db_cursor.execute(
         "SELECT IdMember_FK FROM _necesitan_mensajes_usuarios WHERE Tipo = 'B'"
     )
-    for IdMember in db_cursor.fetchall():
+    for member in db_cursor.fetchall():
         messages.append(
             grab_message_info(
                 db_cursor,
-                IdMember[0],
+                member["IdMember_FK"],
                 template=template_welcome,
                 subject="Bienvenido al Servicio de Alertas Perú",
                 msg_type=12,
@@ -39,11 +39,11 @@ def craft(db_cursor, dash):
     db_cursor.execute(
         "SELECT IdMember_FK FROM _necesitan_mensajes_usuarios WHERE Tipo = 'R'"
     )
-    for IdMember in db_cursor.fetchall():
+    for member in db_cursor.fetchall():
         messages.append(
             grab_message_info(
                 db_cursor,
-                IdMember[0],
+                member["IdMember_FK"],
                 template=template_regular,
                 subject="No Pasa Nada PE [antes Servicio de Alertas Perú]",
                 msg_type=13,
@@ -68,14 +68,16 @@ def grab_message_info(db_cursor, IdMember, template, subject, msg_type):
         f"SELECT TipoAlerta, Placa, Vencido FROM _expira30dias WHERE IdMember = {IdMember}"
     )
     _a = db_cursor.fetchall()
-    alertas = [[i[0], i[1], i[2]] for i in _a if i] if _a else []
+    alertas = (
+        [[i["TipoAlerta"], i["Placa"], i["Vencido"]] for i in _a if i] if _a else []
+    )
 
     # get placas associated with member
     db_cursor.execute(f"SELECT Placa FROM placas WHERE IdMember_FK = {IdMember}")
-    placas = [i[0] for i in db_cursor.fetchall()]
+    placas = [i["Placa"] for i in db_cursor.fetchall()]
 
     # generate random email hash
-    email_id = f"{member[1]}|{str(uuid.uuid4())[-12:]}"
+    email_id = f"{member['CodMember']}|{str(uuid.uuid4())[-12:]}"
 
     # create html format data
     return compose_message(
@@ -133,7 +135,7 @@ def compose_message(
 
     # add revision tecnica information
     db_cursor.execute(
-        f"SELECT * FROM revtecs WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
+        f"SELECT * FROM revtecs WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
     )
     _revtecs = []
 
@@ -141,13 +143,13 @@ def compose_message(
 
         _revtecs.append(
             {
-                "certificadora": _m[1].split("-")[-1][:35],
-                "placa": _m[2],
-                "certificado": _m[3],
-                "fecha_desde": date_friendly(_m[4]),
-                "fecha_hasta": date_friendly(_m[5], delta=True),
-                "resultado": _m[6],
-                "vigencia": _m[7],
+                "certificadora": _m["Certificadora"].split("-")[-1][:35],
+                "placa": _m["PlacaValidate"],
+                "certificado": _m["Certificado"],
+                "fecha_desde": date_friendly(_m["FechaDesde"]),
+                "fecha_hasta": date_friendly(_m["FechaHasta"], delta=True),
+                "resultado": _m["Resultado"],
+                "vigencia": _m["Vigencia"],
             }
         )
     _info.update({"revtecs": _revtecs})
@@ -161,15 +163,15 @@ def compose_message(
         _info.update(
             {
                 "brevete": {
-                    "numero": _m[2],
-                    "clase": _m[1],
-                    "formato": _m[3],
-                    "fecha_desde": date_friendly(_m[4]),
-                    "fecha_hasta": date_friendly(_m[6], delta=True),
-                    "restricciones": _m[5],
-                    "local": _m[7],
-                    "puntos": _m[8],
-                    "record": _m[9],
+                    "numero": _m["Numero"],
+                    "clase": _m["Clase"],
+                    "formato": _m["Tipo"],
+                    "fecha_desde": date_friendly(_m["FechaExp"]),
+                    "fecha_hasta": date_friendly(_m["FechaHasta"], delta=True),
+                    "restricciones": _m["Restricciones"],
+                    "local": _m["Centro"],
+                    "puntos": _m["Puntos"],
+                    "record": _m["Record"],
                 }
             }
         )
@@ -179,7 +181,7 @@ def compose_message(
     # add SUTRAN information
     _sutran = []
     db_cursor.execute(
-        f"SELECT * FROM sutrans JOIN placas ON IdPlaca = IdPlaca_FK WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
+        f"SELECT * FROM sutrans JOIN placas ON Placa = PlacaValidate WHERE Placa IN (SELECT Placa FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
     )
     for _m in db_cursor.fetchall():
         if _m:
@@ -218,7 +220,7 @@ def compose_message(
     # add SOAT information
     _soats = []
     db_cursor.execute(
-        f"SELECT * FROM soats WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
+        f"SELECT * FROM soats WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
     )
     for _m in db_cursor.fetchall():
         _soats.append(
@@ -247,7 +249,7 @@ def compose_message(
     # add SATMUL information
     _satmuls = []
     db_cursor.execute(
-        f"SELECT * FROM satmuls WHERE IdPlaca_FK IN (SELECT IdPlaca FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
+        f"SELECT * FROM satmuls WHERE PlacaValidate IN (SELECT Placa FROM placas WHERE IdMember_FK = {member[0]}) ORDER BY LastUpdate DESC"
     )
     for _m in db_cursor.fetchall():
         _satmuls.append(
@@ -297,8 +299,8 @@ def compose_message(
     # add SUNARP image
     db_cursor.execute(
         f"""    SELECT * FROM sunarps 
-                WHERE IdPlaca_FK IN
-                    (SELECT IdPlaca FROM placas
+                WHERE PlacaValidate IN
+                    (SELECT Placa FROM placas
                         WHERE IdMember_FK = {member[0]})
                 ORDER BY LastUpdate DESC"""
     )

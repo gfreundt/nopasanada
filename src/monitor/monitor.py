@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, redirect
+from flask import Flask, render_template, jsonify, redirect, request
 import threading
 from copy import deepcopy as copy
 import os
@@ -42,6 +42,12 @@ class Dashboard:
             endpoint="solo_enviar_mensajes",
             view_func=self.launch_gather_only_send,
             methods=["POST"],
+        )
+        self.app.add_url_rule(
+            "/redirect",
+            endpoint="redirect",
+            view_func=self.redirect,
+            methods=["POST", "GET"],
         )
 
         self.set_initial_data()
@@ -144,6 +150,25 @@ class Dashboard:
     def launch_gather_only_send(self):
         nopasanada(self, self.db, cmds=["send"])
         return redirect("/")
+
+    def redirect(self):
+        all_params = request.args.to_dict()
+        print(
+            f"Code: {all_params['code']}, Location: {all_params['location']}, Server: {all_params['accounts-server']}"
+        )
+        authorization_code = all_params["code"]
+        client_id = "1000.400ELE5I2WU72H931RQI8HTIY2Y30E"
+        client_secret = "fe41ea63cc1c667091b32b1068660cf0b44fffd823"
+        redirect_uri = "https://www.nopasanadape.com"
+        scope = "ZohoMail.accounts.READ"
+
+        url = f"https://accounts.zoho.com/oauth/v2/token?code={authorization_code}&grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&scope={scope}"
+
+        response = requests.post(url)
+        print("Status code:", response.status_code)
+        print("Response body:", response.text)
+
+        return render_template("redirect.html")
 
     def dashboard(self):
         return render_template("dashboard.html", data=self.data)
