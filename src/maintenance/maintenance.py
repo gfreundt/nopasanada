@@ -27,24 +27,28 @@ def post_maint(db_cursor):
     db_cursor.executescript(cmd)
 
     # manage the backups
-    target_path = os.path.join("data", "backups")
+    network_path = os.path.join(r"\\192.168.68.110\d\pythonCode\nopasanada\data")
+    target_path = os.path.join(network_path, "backups")
 
-    for filename in os.listdir(target_path):
-        num = int(filename[2:4])
-        if num == 8:
-            os.remove(os.path.join(target_path, filename))
-            continue
-        new_filename = f"{filename[:2]}{num+1:02d}{filename[4:]}"
-        os.rename(
-            os.path.join(target_path, filename),
-            os.path.join(target_path, new_filename),
+    try:
+        for filename in os.listdir(target_path):
+            num = int(filename[2:4])
+            if num == 8:
+                os.remove(os.path.join(target_path, filename))
+                continue
+            new_filename = f"{filename[:2]}{num+1:02d}{filename[4:]}"
+            os.rename(
+                os.path.join(target_path, filename),
+                os.path.join(target_path, new_filename),
+            )
+
+        _date = dt.strftime(dt.now(), "%Y-%m-%d %H;%M;%S")
+        shutil.copy(
+            os.path.join(network_path, "members.db"),
+            os.path.join(target_path, f"m-00 [{_date}].db"),
         )
-
-    _date = dt.strftime(dt.now(), "%Y-%m-%d %H;%M;%S")
-    shutil.copy(
-        os.path.join("data", "members.db"),
-        os.path.join(target_path, f"m-00 [{_date}].db"),
-    )
+    except Exception:
+        print("***** Error BACKUP database ******")
 
     # TODO: eliminate all placas with IdMember_FK = 0 and LastUpdates old
     # TODO: extract text data from soat images

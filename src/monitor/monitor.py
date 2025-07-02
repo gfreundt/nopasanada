@@ -37,6 +37,12 @@ class Dashboard:
             view_func=self.launch_gather_send,
             methods=["POST"],
         )
+        self.app.add_url_rule(
+            "/solo_enviar_mensajes",
+            endpoint="solo_enviar_mensajes",
+            view_func=self.launch_gather_only_send,
+            methods=["POST"],
+        )
 
         self.set_initial_data()
         self.update_kpis()
@@ -133,6 +139,10 @@ class Dashboard:
 
     def launch_gather_send(self):
         nopasanada(self, self.db, cmds=["update-threads", "comms", "send"])
+        return redirect("/")
+
+    def launch_gather_only_send(self):
+        nopasanada(self, self.db, cmds=["send"])
         return redirect("/")
 
     def dashboard(self):

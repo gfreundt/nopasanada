@@ -69,6 +69,11 @@ def main():
     # connect to database
     db = Database(dev=False)
 
+    # print update data and end
+    if "DATA" in sys.argv:
+        nopasanada(dash=None, db=db, cmds=[])
+        return
+
     # run dashboard in background (port 7000)
     dash = monitor.Dashboard(db)
     if "NOMON" not in sys.argv:
@@ -92,6 +97,7 @@ def main():
         nopasanada(dash, db, cmds=["update", "comms", "send"])
 
     while True:
+        # print([logging.getLogger(name) for name in logging.root.manager.loggerDict])
         time.sleep(10)
 
     return

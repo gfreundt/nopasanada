@@ -59,14 +59,8 @@ def gather(db_cursor, dash, update_data):
                     lastUpdate=dt.now(),
                 )
 
-                # stop processing if blank response from scraper
+                # next placa if blank response from scraper
                 if not revtec_response:
-                    dash.log(
-                        card=CARD,
-                        status=2,
-                        text="Scraper crash",
-                        lastUpdate=dt.now(),
-                    )
                     break
 
                 # adjust date to match db format (YYYY-MM-DD)
@@ -92,12 +86,12 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
-                retry_attempts += 1
-                dash.log(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.log(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+            #     )
 
             # if code gets here, means scraping has encountred three consecutive errors, skip placa
             dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")

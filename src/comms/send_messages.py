@@ -12,6 +12,7 @@ def send(db, dash, max=9999):
     html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
 
     # log first action
+    dash.log(general_status=("Activo", 1))
     dash.log(
         card=CARD,
         title=f"Comunicaciones [{min(max, len(html_files))}]",
@@ -65,7 +66,7 @@ def send(db, dash, max=9999):
         # update dashboard with progress and last update timestamp
         dash.log(
             card=CARD,
-            progress=int((counter / len(html_files)) * 100),
+            progress=int((counter / min(max, len(html_files))) * 100),
             lastUpdate=dt.now(),
         )
 
