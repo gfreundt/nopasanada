@@ -85,7 +85,7 @@
 
                         <!-- Campo de placa 1 -->
                         <div class="form-group form-floating mb-3 position-relative">
-                            <input type="text" class="form-control {% if errors.get('placa1') %} is-invalid {% endif %}" id="placa1" name="placa1" value="{{ placas[0] }}" placeholder="empty">
+                            <input type="text" class="form-control {% if errors.get('placa1') %} is-invalid {% endif %}" id="placa1" name="placa1" value="{{ placas[0] }}" placeholder="empty" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();">
                             <label for="placa1">Placa</label>
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0" onclick="document.getElementById('placa1').value = ''" title="Borrar">
                                 <i class="bi bi-x-circle-fill text-danger fs-5"></i>
@@ -101,7 +101,7 @@
 
                         <!-- Campo de placa 2 -->
                         <div class="form-group form-floating mb-3 position-relative">
-                            <input type="text" class="form-control {% if errors.get('placa2') %} is-invalid {% endif %}" id="placa2" name="placa2" value="{{ placas[1] }}" placeholder="empty">
+                            <input type="text" class="form-control {% if errors.get('placa2') %} is-invalid {% endif %}" id="placa2" name="placa2" value="{{ placas[1] }}" placeholder="empty" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();">
                             <label for="placa2">Placa</label>
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0" onclick="document.getElementById('placa2').value = ''" title="Borrar">
                                 <i class="bi bi-x-circle-fill text-danger fs-5"></i>
@@ -117,7 +117,7 @@
 
                         <!-- Campo de placa 3 -->
                         <div class="form-group form-floating mb-3 position-relative">
-                            <input type="text" class="form-control {% if errors.get('placa3') %} is-invalid {% endif %}" id="placa3" name="placa3" value="{{ placas[2] }}" placeholder="empty">
+                            <input type="text" class="form-control {% if errors.get('placa3') %} is-invalid {% endif %}" id="placa3" name="placa3" value="{{ placas[2] }}" placeholder="empty" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();">
                             <label for="placa3">Placa</label>
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0" onclick="document.getElementById('placa3').value = ''" title="Borrar">
                                 <i class="bi bi-x-circle-fill text-danger fs-5"></i>

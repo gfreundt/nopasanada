@@ -1,9 +1,9 @@
 from datetime import datetime as dt
-from src.scrapers import scrape_satimp
 import easyocr
 import logging
 
-logging.basicConfig(level=logging.ERROR)
+# local imports
+from src.scrapers import scrape_satimp
 
 
 def gather(db_cursor, dash, update_data):
@@ -20,7 +20,8 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR
+    # start local OCR
+    logging.basicConfig(level=logging.ERROR)
     ocr = easyocr.Reader(["es"], gpu=True)
 
     # iterate on all records that require updating and get scraper results

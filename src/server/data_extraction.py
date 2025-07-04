@@ -34,14 +34,16 @@ class UserData:
     def get_header(self, correo):
         # gathering user data header
         self.cursor.execute(f"SELECT * FROM members WHERE Correo = '{correo}'")
-        return self.cursor.fetchone()
+        user = self.cursor.fetchone()
+        print({user.keys()[n]: user[n] for n in range(13)})
+        return {user.keys()[n]: user[n] for n in range(13)}
 
     def get_reports(self, user):
 
         _info = {"user": user}
 
         _attachments = []
-        member = user[0]
+        member = user["IdMember"]
 
         # add placas
         self.cursor.execute(f"SELECT * FROM placas WHERE IdMember_FK = {member}")

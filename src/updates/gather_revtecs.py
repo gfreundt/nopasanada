@@ -1,6 +1,8 @@
 from datetime import datetime as dt
 import easyocr
 import logging
+
+# local imports
 from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_revtec
 
@@ -87,15 +89,12 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            # except Exception:
-            #     retry_attempts += 1
-            #     dash.log(
-            #         card=CARD,
-            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-            #     )
-
-            # if code gets here, means scraping has encountred three consecutive errors, skip placa
-            dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
+            except Exception:
+                retry_attempts += 1
+                dash.log(
+                    card=CARD,
+                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+                )
 
     # log last action
     dash.log(

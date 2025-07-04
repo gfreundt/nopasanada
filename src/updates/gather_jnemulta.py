@@ -1,4 +1,6 @@
 from datetime import datetime as dt
+
+# local imports
 from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_jnemulta
 
@@ -65,7 +67,7 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except:
+            except Exception:
                 retry_attempts += 1
                 dash.log(
                     card=CARD,

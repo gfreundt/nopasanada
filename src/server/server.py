@@ -65,7 +65,7 @@ class UI:
 
         # if user already logged in, skip login
         if "user" in session:
-            return redirect("reportes")
+            return redirect("mic")
 
         # empty data for first time
         form_response = {}
@@ -79,7 +79,7 @@ class UI:
                 # gather user data header
                 session["user"] = self.users.get_header(correo=form_response["correo"])
                 self.dash.log(
-                    usuario=f"Login {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
+                    usuario=f"Login {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                 )
                 return redirect("mic")
             else:
@@ -223,10 +223,13 @@ class UI:
                     ]
                 )
                 print("-------- REC ---------->", session["codigo_generado"])
+                self.db.cursor.execute(
+                    f"SELECT NombreCompleto FROM members WHERE Correo = '{session["recovery_attempt"]["correo"]}'"
+                )
                 send_code_message.send_code(
                     codigo=session["codigo_generado"],
-                    correo=session["registration_attempt"]["correo"],
-                    nombre=session["registration_attempt"]["nombre"],
+                    correo=session["recovery_attempt"]["correo"],
+                    nombre=self.db.cursor.fetchone()["NombreCompleto"],
                 )
 
                 self.dash.log(
@@ -316,17 +319,17 @@ class UI:
 
         # extract user data
         self.db.cursor.execute(
-            f"SELECT * FROM members WHERE IdMember = {session['user'][0]}"
+            f"SELECT * FROM members WHERE IdMember = {session['user']['IdMember']}"
         )
         user = self.db.cursor.fetchone()
         self.db.cursor.execute(
-            f"SELECT * FROM placas WHERE IdMember_FK = {session['user'][0]}"
+            f"SELECT * FROM placas WHERE IdMember_FK = {session['user']['IdMember']}"
         )
-        placas = [i[2] for i in self.db.cursor.fetchall()]
+        placas = [i["Placa"] for i in self.db.cursor.fetchall()]
 
         # get next message date
         self.db.cursor.execute(
-            f"SELECT FechaEnvio FROM mensajes WHERE IdMember_FK = {session['user'][0]} ORDER BY FechaEnvio DESC"
+            f"SELECT FechaEnvio FROM mensajes WHERE IdMember_FK = {session['user']['IdMember']} ORDER BY FechaEnvio DESC"
         )
         _fecha = self.db.cursor.fetchone()
         siguiente_mensaje = (
@@ -361,10 +364,10 @@ class UI:
 
             # update template data
             user = (
-                session["user"][0],
+                session["user"]["IdMember"],
                 form_response["codigo"],
                 form_response["nombre"],
-                session["user"][3],
+                session["user"]["DocTipo"],
                 form_response["dni"],
                 form_response["celular"],
                 form_response["correo"],
@@ -375,15 +378,17 @@ class UI:
                 form_response["placa3"],
             )
 
-            # remove account
+            # remove account - copy member to another table, erase from main one and unattach placa
             if "eliminar" in form_response:
 
-                cmd = f"""  DELETE FROM members WHERE IdMember = {session['user'][0]};
-                            DELETE FROM placas WHERE IdMember_FK = {session['user'][0]}"""
+                cmd = f""" INSERT INTO membersPast SELECT * FROM members WHERE IdMember = {session['user']['IdMember']};
+                           DELETE FROM members WHERE IdMember = {session['user']['IdMember']};
+                           UPDATE placas SET IdMember_FK = 0 WHERE IdMember_FK = {session['user']['IdMember']}
+                        """
                 self.db.cursor.executescript(cmd)
 
                 self.dash.log(
-                    usuario=f"Eliminado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
+                    usuario=f"Eliminado {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                 )
                 return redirect("logout")
 
@@ -402,21 +407,21 @@ class UI:
                                 DocNum = '{form_response["dni"]}',
                                 Celular = '{form_response["celular"]}',
                                 ForceMsg = '{1 if "Placas" in changes_made else 0}'
-                                WHERE IdMember = {session['user'][0]}"""
+                                WHERE IdMember = {session['user']['IdMember']}"""
                     )
 
                     # update constraseña if changed
                     if "Contraseña" in changes_made:
                         self.db.cursor.execute(
                             f"""    UPDATE members SET Password = '{form_response["contra2"]}'
-                                    WHERE IdMember = {session['user'][0]}"""
+                                    WHERE IdMember = {session['user']['IdMember']}"""
                         )
 
                     _ph = "2020-01-01"  # default placeholder value for date of last scrape for new placas
 
                     # erase foreign key linking placa to member
                     self.db.cursor.execute(
-                        f"UPDATE placas SET IdMember_FK = 0 WHERE IdMember_FK = {session['user'][0]}"
+                        f"UPDATE placas SET IdMember_FK = 0 WHERE IdMember_FK = {session['user']['IdMember']}"
                     )
 
                     # loop all non-empty placas and link foreign key to member if placa exists or create new placa record
@@ -428,22 +433,22 @@ class UI:
                         if len(self.db.cursor.fetchall()) > 0:
                             # placa already exists in the database, assign foreign key to member
                             self.db.cursor.execute(
-                                f"UPDATE placas SET IdMember_FK = {session['user'][0]} WHERE Placa = '{placa}'"
+                                f"UPDATE placas SET IdMember_FK = {session['user']['IdMember']} WHERE Placa = '{placa}'"
                             )
                         else:
                             # create new record
                             self.db.cursor.execute(
                                 "SELECT IdPlaca FROM placas ORDER BY IdPlaca DESC"
                             )
-                            rec = int(self.db.cursor.fetchone()[0]) + 1
+                            rec = int(self.db.cursor.fetchone()["IdPlaca"]) + 1
                             self.db.cursor.execute(
-                                f"INSERT INTO placas VALUES ({rec}, {session['user'][0]}, '{placa}', '{_ph}', '{_ph}', '{_ph}', '{_ph}', '{_ph}')"
+                                f"INSERT INTO placas VALUES ({rec}, {session['user']['IdMember']}, '{placa}', '{_ph}', '{_ph}', '{_ph}', '{_ph}', '{_ph}')"
                             )
 
                     self.db.conn.commit()
                     flash(changes_made, "success")
                     self.dash.log(
-                        usuario=f"Actualizado {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
+                        usuario=f"Actualizado {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                     )
 
         return render_template(
@@ -457,7 +462,7 @@ class UI:
     # logout endpoint (NAVBAR)
     def logout(self):
         self.dash.log(
-            usuario=f"Logout {session['user'][1]} | {session['user'][2]} | {session['user'][4]} | {session['user'][6]}"
+            usuario=f"Logout {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
         )
         session.clear()
         return redirect("log")

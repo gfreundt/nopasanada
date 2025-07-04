@@ -1,6 +1,8 @@
 from datetime import datetime as dt
 import easyocr
 import logging
+
+# local imports
 from src.utils.utils import date_to_db_format
 from src.scrapers import scrape_brevete
 
@@ -19,7 +21,7 @@ def gather(db_cursor, db_conn, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR with no log to console
+    # start local OCR and avoid logging to console
     logging.getLogger("easyocr").setLevel(logging.ERROR)
     ocr = easyocr.Reader(["es"], gpu=False)
 

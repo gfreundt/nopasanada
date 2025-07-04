@@ -9,14 +9,14 @@ def send(db, dash, max=9999):
 
     CARD = 11
 
-    # select all the emails in outbound folder
-    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
+    # select all the emails in outbound folder and cap list to max amount to send
+    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i][:max]
 
     # log first action
     dash.log(general_status=("Activo", 1))
     dash.log(
         card=CARD,
-        title=f"Comunicaciones [{min(max, len(html_files))}]",
+        title=f"Comunicaciones [{len(html_files)}]",
         status=1,
         progress=0,
         text="Inicializando",
@@ -30,13 +30,7 @@ def send(db, dash, max=9999):
 
     counter = 0
     # iterate on all html files in outbound folder
-    for counter, html_file in enumerate(html_files):
-
-        # take html information and create email
-        html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i]
-        # exit loop if reached max emails
-        if counter >= max:
-            break
+    for html_file in html_files:
 
         # open files and find all relevant elements
         with open(
@@ -69,7 +63,7 @@ def send(db, dash, max=9999):
         # update dashboard with progress and last update timestamp
         dash.log(
             card=CARD,
-            progress=int((counter / min(max, len(html_files))) * 100),
+            progress=int((counter / len(html_files)) * 100),
             lastUpdate=dt.now(),
         )
 
@@ -97,6 +91,8 @@ def send(db, dash, max=9999):
 
         else:
             print(f"ERROR sending email to {msg['to']}.")
+
+        counter += 1
 
     db.conn.commit()
 

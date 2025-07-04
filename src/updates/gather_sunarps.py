@@ -1,4 +1,6 @@
 from datetime import datetime as dt
+
+# local imports
 from src.scrapers import scrape_sunarp
 
 

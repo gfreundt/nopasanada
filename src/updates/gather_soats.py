@@ -1,10 +1,12 @@
+import os
 from datetime import datetime as dt
 from copy import deepcopy as copy
+
+# local imports
 from src.updates import soat_image_generator
 from src.utils.utils import date_to_db_format, use_truecaptcha
 from src.scrapers import scrape_soat
 from src.utils.constants import NETWORK_PATH
-import os
 
 
 def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):

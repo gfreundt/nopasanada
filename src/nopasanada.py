@@ -5,14 +5,12 @@ from src.updates import get_records_to_update, gather_all, get_recipients
 from src.comms import craft_messages, send_messages, craft_alerts
 from src.maintenance import maintenance
 
-# import maintenance
-
-# TODO: display $review on web page
+# TODO: display $review on dashboard
 # TODO: expand brevetes to include CE
 
 
 def nopasanada(dash, db, cmds):
-    """Program entry point. Executes actions depending on arguments ran at prompt.
+    """Executes actions depending on arguments ran at prompt.
     Valid cmds: 'update', 'update-threads', 'comms', 'send'
     """
 

@@ -1,5 +1,7 @@
 import time
 from threading import Thread
+
+# local imports
 from src.updates import (
     gather_brevetes,
     gather_revtecs,
@@ -46,6 +48,7 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
 def gather_threads(db_conn, db_cursor, dash, all_updates):
 
+    # log change of dashboard status
     dash.log(general_status=("Activo", 1))
 
     threads = []
@@ -120,10 +123,10 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
         )
     )
 
-    # start all threads with a 2 second gap to avoid webdriver conflict
+    # start all threads with a time gap to avoid webdriver conflict
     for thread in threads:
         thread.start()
-        time.sleep(2)
+        time.sleep(1.5)
 
     # wait for all active threads to finish
     while any([i.is_alive() for i in threads]):
@@ -132,6 +135,6 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     # commit all changes to database
     db_conn.commit()
 
-    # final log update and give some time for webpage update
-    dash.log(general_status=("Inactivo", 2))
-    time.sleep(5)
+    # final log update and give time for dashboard to update
+    dash.log(general_status=("Esperando", 2))
+    time.sleep(3)

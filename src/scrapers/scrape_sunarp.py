@@ -39,7 +39,7 @@ def browser(placa):
         while True:
 
             # capture captcha image from webpage and save
-            _path = os.path.join(NETWORK_PATH, "static", "captcha_sunarp.png")
+            _path = os.path.join(NETWORK_PATH, "temp", "captcha_sunarp.png")
             with open(_path, "wb+") as file:
                 file.write(webdriver.find_element(By.ID, "image").screenshot_as_png)
             captcha_txt = use_truecaptcha(_path)["result"]
