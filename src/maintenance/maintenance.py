@@ -1,14 +1,15 @@
 import os
 import shutil
 from datetime import datetime as dt
+from src.utils.constants import NETWORK_PATH
 
 
 def pre_maint(db_cursor):
 
     # erase all comms that might still be in outbound folder
-    for file in os.listdir("outbound"):
+    for file in os.listdir(os.path.join(NETWORK_PATH, "outbound")):
         if "alert" in file or "message" in file:
-            os.remove(os.path.join("outbound", file))
+            os.remove(os.path.join(NETWORK_PATH, "outbound", file))
 
 
 def post_maint(db_cursor):
@@ -27,8 +28,8 @@ def post_maint(db_cursor):
     db_cursor.executescript(cmd)
 
     # manage the backups
-    network_path = os.path.join(r"\\192.168.68.110\d\pythonCode\nopasanada\data")
-    target_path = os.path.join(network_path, "backups")
+    from_path = os.path.join(NETWORK_PATH, "data")
+    target_path = os.path.join(NETWORK_PATH, "data", "backups")
 
     try:
         for filename in os.listdir(target_path):
@@ -44,10 +45,10 @@ def post_maint(db_cursor):
 
         _date = dt.strftime(dt.now(), "%Y-%m-%d %H;%M;%S")
         shutil.copy(
-            os.path.join(network_path, "members.db"),
+            os.path.join(from_path, "members.db"),
             os.path.join(target_path, f"m-00 [{_date}].db"),
         )
-    except Exception:
+    except KeyboardInterrupt:  # Exception:
         print("***** Error BACKUP database ******")
 
     # TODO: eliminate all placas with IdMember_FK = 0 and LastUpdates old

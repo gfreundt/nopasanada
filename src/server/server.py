@@ -78,12 +78,12 @@ class UI:
             if not errors:
                 # gather user data header
                 session["user"] = self.users.get_header(correo=form_response["correo"])
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Login {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                 )
                 return redirect("mic")
             else:
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Unsuccesful Login ({form_response['correo']} | {form_response['password']})"
                 )
 
@@ -127,7 +127,7 @@ class UI:
                     nombre=session["registration_attempt"]["nombre"],
                 )
 
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Nuevo Registro. Correo enviado. {form_response['correo']}."
                 )
 
@@ -180,7 +180,7 @@ class UI:
                     f"UPDATE membersLastUpdate SET IdMember_FK = {rec} WHERE IdMember_FK IS NULL"
                 )
                 self.db.conn.commit()
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Nuevo Registro Completo. {rec} | {cod} | {nom} | {dni} | {cel} | {cor} | {dat} | {pwd}"
                 )
 
@@ -232,7 +232,7 @@ class UI:
                     nombre=self.db.cursor.fetchone()["NombreCompleto"],
                 )
 
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Recuperacion. Correo enviado. {form_response["correo"]}."
                 )
 
@@ -267,7 +267,7 @@ class UI:
                     f"UPDATE members SET Password = '{pwd}' WHERE Correo = '{cor}'"
                 )
                 self.db.conn.commit()
-                self.dash.log(usuario="Recuperacion ok.")
+                self.dash.logging(usuario="Recuperacion ok.")
 
                 # clear session data (back to login) and reload db to include new record
                 session.clear()
@@ -277,7 +277,7 @@ class UI:
 
             else:
 
-                self.dash.log(usuario="Recuperacion ERROR.")
+                self.dash.logging(usuario="Recuperacion ERROR.")
 
         # render form for user to fill (first time or returned with errors)
         if "password1" in form_response:
@@ -387,7 +387,7 @@ class UI:
                         """
                 self.db.cursor.executescript(cmd)
 
-                self.dash.log(
+                self.dash.logging(
                     usuario=f"Eliminado {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                 )
                 return redirect("logout")
@@ -447,7 +447,7 @@ class UI:
 
                     self.db.conn.commit()
                     flash(changes_made, "success")
-                    self.dash.log(
+                    self.dash.logging(
                         usuario=f"Actualizado {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
                     )
 
@@ -461,7 +461,7 @@ class UI:
 
     # logout endpoint (NAVBAR)
     def logout(self):
-        self.dash.log(
+        self.dash.logging(
             usuario=f"Logout {session['user']['CodMember']} | {session['user']['NombreCompleto']} | {session['user']['DocNum']} | {session['user']['Correo']}"
         )
         session.clear()

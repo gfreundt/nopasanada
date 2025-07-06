@@ -10,7 +10,7 @@ def gather(db_cursor, dash, update_data):
     CARD = 10
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"JNE Multa [{len(update_data)}]",
         status=1,
@@ -26,7 +26,7 @@ def gather(db_cursor, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {doc_num}")
+                dash.logging(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
                 sunat_response = scrape_jnemulta.browser(doc_tipo, doc_num)
@@ -38,7 +38,7 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -59,7 +59,7 @@ def gather(db_cursor, dash, update_data):
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO sunats VALUES {tuple(_values)}")
 
-                dash.log(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
+                dash.logging(action=f"[ SUNATS ] {"|".join([str(i) for i in _values])}")
 
                 # skip to next record
                 break
@@ -69,13 +69,13 @@ def gather(db_cursor, dash, update_data):
 
             except Exception:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
                 )
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="JNE Multas",
         progress=100,

@@ -10,7 +10,7 @@ def gather(db_cursor, dash, update_data):
     CARD = 7
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"Sutran [{len(update_data)}]",
         status=1,
@@ -20,14 +20,14 @@ def gather(db_cursor, dash, update_data):
     )
 
     # iterate on all records that require updating and get scraper results
-    for counter, (id_placa, placa) in enumerate(update_data, start=1):
+    for counter, placa in enumerate(update_data, start=1):
 
         retry_attempts = 0
         # loop to catch scraper errors and retry limited times
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {placa}")
+                dash.logging(card=CARD, text=f"Procesando: {placa}")
 
                 # send request to scraper
                 sutran_response = scrape_sutran.browser(placa=placa)
@@ -36,7 +36,7 @@ def gather(db_cursor, dash, update_data):
 
                 # if no error in scrape, erase any prior records of this placa
                 db_cursor.execute(
-                    f"DELETE FROM sutrans WHERE PlacaValidate = '{placa}')"
+                    f"DELETE FROM sutrans WHERE PlacaValidate = '{placa}'"
                 )
 
                 # update placas table with last update information
@@ -45,7 +45,7 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -62,7 +62,7 @@ def gather(db_cursor, dash, update_data):
 
                     # insert gathered record of member
                     db_cursor.execute(f"INSERT INTO sutrans VALUES {tuple(_values)}")
-                    dash.log(
+                    dash.logging(
                         action=f"[ SUTRANS ] {"|".join([str(i) for i in _values])}"
                     )
 
@@ -74,16 +74,16 @@ def gather(db_cursor, dash, update_data):
 
             # except Exception:
             #     retry_attempts += 1
-            #     dash.log(
+            #     dash.logging(
             #         card=CARD,
             #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
             #     )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
-        dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
+        dash.logging(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Sutran",
         progress=100,

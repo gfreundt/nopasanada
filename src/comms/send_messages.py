@@ -10,11 +10,13 @@ def send(db, dash, max=9999):
     CARD = 11
 
     # select all the emails in outbound folder and cap list to max amount to send
-    html_files = [i for i in os.listdir(os.path.join("outbound")) if ".html" in i][:max]
+    html_files = [
+        i for i in os.listdir(os.path.join(NETWORK_PATH, "outbound")) if ".html" in i
+    ][:max]
 
     # log first action
-    dash.log(general_status=("Activo", 1))
-    dash.log(
+    dash.logging(general_status=("Activo", 1))
+    dash.logging(
         card=CARD,
         title=f"Comunicaciones [{len(html_files)}]",
         status=1,
@@ -55,13 +57,13 @@ def send(db, dash, max=9999):
         msg.update({"html_content": data})
 
         # log action
-        dash.log(card=CARD, text=f"Enviando: {msg["to"]}")
+        dash.logging(card=CARD, text=f"Enviando: {msg["to"]}")
 
         # activate mail API and send all
         response = email.send_email(msg)
 
         # update dashboard with progress and last update timestamp
-        dash.log(
+        dash.logging(
             card=CARD,
             progress=int((counter / len(html_files)) * 100),
             lastUpdate=dt.now(),
@@ -86,8 +88,8 @@ def send(db, dash, max=9999):
                 )
 
             # erase message from outbound folder
-            os.remove(os.path.join("outbound", html_file))
-            dash.log(action=f"[ SEND ] | {msg['to']}")
+            os.remove(os.path.join(NETWORK_PATH, "outbound", html_file))
+            dash.logging(action=f"[ SEND ] | {msg['to']}")
 
         else:
             print(f"ERROR sending email to {msg['to']}.")
@@ -97,7 +99,7 @@ def send(db, dash, max=9999):
     db.conn.commit()
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Comunicaciones",
         progress=100,

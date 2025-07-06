@@ -2,13 +2,11 @@ import time
 import sqlite3
 import sys
 import logging
-import schedule
 import atexit
 
 # local imports
 from src.nopasanada import nopasanada
-from src.server import server
-from src.monitor import monitor
+from src.server import server2
 from src.utils.constants import DB_LOCAL_PATH, DB_NETWORK_PATH
 
 
@@ -66,19 +64,14 @@ def main():
         nopasanada(dash=None, db=db, cmds=[])
         return
 
-    # run dashboard in background (port 7000)
-    dash = monitor.Dashboard(db)
-    if "NOMON" not in sys.argv:
-        dash.run_in_background()
+    # run server in background (port 5000)
+    dash = server2.Server(db=db)
+    dash.run_in_background()
 
     # code to run after exiting program
     atexit.register(run_at_exit, dash, db)
 
-    # run user UI in background (port 5000)
-    ui = server.UI(db=db, dash=dash)
-    if "NOUI" not in sys.argv:
-        ui.run_in_background()
-
+    # run according to parameters
     if "NOW" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms"])
 
@@ -88,28 +81,11 @@ def main():
     if "SEND" in sys.argv:
         nopasanada(dash, db, cmds=["update", "comms", "send"])
 
+    # endless loop
     while True:
         # print([logging.getLogger(name) for name in logging.root.manager.loggerDict])
+        print("Running")
         time.sleep(10)
-
-    return
-
-    # set up scheduler: dashboard updates
-    schedule.every().second.do(dash.update_remaining_time, dash)
-    schedule.every(15).minutes.do(dash.update_db_stats, dash, db)
-
-    # set up scheduler: three updates (no messages/alerts) + one update (and messages/alerts)
-    _update = "update-threads" if "THREAD" in sys.argv else "update"
-    schedule.every().day.at("18:15").do(
-        nopasanada, dash=dash, db=db, cmds=[_update, "comms"]
-    ).tag("update")
-
-    # run stats update for dashboard before scheduling begins
-    dash.update_db_stats(dash, db)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
 
 
 if __name__ == "__main__":

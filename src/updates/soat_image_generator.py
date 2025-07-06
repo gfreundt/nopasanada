@@ -7,7 +7,7 @@ from src.utils.pdf import PDFUtils
 from src.utils.constants import NETWORK_PATH
 
 
-def generate(db_cursor, id_placa, data):
+def generate(db_cursor, data):
 
     # load fonts
     _resources = os.path.join("D:\pythonCode", "Resources", "Fonts")
@@ -21,15 +21,6 @@ def generate(db_cursor, id_placa, data):
     # open blank template image and prepare for edit
     base_img = Image.open(os.path.join(_templates_path, "SOAT_base.png"))
     editable_img = ImageDraw.Draw(base_img)
-
-    # if id_placa is sent, use that index to query database (replaces any data sent to function)
-    if id_placa:
-        db_cursor.execute(
-            f"""  SELECT Aseguradora, Certificado, FechaInicio, FechaHasta,
-                                PlacaValidate, Clase, Uso
-                                FROM soats WHERE PlacaValidate={placa}"""
-        )
-        data = db_cursor.fetchone()
 
     # turn date into correct format for certificate
     data[1] = dt.strftime(dt.strptime(data[1], "%Y-%m-%d"), "%d/%m/%Y")

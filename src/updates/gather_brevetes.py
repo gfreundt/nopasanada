@@ -12,7 +12,7 @@ def gather(db_cursor, db_conn, dash, update_data):
     CARD = 0
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"Brevete [{len(update_data)}]",
         status=1,
@@ -37,7 +37,7 @@ def gather(db_cursor, db_conn, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
+                dash.logging(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
 
                 # send request to scraper
                 brevete_response, pimpagas_response = scrape_brevete.browser(
@@ -52,7 +52,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # stop processing if blank response from scraper
                 if not brevete_response:
-                    dash.log(
+                    dash.logging(
                         card=CARD,
                         status=2,
                         text="Scraper crash",
@@ -82,7 +82,9 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO brevetes VALUES {tuple(_values)}")
-                dash.log(action=f"[ BREVETES ] {"|".join([str(i) for i in _values])}")
+                dash.logging(
+                    action=f"[ BREVETES ] {"|".join([str(i) for i in _values])}"
+                )
 
                 # process list of papeletas impagas and put them in different table
                 for papeleta in pimpagas_response:
@@ -104,7 +106,7 @@ def gather(db_cursor, db_conn, dash, update_data):
                     )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -118,17 +120,19 @@ def gather(db_cursor, db_conn, dash, update_data):
 
             except:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD, msg=f"< BREVETE > Retrying Record {doc_tipo}-{doc_num}."
                 )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
-        dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}.")
+        dash.logging(
+            card=CARD, msg=f"|ERROR| No se pudo procesar {doc_tipo} {doc_num}."
+        )
 
         db_conn.commit()
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Brevetes",
         progress=100,

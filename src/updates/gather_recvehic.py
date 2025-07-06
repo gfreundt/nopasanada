@@ -9,7 +9,7 @@ def gather(db_cursor, db_conn, dash, update_data):
     CARD = 1
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"Record Conductor [{len(update_data)}]",
         status=1,
@@ -30,7 +30,7 @@ def gather(db_cursor, db_conn, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
+                dash.logging(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
 
                 # send request to scraper
                 _img_filename = scrape_recvehic.browser(doc_num=doc_num)
@@ -47,7 +47,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # stop process if blank response from scraper
                 if not _img_filename:
-                    dash.log(
+                    dash.logging(
                         card=CARD,
                         status=2,
                         text="Scraper crash",
@@ -67,10 +67,10 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # insert record into database
                 db_cursor.execute(f"INSERT INTO recordConductores VALUES {_values}")
-                dash.log(action=f"[ RECORD ] {"|".join([str(i) for i in _values])}")
+                dash.logging(action=f"[ RECORD ] {"|".join([str(i) for i in _values])}")
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -84,7 +84,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
             except Exception:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD,
                     status=2,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
@@ -93,7 +93,7 @@ def gather(db_cursor, db_conn, dash, update_data):
         db_conn.commit()
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Record del Conductor",
         progress=100,

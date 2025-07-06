@@ -53,7 +53,7 @@ class Dashboard:
         self.set_initial_data()
         self.update_kpis()
 
-    def log(self, **kwargs):
+    def logging(self, **kwargs):
 
         if "general_status" in kwargs:
             self.data["top_right"]["content"] = kwargs["general_status"][0]

@@ -19,7 +19,7 @@ from src.updates import (
 
 def gather_no_threads(db_conn, db_cursor, dash, all_updates):
 
-    dash.log(general_status=("Activo", 1))
+    dash.logging(general_status=("Activo", 1))
 
     # # auto gathering
     # gather_brevetes.gather(db_cursor, db_conn, dash, all_updates["brevetes"])
@@ -42,14 +42,14 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
     db_conn.commit()
 
     # final log update and give some time for webpage update
-    dash.log(general_status=("Inactivo", 2))
+    dash.logging(general_status=("Inactivo", 2))
     time.sleep(5)
 
 
 def gather_threads(db_conn, db_cursor, dash, all_updates):
 
     # log change of dashboard status
-    dash.log(general_status=("Activo", 1))
+    dash.logging(general_status=("Activo", 1))
 
     threads = []
 
@@ -136,5 +136,5 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     db_conn.commit()
 
     # final log update and give time for dashboard to update
-    dash.log(general_status=("Esperando", 2))
+    dash.logging(general_status=("Esperando", 2))
     time.sleep(3)

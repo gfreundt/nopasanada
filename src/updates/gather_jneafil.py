@@ -9,7 +9,7 @@ def gather(db_cursor, dash, update_data):
     CARD = 9
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"JNE Afiliacion [{len(update_data)}]",
         status=1,
@@ -25,7 +25,7 @@ def gather(db_cursor, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {doc_num}")
+                dash.logging(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
                 jne_response = scrape_jneafil.browser(doc_num)
@@ -37,7 +37,7 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -53,7 +53,9 @@ def gather(db_cursor, dash, update_data):
 
                 # insert gathered record of member
                 db_cursor.execute(f"INSERT INTO JNEAfiliacion VALUES {tuple(_values)}")
-                dash.log(action=f"[ JNE Afil ] {"|".join([str(i) for i in _values])}")
+                dash.logging(
+                    action=f"[ JNE Afil ] {"|".join([str(i) for i in _values])}"
+                )
 
                 # next record
                 break
@@ -63,13 +65,13 @@ def gather(db_cursor, dash, update_data):
 
             except Exception:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_num}",
                 )
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="JNE Afiliacion",
         progress=100,

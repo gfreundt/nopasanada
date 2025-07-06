@@ -12,7 +12,7 @@ def gather(db_cursor, dash, update_data):
     CARD = 2
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"Revisión Técnica [{len(update_data)}]",
         status=1,
@@ -33,14 +33,14 @@ def gather(db_cursor, dash, update_data):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {placa}")
+                dash.logging(card=CARD, text=f"Procesando: {placa}")
 
                 # send request to scraper
                 revtec_response = scrape_revtec.browser(ocr=ocr, placa=placa)
 
                 # webpage is down: stop gathering and show error in dashboard
                 if revtec_response == 404:
-                    dash.log(
+                    dash.logging(
                         card=CARD,
                         status=2,
                         text="MTC offline",
@@ -55,7 +55,7 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -81,7 +81,9 @@ def gather(db_cursor, dash, update_data):
 
                 # insert new record into database
                 db_cursor.execute(f"INSERT INTO revtecs VALUES {tuple(_values)}")
-                dash.log(action=f"[ REVTECS ] {"|".join([str(i) for i in _values])}")
+                dash.logging(
+                    action=f"[ REVTECS ] {"|".join([str(i) for i in _values])}"
+                )
 
                 # skip to next record
                 break
@@ -91,13 +93,13 @@ def gather(db_cursor, dash, update_data):
 
             except Exception:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
                 )
 
     # log last action
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Revisión Técnica",
         progress=100,

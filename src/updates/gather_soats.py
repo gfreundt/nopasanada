@@ -14,7 +14,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
     CARD = 5
 
     # log first action
-    dash.log(
+    dash.logging(
         card=CARD,
         title=f"Certificados Soat [{len(update_data)}]",
         status=1,
@@ -37,7 +37,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
         while retry_attempts < 3:
             try:
                 # log action
-                dash.log(card=CARD, text=f"Procesando: {placa}")
+                dash.logging(card=CARD, text=f"Procesando: {placa}")
 
                 # grab captcha image from website and save to temp file
                 scraper.get_captcha()
@@ -49,7 +49,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                 # captcha timeout - manual user not there to enter captcha, skip process
                 if captcha == -1:
-                    dash.log(
+                    dash.logging(
                         card=CARD,
                         title="Certificados Soat",
                         status=0,
@@ -67,7 +67,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                 # scraper exceed limit of manual captchas - abort iteration
                 elif response_soat == -1:
-                    dash.log(
+                    dash.logging(
                         card=CARD,
                         title="Certificados Soat",
                         status=2,
@@ -87,7 +87,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                     # if soat data gathered succesfully, generate soat image and save in folder
                     img_name = soat_image_generator.generate(
-                        db_cursor, id_placa=None, data=copy(new_record_dates_fixed)
+                        db_cursor, data=copy(new_record_dates_fixed)
                     )
 
                     _now = dt.now().strftime("%Y-%m-%d")
@@ -102,7 +102,9 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
                     # insert gathered record of member
                     db_cursor.execute(f"INSERT INTO soats VALUES {tuple(_values)}")
-                    dash.log(action=f"[ SOATS ] {"|".join([str(i) for i in _values])}")
+                    dash.logging(
+                        action=f"[ SOATS ] {"|".join([str(i) for i in _values])}"
+                    )
 
                     # update placas table with last update information
                     db_cursor.execute(
@@ -110,7 +112,7 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                     )
 
                 # update dashboard with progress and last update timestamp
-                dash.log(
+                dash.logging(
                     card=CARD,
                     progress=int((counter / len(update_data)) * 100),
                     lastUpdate=dt.now(),
@@ -125,16 +127,16 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
 
             except Exception:
                 retry_attempts += 1
-                dash.log(
+                dash.logging(
                     card=CARD,
                     text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
                 )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
-        dash.log(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
+        dash.logging(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
 
         # log last action and close webdriver
-    dash.log(
+    dash.logging(
         card=CARD,
         title="Certificados Soat",
         progress=100,
