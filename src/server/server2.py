@@ -39,6 +39,9 @@ class Server:
         dashboard.set_initial_data(self)
         dashboard.update_kpis(self)
 
+        # redirect endpoint
+        self.app.add_url_rule("/redir", "redir", self.redir)
+
     def redir(self):
         """OAuth2 endpoint for Zoho Mail"""
         all_params = request.args.to_dict()
