@@ -53,7 +53,7 @@ class Server:
         client_id = ZOHO_MAIL_API_CLIENT_ID
         client_secret = ZOHO_MAIL_API_CLIENT_SECRET
         redirect_uri = ZOHO_MAIL_API_REDIRECT_URL
-        scope = "ZohoMail.accounts.READ"
+        scope = "ZohoMail.accounts.ALL"
 
         url = f"https://accounts.zoho.com/oauth/v2/token?code={authorization_code}&grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&scope={scope}"
 
@@ -61,7 +61,25 @@ class Server:
         response = requests.post(url)
         print("Status code:", response.status_code)
         print("Response body:", response.text)
-        self.zoho_mail_token = response.text
+        self.zoho_mail_token = response.text["access_token"]
+
+        url = "https://mail.zoho.com/api/accounts"
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "Zoho-oauthtoken 1000.9305fb65057d05d5fca94c0b434d9fee.51a50174728a68d50b36866883e0403f"
+}
+
+response = requests.get(url, headers=headers)
+
+print(response.status_code)
+print(response.json())  # Use response.text if it's not valid JSON
+}
+
+response = requests.get(url, headers=headers, params=params)
+
+print(response.status_code)
+print(response.json())  # or response.text if it's not valid JSON
 
         return render_template("redirect.html")
 
