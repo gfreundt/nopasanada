@@ -2,6 +2,7 @@ import os
 from threading import Thread
 from jinja2 import Environment, FileSystemLoader
 from src.utils.email import Email
+from src.utils.constants import ZOHO_INFO_PASSWORD
 
 
 def send_code(codigo, correo, nombre):
@@ -19,7 +20,7 @@ def run_thread(codigo, correo, nombre):
 
     # crea objeto para enviar correo desde info@
     email = Email(
-        from_account="info@nopasanadape.com", password=os.environ["ZOHO-1-PWD"]
+        from_account="info@nopasanadape.com", password=ZOHO_INFO_PASSWORD]
     )
 
     # crear contenido del correo
