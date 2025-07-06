@@ -19,9 +19,7 @@ def run_thread(codigo, correo, nombre):
     template = environment.get_template("codigo.html")
 
     # crea objeto para enviar correo desde info@
-    email = Email(
-        from_account="info@nopasanadape.com", password=ZOHO_INFO_PASSWORD]
-    )
+    email = Email(from_account="info@nopasanadape.com", password=ZOHO_INFO_PASSWORD)
 
     # crear contenido del correo
     msg = {
