@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session
 import threading
-import os
+import os, time
 import requests
 
 # local imports
@@ -11,6 +11,7 @@ from src.utils.constants import (
     NETWORK_PATH,
     ZOHO_MAIL_API_CLIENT_ID,
     ZOHO_MAIL_API_CLIENT_SECRET,
+    ZOHO_MAIL_API_REDIRECT_URL,
 )
 from src.server.settings import set_routes, set_config
 from src.server import dashboard, ui
@@ -51,11 +52,12 @@ class Server:
         authorization_code = all_params["code"]
         client_id = ZOHO_MAIL_API_CLIENT_ID
         client_secret = ZOHO_MAIL_API_CLIENT_SECRET
-        redirect_uri = "https://www.nopasanadape.com/redir"
+        redirect_uri = ZOHO_MAIL_API_REDIRECT_URL
         scope = "ZohoMail.accounts.READ"
 
         url = f"https://accounts.zoho.com/oauth/v2/token?code={authorization_code}&grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&scope={scope}"
 
+        time.sleep(3)
         response = requests.post(url)
         print("Status code:", response.status_code)
         print("Response body:", response.text)
