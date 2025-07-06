@@ -1,4 +1,3 @@
-import os
 from threading import Thread
 from jinja2 import Environment, FileSystemLoader
 from src.utils.email import Email

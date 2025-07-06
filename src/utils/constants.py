@@ -1,11 +1,14 @@
 import os
+import platform
 
-NETWORK_PATH = os.path.join(r"\\192.168.68.110\d\pythonCode\nopasanada")
-SCRAPER_TEST = False
+# paths
+if platform.system() == "Linux":
+    NETWORK_PATH = os.path.join("/mnt/nopasanada_server")
+else:
+    NETWORK_PATH = os.path.join("192.168.68.110", "d", "pythonCode", "nopasanada")
 
-
-DB_LOCAL_PATH = os.path.join("data", "members.db")
 DB_NETWORK_PATH = os.path.join(NETWORK_PATH, "data", "members.db")
+DB_LOCAL_PATH = os.path.join("data", "members.db")
 
 # info email account
 ZOHO_INFO_PASSWORD = "5QJWEKi0trAL"
