@@ -7,17 +7,15 @@ import requests
 import schedule
 from src.utils.utils import get_local_ip
 from src.nopasanada import nopasanada
+from src.utils.constants import NETWORK_PATH
 
 
 class Dashboard:
     def __init__(self, db):
-        BASE_PATH = os.path.abspath(
-            "d:/pythonCode/nopasanada"
-        )  # os.path.abspath(os.curdir)
         self.app = Flask(
             __name__,
-            template_folder=os.path.join(BASE_PATH, "templates"),
-            static_folder=os.path.join(BASE_PATH, "static"),
+            template_folder=os.path.join(NETWORK_PATH, "templates"),
+            static_folder=os.path.join(NETWORK_PATH, "static"),
         )
         self.data_lock = threading.Lock()
         self.db = db

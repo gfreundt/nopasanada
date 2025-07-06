@@ -10,8 +10,8 @@ import os
 from src.server.validation import FormValidate
 from src.server.data_extraction import UserData
 from src.utils.utils import get_local_ip
-
 from src.comms import send_code_message
+from src.utils.constants import NETWORK_PATH
 
 
 # TODO: fix last two to show correct format
@@ -34,11 +34,10 @@ class UI:
         self.users = UserData(db=self.db)
 
         # initialize Flask app
-        BASE_PATH = os.path.abspath(os.curdir)
         self.app = Flask(
             __name__,
-            template_folder=os.path.join(BASE_PATH, "templates"),
-            static_folder=os.path.join(BASE_PATH, "static"),
+            template_folder=os.path.join(NETWORK_PATH, "templates"),
+            static_folder=os.path.join(NETWORK_PATH, "static"),
         )
         self.app.config["SECRET_KEY"] = "sdlkfjsdlojf3r49tgf8"
         self.app.config["TEMPLATES_AUTO_RELOAD"] = True

@@ -5,9 +5,10 @@ import platform
 if platform.system() == "Linux":
     NETWORK_PATH = os.path.join("/mnt/nopasanada_server")
 else:
-    NETWORK_PATH = os.path.join("192.168.68.110", "d", "pythonCode", "nopasanada")
+    NETWORK_PATH = os.path.join(r"\\192.168.68.110", "d", "pythonCode", "nopasanada")
 
 DB_NETWORK_PATH = os.path.join(NETWORK_PATH, "data", "members.db")
+print(DB_NETWORK_PATH, "++++++++++++++++++++++++++++++++")
 DB_LOCAL_PATH = os.path.join("data", "members.db")
 
 # info email account
