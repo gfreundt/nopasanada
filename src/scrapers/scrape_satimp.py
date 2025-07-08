@@ -9,7 +9,7 @@ from src.utils.constants import NETWORK_PATH
 
 
 def browser(ocr, doc_num, doc_tipo):
-    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
     webdriver.get("https://www.sat.gob.pe/WebSitev8/IncioOV2.aspx")
     # navigate once to Tributo Detalles page with internal URL
     _target = (
@@ -27,7 +27,9 @@ def browser(ocr, doc_num, doc_tipo):
             By.XPATH,
             "/html/body/form/div[3]/section/div/div/div[2]/div[3]/div[5]/div/div[1]/div[2]/div/img",
         )
-        _captcha_img_url.screenshot(os.path.join("temp", "captcha_satimp.png"))
+        _captcha_img_url.screenshot(
+            os.path.join(NETWORK_PATH, "temp", "captcha_satimp.png")
+        )
 
         # apply OCR to temp file
         _captcha = ocr.readtext(

@@ -20,7 +20,7 @@ def browser(placa):
 
         # start chromedriver
         webdriver = ChromeUtils().init_driver(
-            headless=False, verbose=True, maximized=True, incognito=True
+            headless=True, verbose=True, maximized=True, incognito=True
         )
 
         # open first URL, wait and open second URL (avoids limiting requests)
@@ -43,7 +43,6 @@ def browser(placa):
             with open(_path, "wb+") as file:
                 file.write(webdriver.find_element(By.ID, "image").screenshot_as_png)
             captcha_txt = use_truecaptcha(_path)["result"]
-            print("---------", captcha_txt)
 
             # clear captcha field and enter captcha text
             webdriver.find_element(By.ID, "codigoCaptcha").send_keys(
@@ -61,7 +60,6 @@ def browser(placa):
             # if captcha is not correct, refresh captcha and try again
             _alerta = webdriver.find_elements(By.ID, "swal2-html-container")
             if _alerta and "correctamente" in _alerta[0].text:
-                print("************ refresh")
                 # click salir de la alerta
                 webdriver.find_element(
                     By.XPATH, "/html/body/div/div/div[6]/button[1]"
@@ -84,7 +82,6 @@ def browser(placa):
                 return False
 
             # no error... continue
-            print("breaj!!!!!!")
             break
 
         # wait up to 10 seconds for image to load
@@ -104,7 +101,9 @@ def browser(placa):
 
         # grab image and save in file, return succesful
         base64_string = _card_image[0].get_attribute("src")[21:]
-        output_path = os.path.join("data", "images", f"SUNARP_{placa}.png")
+        output_path = os.path.join(
+            NETWORK_PATH, "data", "images", f"SUNARP_{placa}.png"
+        )
         base64_to_image(base64_string, output_path)
 
         # press boton to start over

@@ -13,7 +13,7 @@ def browser(doc_num):
     from_path = os.path.join(
         os.path.expanduser("~/Downloads"), "RECORD DE CONDUCTOR.pdf"
     )
-    to_path = os.path.join(".", "data", "images", f"RECORD_{doc_num}.pdf")
+    to_path = os.path.join(NETWORK_PATH, "data", "images", f"RECORD_{doc_num}.pdf")
 
     # erase file from Downloads folder before downloading new one
     if os.path.exists(from_path):
@@ -58,7 +58,6 @@ def browser(doc_num):
         # if captcha is not correct, refresh and restart cycle, if no data found, return blank
         _alerta = webdriver.find_elements(By.ID, "idxAlertmensaje")
         if _alerta and "ingresado" in _alerta[0].text:
-            print("111111111111")
             # click on "Cerrar" to close pop-up
             webdriver.find_element(
                 By.XPATH, "/html/body/div[5]/div/div/div[2]/button"
@@ -68,11 +67,9 @@ def browser(doc_num):
             webdriver.refresh()
             continue
         elif _alerta and "PERSONA" in _alerta[0].text:
-            print("22222222222")
             webdriver.quit()
             return -1
         else:
-            print("333333333333333")
             break
 
     # click on download button
@@ -95,10 +92,10 @@ def browser(doc_num):
 
     print(from_path)
 
-    print(os.path.isfile(os.path.join(from_path)))
+    print(os.path.isfile(from_path))
 
     print(to_path)
 
     if count < 10:
         shutil.move(from_path, to_path)
-        return str(os.path.basename(from_path))
+        return str(os.path.basename(to_path))

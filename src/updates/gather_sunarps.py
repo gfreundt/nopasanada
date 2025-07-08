@@ -49,13 +49,14 @@ def gather(db_cursor, db_conn, dash, update_data):
                 # add foreign key and current date to response
                 _values = (
                     [999]
+                    + [placa]
                     + extract_data_from_image(_img_filename)
                     + [_img_filename, _now]
                 )
 
                 # delete all old records from placa
                 db_cursor.execute(
-                    f"DELETE FROM sunarps WHERE PlacaValidate = (SELECT Placa FROM placas WHERE ImgFilename = '{_img_filename}')"
+                    f"DELETE FROM sunarps WHERE PlacaValidate = '{placa}'"
                 )
 
                 # insert new record into database
@@ -75,12 +76,12 @@ def gather(db_cursor, db_conn, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except Exception:
-                retry_attempts += 1
-                dash.logging(
-                    card=CARD,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.logging(
+            #         card=CARD,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {placa}",
+            #     )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.logging(card=CARD, msg=f"|ERROR| No se pudo procesar {placa}.")
@@ -100,4 +101,4 @@ def gather(db_cursor, db_conn, dash, update_data):
 
 # TODO: move to post-processing
 def extract_data_from_image(img_filename):
-    return [""] * 14
+    return [""] * 13
