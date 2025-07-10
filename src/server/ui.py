@@ -296,7 +296,7 @@ def mic(self):
         f"SELECT FechaEnvio FROM mensajes WHERE IdMember_FK = {self.session['user']['IdMember']} ORDER BY FechaEnvio DESC"
     )
     _fecha = self.db.cursor.fetchone()
-    siguiente_mensaje = (
+    _siguiente_mensaje = (
         (
             max(
                 dt.strptime(_fecha[0], "%Y-%m-%d %H:%M:%S") + td(days=30),
@@ -306,7 +306,11 @@ def mic(self):
         if _fecha
         else (dt.now() + td(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     )
-    sgte_boletin = {"fecha": siguiente_mensaje, "dias": "17"}
+
+    _dias_faltantes = (
+        dt.strptime(_fecha[0], "%Y-%m-%d %H:%M:%S") - dt.now() + td(days=30)
+    ).days
+    sgte_boletin = {"fecha": _siguiente_mensaje, "dias": _dias_faltantes}
 
     # empty data for first time
     errors = {}

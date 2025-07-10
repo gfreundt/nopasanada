@@ -18,8 +18,6 @@ class Server:
         self.validacion = FormValidate(db=self.db)
         self.data_lock = threading.Lock()
 
-        # NETWORK_PATH = r"d:\pythonCode\nopasanada"  # ERASE IN PRODUCTION
-
         # initialize Flask app object, set configuration and define routes
         self.app = Flask(
             __name__,
