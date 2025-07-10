@@ -12,7 +12,7 @@ def set_routes(self):
     self.app.add_url_rule("/logout", "logout", self.logout)
 
     # dashboard routes
-    self.app.add_url_rule("/dashboard", "dashboard", self.dash)
+    # self.app.add_url_rule("/dashboard", "dashboard", self.dash)
     self.app.add_url_rule("/wvpeagu2d27l6v7b", "dashboard", self.dash)
     self.app.add_url_rule("/data", "get_data", self.get_data)
     self.app.add_url_rule(

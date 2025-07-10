@@ -1,0 +1,69 @@
+<meta name="to" content="{{to}}">
+<meta name="bcc" content="{{bcc}}">
+<meta name="subject" content="{{subject}}">
+<meta name="hashcode" content= "{{hashcode}}">
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Invitación a No Pasa Nada PE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333333;
+            line-height: 1.5;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: auto;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            border-top: 1px solid #cccccc;
+            border-bottom: 1px solid #cccccc;
+        }
+        h1 {
+            color: #007bff;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777777;
+        }
+        .highlight {
+            background-color: #e7f1ff;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hola {{nombre}},</h1>
+        <p>Gracias por ser parte de <strong>No Pasa Nada PE</strong>.</p>
+        <p>Desde ahora ya puedes ingresar a nuestra página web para <strong>administrar tus 
+            datos y modificar tus placas</strong> en cualquier momento. Si quieres tambien puedes eliminar tu cuenta.</p>
+        <p>🌐 Visítanos en: <a href="https://www.nopasanadape.com" target="_blank" rel="noopener noreferrer">www.nopasanadape.com</a></p>
+        <p><strong>Tus datos de acceso son:</strong></p>
+        <ul>
+            <li><strong>Usuario:</strong> Este mismo correo donde has recibido el mensaje.</li>
+            <li><strong>Contraseña:</strong> <span class="highlight">{{password}}</span></li>
+        </ul>
+        <p><strong>Para mayor seguridad, te recomendamos cambiar tu contraseña cuando ingreses por primera vez.</strong></p>
+        <p>📩 Si tienes dudas o sugerencias, escríbenos a: <a href="mailto:info@nopasanadape.com">info@nopasanadape.com</a>.</p>
+        <p>¡Gracias por confiar en nosotros!<br><strong>El equipo de No Pasa Nada PE</strong></p>
+    </div>
+</body>
+</html>
+

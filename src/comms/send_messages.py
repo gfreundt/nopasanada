@@ -45,7 +45,10 @@ def send(db, dash, max=9999):
         msg = {i.get("name"): i.get("content") for i in soup.find_all("meta")}
 
         # parse message types and convert to list
-        msg["msgTypes"] = [i for i in msg["msgTypes"][1:-1].split(",")]
+        if msg.get("msgTypes"):
+            msg["msgTypes"] = [i for i in msg["msgTypes"][1:-1].split(",")]
+        else:
+            msg["msgTypes"] = []
 
         # parse attachment paths and convert to list
         if msg.get("attachment"):
