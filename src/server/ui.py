@@ -9,10 +9,11 @@ from src.comms import send_code_message
 
 
 def logout(self):
-    self.logging(
-        usuario=f"Logout {self.session['user']['CodMember']} | {self.session['user']['NombreCompleto']} | {self.session['user']['DocNum']} | {self.session['user']['Correo']}"
-    )
-    self.session.clear()
+    if self.session.get("user"):
+        self.logging(
+            usuario=f"Logout {self.session['user']['CodMember']} | {self.session['user']['NombreCompleto']} | {self.session['user']['DocNum']} | {self.session['user']['Correo']}"
+        )
+        self.session.clear()
     return redirect("log")
 
 
@@ -38,7 +39,9 @@ def log(self):
         errors = self.validacion.log(form_response, db=self.db)
         if not errors:
             # gather user data header
-            self.session["user"] = self.users.get_header(correo=form_response["correo"])
+            self.session["user"] = load_member(
+                db=self.db, correo=form_response["correo"]
+            )
             self.logging(
                 usuario=f"Login {self.session['user']['CodMember']} | {self.session['user']['NombreCompleto']} | {self.session['user']['DocNum']} | {self.session['user']['Correo']}"
             )
@@ -149,7 +152,7 @@ def reg2(self):
             self.db.load_members()
 
             # log in recently created user and success message
-            self.session["user"] = self.users.get_header(correo=cor)
+            self.session["user"] = load_member(db=self.db, correo=cor)
             return render_template("reg-3.html")
 
     # render form for user to fill (first time or returned with errors)
@@ -303,9 +306,7 @@ def mic(self):
         if _fecha
         else (dt.now() + td(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     )
-    comm = {
-        "siguiente_mensaje": siguiente_mensaje,
-    }
+    sgte_boletin = {"fecha": siguiente_mensaje, "dias": "17"}
 
     # empty data for first time
     errors = {}
@@ -416,6 +417,14 @@ def mic(self):
         "mic.html",
         user=user,
         placas=placas,
-        comm=comm,
+        sgte_boletin=sgte_boletin,
         errors=errors,
     )
+
+
+def load_member(db, correo):
+    # gathering user data header
+    db.cursor.execute(f"SELECT * FROM members WHERE Correo = '{correo}'")
+    user = db.cursor.fetchone()
+    print({user.keys()[n]: user[n] for n in range(13)})
+    return {user.keys()[n]: user[n] for n in range(13)}
