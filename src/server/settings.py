@@ -8,6 +8,7 @@ def set_routes(self):
     self.app.add_url_rule("/rec", "rec", self.rec, methods=["GET", "POST"])
     self.app.add_url_rule("/rec-2", "rec-2", self.rec2, methods=["GET", "POST"])
     self.app.add_url_rule("/mic", "mic", self.mic, methods=["GET", "POST"])
+    self.app.add_url_rule("/acerca", "acerca", self.acerca)
     self.app.add_url_rule("/logout", "logout", self.logout)
 
     # dashboard routes

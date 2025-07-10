@@ -8,6 +8,10 @@ from flask import redirect, render_template, request, flash
 from src.comms import send_code_message
 
 
+def acerca(self):
+    return render_template("acerca.html")
+
+
 def logout(self):
     if self.session.get("user"):
         self.logging(

@@ -87,6 +87,10 @@ class Server:
         return ui.mic(self)
 
     # logout endpoint (NAVBAR)
+    def acerca(self):
+        return ui.acerca(self)
+
+    # logout endpoint (NAVBAR)
     def logout(self):
         return ui.logout(self)
 
