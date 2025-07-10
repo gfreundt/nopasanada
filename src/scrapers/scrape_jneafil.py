@@ -55,6 +55,7 @@ def browser(doc_num):
     _historial = webdriver.find_element(By.ID, "divMsjHistAfil")
 
     if "Ninguno" in _historial.text:
+        webdriver.quit()
         return ""
 
     else:
@@ -68,9 +69,8 @@ def browser(doc_num):
 
         # save cropped image
         _filename = f"JNE_Afil_{doc_num}.png"
-        _img_cropped.save(os.path.join("data", "images", _filename))
+        _img_cropped.save(os.path.join(NETWORK_PATH, "data", "images", _filename))
 
         # close webdrive
         webdriver.quit()
-
         return _filename

@@ -3,6 +3,7 @@ import re
 import requests
 import base64
 import socket
+from src.utils.constants import MONTHS_3_LETTERS
 
 
 def date_to_db_format(data):
@@ -31,6 +32,40 @@ def date_to_db_format(data):
             new_record_dates_fixed.append(data_item)
 
     return new_record_dates_fixed
+
+
+def date_to_mail_format(fecha, delta=False):
+    _day = fecha[8:]
+    _month = MONTHS_3_LETTERS[int(fecha[5:7]) - 1]
+    _year = fecha[:4]
+    _deltatxt = ""
+    if delta:
+        _delta = int((dt.strptime(fecha, "%Y-%m-%d") - dt.now()).days)
+        _deltatxt = f"[ {_delta:,} días ]" if _delta > 0 else "[ VENCIDO ]"
+    return f"{_day}-{_month}-{_year} {_deltatxt}"
+
+
+def date_to_user_format(fecha):
+    # change date format to a more legible one
+    _months = (
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Oct",
+        "Nov",
+        "Dic",
+    )
+    _day = fecha[8:]
+    _month = _months[int(fecha[5:7]) - 1]
+    _year = fecha[:4]
+
+    return f"{_day}-{_month}-{_year}"
 
 
 def use_truecaptcha(img_path):

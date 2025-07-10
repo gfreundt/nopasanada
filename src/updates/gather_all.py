@@ -130,7 +130,7 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
 
     # wait for all active threads to finish
     while any([i.is_alive() for i in threads]):
-        time.sleep(10)
+        time.sleep(3)
 
     # commit all changes to database
     db_conn.commit()

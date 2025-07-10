@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from copy import deepcopy as copy
 
 # local imports
-from src import nopasanada
+from src.nopasanada import nopasanada
 
 
 # endpoints

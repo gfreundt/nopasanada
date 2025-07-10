@@ -9,6 +9,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "easyocr>=1.7.2",
     "flask>=3.1.0",
+    "fpdf>=1.7.2",
     "img2pdf>=0.6.1",
     "opencv-python>=4.11.0.86",
     "pillow>=11.2.1",

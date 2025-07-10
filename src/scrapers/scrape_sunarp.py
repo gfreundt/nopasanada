@@ -97,6 +97,7 @@ def browser(placa):
 
         # if image fails to load, return False
         if not _card_image:
+            webdriver.quit()
             return False
 
         # grab image and save in file, return succesful

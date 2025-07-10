@@ -84,6 +84,7 @@ def browser(ocr, doc_num, doc_tipo):
 
     _qty = int("".join([i for i in _msg if i.isdigit()]))
     if _qty == 0:
+        webdriver.quit()
         return []
 
     response = []
@@ -137,4 +138,5 @@ def browser(ocr, doc_num, doc_tipo):
 
     time.sleep(0.5)
 
+    webdriver.quit()
     return response

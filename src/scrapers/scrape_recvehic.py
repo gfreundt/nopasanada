@@ -1,4 +1,5 @@
 import os
+import io
 import shutil
 from selenium.webdriver.common.by import By
 import time
@@ -34,14 +35,27 @@ def browser(doc_num):
                 time.sleep(2)
             # capture captcha image from webpage and store in variable
             try:
-                _path = os.path.join(NETWORK_PATH, "temp", "recvehic_temp.png")
-                with open(_path, "wb") as file:
-                    file.write(
-                        webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
-                    )
+
+                # _path = os.path.join(NETWORK_PATH, "temp", "recvehic_temp.png")
+                # with open(_path, "wb") as file:
+                #     file.write(
+                #         webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
+                #     )
                 # convert image to text using OCR
-                captcha_txt = use_truecaptcha(_path)["result"]
+                _captcha_file_like = io.BytesIO(
+                    webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
+                )
+                captcha_txt = use_truecaptcha(_captcha_file_like)["result"]
                 retry_captcha = True
+
+                """
+                # create an in-memory file-like object of the screenshot
+                
+
+                # Pass to function that expects a file-like object
+                captcha_txt = use_truecaptcha(captcha_file_like)["result"]
+                retry_captcha = True
+                """
 
             except ValueError:
                 # captcha image did not load, reset webpage

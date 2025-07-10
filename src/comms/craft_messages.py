@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 import uuid
 from src.comms import create_within_expiration
 from src.utils.constants import NETWORK_PATH
+from src.utils.utils import date_to_mail_format
 
 
 def craft(db_cursor, dash):
@@ -46,7 +47,7 @@ def craft(db_cursor, dash):
                 db_cursor,
                 member["IdMember_FK"],
                 template=template_regular,
-                subject="No Pasa Nada PE [antes Servicio de Alertas Perú]",
+                subject="Tu Boletín de No Pasa Nada PE",
                 msg_type=13,
             )
         )
@@ -149,8 +150,8 @@ def compose_message(
                 "certificadora": _m["Certificadora"].split("-")[-1][:35],
                 "placa": _m["PlacaValidate"],
                 "certificado": _m["Certificado"],
-                "fecha_desde": date_friendly(_m["FechaDesde"]),
-                "fecha_hasta": date_friendly(_m["FechaHasta"], delta=True),
+                "fecha_desde": date_to_mail_format(_m["FechaDesde"]),
+                "fecha_hasta": date_to_mail_format(_m["FechaHasta"], delta=True),
                 "resultado": _m["Resultado"],
                 "vigencia": _m["Vigencia"],
             }
@@ -169,8 +170,8 @@ def compose_message(
                     "numero": _m["Numero"],
                     "clase": _m["Clase"],
                     "formato": _m["Tipo"],
-                    "fecha_desde": date_friendly(_m["FechaExp"]),
-                    "fecha_hasta": date_friendly(_m["FechaHasta"], delta=True),
+                    "fecha_desde": date_to_mail_format(_m["FechaExp"]),
+                    "fecha_hasta": date_to_mail_format(_m["FechaHasta"], delta=True),
                     "restricciones": _m["Restricciones"],
                     "local": _m["Centro"],
                     "puntos": _m["Puntos"],
@@ -193,7 +194,7 @@ def compose_message(
                     "placa": _m[9],
                     "documento": _m[1],
                     "tipo": _m[2],
-                    "fecha_documento": date_friendly(_m[3]),
+                    "fecha_documento": date_to_mail_format(_m[3]),
                     "infraccion": (f"{_m[4]} - {_m[5]}"),
                 }
             )
@@ -229,8 +230,8 @@ def compose_message(
         _soats.append(
             {
                 "aseguradora": _m[1],
-                "fecha_desde": date_friendly(_m[2]),
-                "fecha_hasta": date_friendly(_m[3], delta=True),
+                "fecha_desde": date_to_mail_format(_m[2]),
+                "fecha_hasta": date_to_mail_format(_m[3], delta=True),
                 "certificado": _m[5],
                 "placa": _m[4],
                 "uso": _m[6],
@@ -240,7 +241,9 @@ def compose_message(
             }
         )
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("data", "images", _m[11]))
+        _img_path = os.path.abspath(
+            os.path.join(NETWORK_PATH, "data", "images", _m[11])
+        )
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -261,7 +264,7 @@ def compose_message(
                 "reglamento": _m[2],
                 "falta": _m[3],
                 "documento": _m[4],
-                "fecha_emision": date_friendly(_m[5]),
+                "fecha_emision": date_to_mail_format(_m[5]),
                 "importe": _m[6],
                 "gastos": _m[7],
                 "descuento": _m[8],
@@ -271,7 +274,9 @@ def compose_message(
             }
         )
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("data", "images", _m[14]))
+        _img_path = os.path.abspath(
+            os.path.join(NETWORK_PATH, "data", "images", _m[14])
+        )
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -291,8 +296,8 @@ def compose_message(
             {
                 "entidad": _m[1],
                 "numero": _m[2],
-                "fecha": date_friendly(_m[3]),
-                "fecha_firme": date_friendly(_m[4]),
+                "fecha": date_to_mail_format(_m[3]),
+                "fecha_firme": date_to_mail_format(_m[4]),
                 "falta": _m[5],
                 "estado_deuda": _m[6],
             }
@@ -309,7 +314,9 @@ def compose_message(
     )
     for _m in db_cursor.fetchall():
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("data", "images", _m[15]))
+        _img_path = os.path.abspath(
+            os.path.join(NETWORK_PATH, "data", "images", _m[15])
+        )
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append(
@@ -323,7 +330,7 @@ def compose_message(
     )
     for _m in db_cursor.fetchall():
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("data", "images", _m[1]))
+        _img_path = os.path.abspath(os.path.join(NETWORK_PATH, "data", "images", _m[1]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append("Récord del Conductor MTC.")
@@ -357,7 +364,7 @@ def compose_message(
     if _m and _m[1]:
         _jneafil = True
         # add image to attachment list
-        _img_path = os.path.abspath(os.path.join("data", "images", _m[2]))
+        _img_path = os.path.abspath(os.path.join(NETWORK_PATH, "data", "images", _m[2]))
         if os.path.isfile(_img_path):
             _attachments.append(str(_img_path))
             _attach_txt.append("Afiliación a Partidos Políticos")
@@ -388,28 +395,3 @@ def compose_message(
     _info.update({"attachments": _attachments})
 
     return template.render(_info)
-
-
-def date_friendly(fecha, delta=False):
-    _months = (
-        "Ene",
-        "Feb",
-        "Mar",
-        "Abr",
-        "May",
-        "Jun",
-        "Jul",
-        "Ago",
-        "Set",
-        "Oct",
-        "Nov",
-        "Dic",
-    )
-    _day = fecha[8:]
-    _month = _months[int(fecha[5:7]) - 1]
-    _year = fecha[:4]
-    _deltatxt = ""
-    if delta:
-        _delta = int((dt.strptime(fecha, "%Y-%m-%d") - dt.now()).days)
-        _deltatxt = f"[ {_delta:,} días ]" if _delta > 0 else "[ VENCIDO ]"
-    return f"{_day}-{_month}-{_year} {_deltatxt}"

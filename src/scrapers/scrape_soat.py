@@ -3,14 +3,14 @@ from selenium.common.exceptions import *
 import time
 import os
 from src.utils.chromedriver import ChromeUtils
-from src.utils.constants import NETWORK_PATH
+from src.utils.constants import NETWORK_PATH, HEADLESS
 
 
 class Soat:
 
     def __init__(self):
         self.webdriver = ChromeUtils().init_driver(
-            headless=True, maximized=True, verbose=False, incognito=True
+            headless=HEADLESS["soat"], maximized=True, verbose=False, incognito=True
         )
 
     def get_captcha(self):
@@ -57,6 +57,7 @@ class Soat:
         limit_msg = self.webdriver.find_elements(By.XPATH, "/html/body")
         if limit_msg and "superado" in limit_msg[0].text:
             # self.webdriver.refresh()
+            self.webdriver.quit()
             return -1
 
         # Check if error message pops up
@@ -67,11 +68,13 @@ class Soat:
         # Error: wrong captcha
         if error_msg and "incorrecto" in error_msg[0].text:
             # self.webdriver.refresh()
+            self.webdriver.quit()
             return -2
 
         # Error: no data for placa
         if error_msg and "registrados" in error_msg[0].text:
             # self.webdriver.refresh()
+            self.webdriver.quit()
             return {}
 
         time.sleep(2)
@@ -113,4 +116,5 @@ class Soat:
             "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[4]/div/div/div[3]/button",
         ).click()
 
+        self.webdriver.quit()
         return response

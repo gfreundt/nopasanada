@@ -3,6 +3,7 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime as dt
 import uuid
 from src.utils.constants import NETWORK_PATH
+from src.utils.utils import date_to_mail_format
 
 
 def craft(db_cursor, dash):
@@ -54,13 +55,13 @@ def compose_wapp(alert_data):
     # add all corresponding alerts to message text
     match alert_data[5]:
         case "BREVETE":
-            msg = f"{_base_msg}{alert_data[1]}, tu Licencia de Conducir vence el {date_friendly(alert_data[4])}.\n"
+            msg = f"{_base_msg}{alert_data[1]}, tu Licencia de Conducir vence el {date_to_mail_format(alert_data[4])}.\n"
         case "SOAT":
-            msg = f"{_base_msg}{alert_data[1]}, tu Certificado SOAT de placa *{alert_data[3]}* vence el *{date_friendly(alert_data[4])}*.\n"
+            msg = f"{_base_msg}{alert_data[1]}, tu Certificado SOAT de placa *{alert_data[3]}* vence el *{date_to_mail_format(alert_data[4])}*.\n"
         case "SATIMP":
-            msg = f"{_base_msg}{alert_data[1]}, tu Impuesto Vehicular SAT vence el {date_friendly(alert_data[4])}.\n"
+            msg = f"{_base_msg}{alert_data[1]}, tu Impuesto Vehicular SAT vence el {date_to_mail_format(alert_data[4])}.\n"
         case "REVTEC":
-            msg = f"{_base_msg}{alert_data[1]}, tu Revision Técnica de placa *{alert_data[3]}* vence el *{date_friendly(alert_data[4])}*.\n"
+            msg = f"{_base_msg}{alert_data[1]}, tu Revision Técnica de placa *{alert_data[3]}* vence el *{date_to_mail_format(alert_data[4])}*.\n"
 
     return msg
 
@@ -122,26 +123,3 @@ def compose_message(
     _info.update({"attachment_paths": []})
 
     return template.render(_info)
-
-
-def date_friendly(fecha):
-    # change date format to a more legible one
-    _months = (
-        "Ene",
-        "Feb",
-        "Mar",
-        "Abr",
-        "May",
-        "Jun",
-        "Jul",
-        "Ago",
-        "Set",
-        "Oct",
-        "Nov",
-        "Dic",
-    )
-    _day = fecha[8:]
-    _month = _months[int(fecha[5:7]) - 1]
-    _year = fecha[:4]
-
-    return f"{_day}-{_month}-{_year}"

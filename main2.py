@@ -21,7 +21,7 @@ class Database:
         self.load_members()
 
     def start(self, dev=True):
-        """Connect to database. Network database preferred. Fallback is local database."""
+        """Connect to network database. Local database only used as fallback when development is ON."""
 
         # attempt tp connect to network production database, default to local if not possible
         try:
@@ -84,7 +84,6 @@ def main():
     # endless loop
     while True:
         # print([logging.getLogger(name) for name in logging.root.manager.loggerDict])
-        print("Running")
         time.sleep(10)
 
 

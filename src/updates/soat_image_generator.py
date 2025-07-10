@@ -70,7 +70,7 @@ def generate(db_cursor, data):
         )
 
     file_name = f"SOAT_{data[4].upper()}.pdf"
-    to_path = os.path.join("data", "images", file_name)
+    to_path = os.path.join(NETWORK_PATH, "data", "images", file_name)
 
     # delete image with same name (previous version) from destination folder if it exists
     if os.path.exists(to_path):

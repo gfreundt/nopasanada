@@ -1,4 +1,3 @@
-# user interface routes
 def set_routes(self):
 
     # user interface routes
@@ -13,6 +12,7 @@ def set_routes(self):
 
     # dashboard routes
     self.app.add_url_rule("/dashboard", "dashboard", self.dash)
+    self.app.add_url_rule("/wvpeagu2d27l6v7b", "dashboard", self.dash)
     self.app.add_url_rule("/data", "get_data", self.get_data)
     self.app.add_url_rule(
         "/crear_mensajes",
@@ -38,6 +38,9 @@ def set_routes(self):
         view_func=self.redir,
         methods=["POST", "GET"],
     )
+
+    # redirect route (OAuth2)
+    self.app.add_url_rule("/redir", "redir", self.redir)
 
 
 def set_config(self):

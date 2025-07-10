@@ -14,24 +14,29 @@ def nopasanada(dash, db, cmds):
     Valid cmds: 'update', 'update-threads', 'comms', 'send'
     """
 
+    # perform pre-maintenance
+
+    # update tables: users that require monthly message and users that require alert
+    get_recipients.need_alert(db.cursor)
+    get_recipients.need_message(db.cursor)
+
+    # get all users and placas that need to be updated
+    all_updates = get_records_to_update.get_records(db.cursor)
+
+    pprint(all_updates)
+    pprint([f"{i}: {len(all_updates[i])}" for i in all_updates])
+
     # scrape information on records that need to be updated
-    if "update-threads" in cmds:
-        # update tables: users that require monthly message and users that require alert
+    if "update" in cmds:
+        gather_all.gather_no_threads(db.conn, db.cursor, dash, all_updates)
+        # after update re-run alerts in case old information has been updated
         get_recipients.need_alert(db.cursor)
-        get_recipients.need_message(db.cursor)
-
-        # get all users and placas that need to be updated
-        all_updates = get_records_to_update.get_records(db.cursor)
-
-        pprint(all_updates)
-        pprint([f"{i}: {len(all_updates[i])}" for i in all_updates])
-
+    elif "update-threads" in cmds:
         gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
-
-        # after update re-run alerts in case old information has been updated and alert no longer necessary
+        # after update re-run alerts in case old information has been updated
         get_recipients.need_alert(db.cursor)
 
-    # clear outbound folder, craft messages and alerts, save them to outbound folder
+    # clear oubound folder, craft messages and alerts, save them to outbound folder
     if "comms" in cmds:
         maintenance.clear_outbound_folder()
         craft_messages.craft(db.cursor, dash)

@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from src.utils.constants import NETWORK_PATH
 
 
-def pre_maint(db_cursor):
+def clear_outbound_folder():
 
     # erase all comms that might still be in outbound folder
     for file in os.listdir(os.path.join(NETWORK_PATH, "outbound")):
@@ -53,9 +53,3 @@ def post_maint(db_cursor):
 
     # TODO: eliminate all placas with IdMember_FK = 0 and LastUpdates old
     # TODO: extract text data from soat images
-
-
-def post_maint_send(db_cursor):
-
-    # turns off all flags for forced messages
-    db_cursor.execute("UPDATE members SET ForceMsg = 0")

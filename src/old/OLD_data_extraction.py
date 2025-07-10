@@ -7,7 +7,7 @@ class UserData:
     def __init__(self, db):
         self.cursor = db.cursor
 
-    def date_friendly(self, fecha, delta=False):
+    def date_to_user_format(self, fecha, delta=False):
         _months = (
             "Ene",
             "Feb",
@@ -125,7 +125,7 @@ class UserData:
                     "reglamento": _m[2],
                     "falta": _m[3],
                     "documento": _m[4],
-                    "fecha_emision": self.date_friendly(_m[5]),
+                    "fecha_emision": self.date_to_user_format(_m[5]),
                     "importe": _m[6],
                     "gastos": _m[7],
                     "descuento": _m[8],
@@ -152,7 +152,7 @@ class UserData:
                         "placa": _m[9],
                         "documento": _m[1],
                         "tipo": _m[2],
-                        "fecha_documento": self.date_friendly(_m[3]),
+                        "fecha_documento": self.date_to_user_format(_m[3]),
                         "infraccion": (f"{_m[4]} - {_m[5]}"),
                     }
                 )
@@ -168,8 +168,8 @@ class UserData:
                 {
                     "entidad": _m[2],
                     "numero": _m[3],
-                    "fecha": self.date_friendly(_m[4]),
-                    "fecha_firme": self.date_friendly(_m[5]),
+                    "fecha": self.date_to_user_format(_m[4]),
+                    "fecha_firme": self.date_to_user_format(_m[5]),
                     "falta": _m[6],
                     "estado_deuda": _m[7],
                 }
@@ -185,8 +185,8 @@ class UserData:
             _soats.append(
                 {
                     "aseguradora": _m[1],
-                    "fecha_desde": self.date_friendly(_m[2]),
-                    "fecha_hasta": self.date_friendly(_m[3], delta=True),
+                    "fecha_desde": self.date_to_user_format(_m[2]),
+                    "fecha_hasta": self.date_to_user_format(_m[3], delta=True),
                     "certificado": _m[5],
                     "placa": _m[4],
                     "uso": _m[6],
@@ -215,8 +215,8 @@ class UserData:
                     "certificadora": _m[1].split("-")[-1][:35],
                     "placa": _m[2],
                     "certificado": _m[3],
-                    "fecha_desde": self.date_friendly(_m[4]),
-                    "fecha_hasta": self.date_friendly(_m[5], delta=True),
+                    "fecha_desde": self.date_to_user_format(_m[4]),
+                    "fecha_hasta": self.date_to_user_format(_m[5], delta=True),
                     "resultado": _m[6],
                     "vigencia": _m[7],
                 }

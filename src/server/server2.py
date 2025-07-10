@@ -1,20 +1,13 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, request, session
 import threading
-import os, time
-import requests
+import os
 
 # local imports
 from src.server.validation import FormValidate
-from src.server.data_extraction import UserData
 from src.utils.utils import get_local_ip
-from src.utils.constants import (
-    NETWORK_PATH,
-    ZOHO_MAIL_API_CLIENT_ID,
-    ZOHO_MAIL_API_CLIENT_SECRET,
-    ZOHO_MAIL_API_REDIRECT_URL,
-)
-from src.server.settings import set_routes, set_config
-from src.server import dashboard, ui
+from src.utils.constants import NETWORK_PATH
+from src.server import settings
+from src.server import dashboard, ui, redir
 
 
 class Server:
@@ -23,8 +16,9 @@ class Server:
 
         self.db = db
         self.validacion = FormValidate(db=self.db)
-        self.users = UserData(db=self.db)
         self.data_lock = threading.Lock()
+
+        NETWORK_PATH = r"d:\pythonCode\nopasanada"  # ERASE IN PRODUCTION
 
         # initialize Flask app object, set configuration and define routes
         self.app = Flask(
@@ -33,55 +27,36 @@ class Server:
             static_folder=os.path.join(NETWORK_PATH, "static"),
         )
         self.session = session
-        set_config(self)
-        set_routes(self)
+
+        # set app configurations
+        settings.set_config(self)
+
+        # define endpoints
+        settings.set_routes(self)
 
         # dashboard start
         dashboard.set_initial_data(self)
         dashboard.update_kpis(self)
 
-        # redirect endpoint
-        self.app.add_url_rule("/redir", "redir", self.redir)
-
-    def redir(self):
-        """OAuth2 endpoint for Zoho Mail"""
-        all_params = request.args.to_dict()
-        print(
-            f"Code: {all_params['code']}, Location: {all_params['location']}, Server: {all_params['accounts-server']}"
+    # starting server
+    def run(self):
+        print(f" > SERVER RUNNING ON: http://{get_local_ip()}:5000")
+        self.app.run(
+            debug=False,
+            threaded=True,
+            host="0.0.0.0",
+            port=5000,
         )
-        authorization_code = all_params["code"]
-        client_id = ZOHO_MAIL_API_CLIENT_ID
-        client_secret = ZOHO_MAIL_API_CLIENT_SECRET
-        redirect_uri = ZOHO_MAIL_API_REDIRECT_URL
-        scope = "ZohoMail.accounts.ALL"
 
-        url = f"https://accounts.zoho.com/oauth/v2/token?code={authorization_code}&grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&scope={scope}"
+    def run_in_background(self):
+        flask_thread = threading.Thread(target=self.run, daemon=True)
+        flask_thread.start()
+        return flask_thread
 
-        time.sleep(3)
-        response = requests.post(url)
-        print("Status code:", response.status_code)
-        print("Response body:", response.text)
-        self.zoho_mail_token = response.text["access_token"]
-
-        url = "https://mail.zoho.com/api/accounts"
-        headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": "Zoho-oauthtoken 1000.9305fb65057d05d5fca94c0b434d9fee.51a50174728a68d50b36866883e0403f"
-}
-
-response = requests.get(url, headers=headers)
-
-print(response.status_code)
-print(response.json())  # Use response.text if it's not valid JSON
-}
-
-response = requests.get(url, headers=headers, params=params)
-
-print(response.status_code)
-print(response.json())  # or response.text if it's not valid JSON
-
-        return render_template("redirect.html")
+    # redirect endpoint
+    def redir(self):
+        self.all_params = request.args.to_dict()
+        redir.get_oauth2_token(self)
 
     # root endpoint
     def root(self):
@@ -136,18 +111,3 @@ print(response.json())  # or response.text if it's not valid JSON
     # dashboard functions
     def logging(self, **kwargs):
         dashboard.logging(self, kwargs)
-
-    # starting server
-    def run(self):
-        print(f" > SERVER RUNNING ON: http://{get_local_ip()}:5000")
-        self.app.run(
-            debug=False,
-            threaded=True,
-            host="0.0.0.0",
-            port=5000,
-        )
-
-    def run_in_background(self):
-        flask_thread = threading.Thread(target=self.run, daemon=True)
-        flask_thread.start()
-        return flask_thread
