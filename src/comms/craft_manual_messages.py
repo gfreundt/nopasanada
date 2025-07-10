@@ -40,7 +40,6 @@ def craft():
         )
         with open(_file_path, "w", encoding="utf-8") as file:
             file.write(message)
-        return
 
 
 def compose_message(nombre, correo, email_id, template, subject, pwd):
