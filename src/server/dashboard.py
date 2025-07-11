@@ -1,4 +1,4 @@
-from flask import redirect, render_template, jsonify
+from flask import redirect, render_template, jsonify, url_for
 import requests
 from datetime import datetime as dt
 from copy import deepcopy as copy
@@ -19,17 +19,17 @@ def get_data(self):
 
 def launch_gather_comm(self):
     nopasanada(self, self.db, cmds=["update-threads", "comms"])
-    return redirect("/dashboard")
+    return redirect(url_for("dashboard"))
 
 
 def launch_gather_send(self):
     nopasanada(self, self.db, cmds=["update-threads", "comms", "send"])
-    return redirect("/dashboard")
+    return redirect(url_for("dashboard"))
 
 
 def launch_gather_only_send(self):
     nopasanada(self, self.db, cmds=["send"])
-    return redirect("/dashboard")
+    return redirect(url_for("dashboard"))
 
 
 # functions
