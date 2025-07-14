@@ -27,9 +27,8 @@ def browser(ocr, placa):
             _captcha_img_url = webdriver.find_element(
                 By.ID, "imgCaptcha"
             ).get_attribute("src")
-            _img = Image.open(
-                io.BytesIO(urllib.request.urlopen(_captcha_img_url).read())
-            )
+            _img = io.BytesIO(urllib.request.urlopen(_captcha_img_url).read())
+
             # convert image to text using OCR
             _captcha = ocr.readtext(_img, text_threshold=0.5)
             captcha_txt = (

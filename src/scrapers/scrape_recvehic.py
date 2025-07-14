@@ -36,11 +36,6 @@ def browser(doc_num):
             # capture captcha image from webpage and store in variable
             try:
 
-                # _path = os.path.join(NETWORK_PATH, "temp", "recvehic_temp.png")
-                # with open(_path, "wb") as file:
-                #     file.write(
-                #         webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png
-                #     )
                 # convert image to text using OCR
                 _captcha_file_like = io.BytesIO(
                     webdriver.find_element(By.ID, "idxcaptcha").screenshot_as_png

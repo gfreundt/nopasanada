@@ -1,17 +1,18 @@
 import time
 import io
-import urllib
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from PIL import Image
 from src.utils.chromedriver import ChromeUtils
+from src.utils.utils import use_truecaptcha
 
 
-def browser(doc_num, ocr):
+def browser(doc_num):
 
-    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=False)
+    webdriver = ChromeUtils().init_driver(
+        headless=False, verbose=False, maximized=False
+    )
     url = "https://licencias.mtc.gob.pe/#/index"
 
     # load webpage
@@ -36,15 +37,10 @@ def browser(doc_num, ocr):
                 _captcha_img_url = webdriver.find_element(
                     By.XPATH,
                     "/html/body/app-root/div[2]/app-home/div/mat-card[1]/form/div[3]/div[2]/img",
-                ).get_attribute("src")
-                _img = Image.open(
-                    io.BytesIO(urllib.request.urlopen(_captcha_img_url).read())
                 )
+                _img = io.BytesIO(_captcha_img_url.screenshot_as_png)
                 # convert image to text using OCR
-                _captcha = ocr.readtext(_img, text_threshold=0.5)
-                captcha_txt = (
-                    _captcha[0][1] if len(_captcha) > 0 and len(_captcha[0]) > 0 else ""
-                )
+                captcha_txt = use_truecaptcha(_img)["result"]
                 retry_captcha = True
 
             except ValueError:

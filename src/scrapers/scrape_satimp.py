@@ -1,14 +1,13 @@
 import time
-import os
+import io
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import *
 from selenium.webdriver.support.ui import Select
 
 from src.utils.chromedriver import ChromeUtils
-from src.utils.constants import NETWORK_PATH
+from src.utils.utils import use_truecaptcha
 
 
-def browser(ocr, doc_num, doc_tipo):
+def browser(doc_num, doc_tipo):
     webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
     webdriver.get("https://www.sat.gob.pe/WebSitev8/IncioOV2.aspx")
     # navigate once to Tributo Detalles page with internal URL
@@ -23,23 +22,14 @@ def browser(ocr, doc_num, doc_tipo):
 
     while True:
         # capture captcha image from webpage store in temp file
-        _captcha_img_url = webdriver.find_element(
+        _captcha_img = webdriver.find_element(
             By.XPATH,
             "/html/body/form/div[3]/section/div/div/div[2]/div[3]/div[5]/div/div[1]/div[2]/div/img",
         )
-        _captcha_img_url.screenshot(
-            os.path.join(NETWORK_PATH, "temp", "captcha_satimp.png")
-        )
 
         # apply OCR to temp file
-        _captcha = ocr.readtext(
-            os.path.join(NETWORK_PATH, "temp", "captcha_satimp.png"),
-            text_threshold=0.5,
-        )
-        captcha_txt = (
-            _captcha[0][1] if len(_captcha) > 0 and len(_captcha[0]) > 0 else ""
-        )
-        captcha_txt = "".join([i.upper() for i in captcha_txt if i.isalnum()])
+        _img = io.BytesIO(_captcha_img.screenshot_as_png)
+        captcha_txt = use_truecaptcha(_img)["result"]
 
         # select alternative option from dropdown to reset it
         drop = Select(webdriver.find_element(By.ID, "tipoBusqueda"))

@@ -68,18 +68,21 @@ def date_to_user_format(fecha):
     return f"{_day}-{_month}-{_year}"
 
 
-def use_truecaptcha(img_path):
-    with open(img_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode("ascii")
-        url = "https://api.apitruecaptcha.org/one/gettext"
+def use_truecaptcha(image):
 
-        data = {
-            "userid": "gabfre@gmail.com",
-            "apikey": "UEJgzM79VWFZh6MpOJgh",
-            "data": encoded_string,
-        }
-        response = requests.post(url=url, json=data)
-        return response.json()
+    # legacy: transform received path to object
+    if type(image) is str:
+        print("fdfdf")
+        image = open(image, "rb")
+
+    _url = "https://api.apitruecaptcha.org/one/gettext"
+    _data = {
+        "userid": "gabfre@gmail.com",
+        "apikey": "UEJgzM79VWFZh6MpOJgh",
+        "data": base64.b64encode(image.read()).decode("ascii"),
+    }
+    response = requests.post(url=_url, json=_data)
+    return response.json()
 
 
 def base64_to_image(base64_string, output_path):

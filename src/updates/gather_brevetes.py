@@ -1,6 +1,4 @@
 from datetime import datetime as dt
-import easyocr
-import logging
 
 # local imports
 from src.utils.utils import date_to_db_format
@@ -21,10 +19,6 @@ def gather(db_cursor, db_conn, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start local OCR and avoid logging to console
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
-    ocr = easyocr.Reader(["es"], gpu=False)
-
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data):
 
@@ -41,7 +35,7 @@ def gather(db_cursor, db_conn, dash, update_data):
 
                 # send request to scraper
                 brevete_response, pimpagas_response = scrape_brevete.browser(
-                    doc_num=doc_num, ocr=ocr
+                    doc_num=doc_num
                 )
 
                 # update memberLastUpdate table with last update information

@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 import time
 import os
 from PIL import Image
-from io import BytesIO
+import io
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
 from src.utils.constants import NETWORK_PATH
@@ -18,15 +18,12 @@ def browser(doc_num):
 
     while True:
 
-        _img = webdriver.find_element(
-            By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
+        _captcha_file_like = io.BytesIO(
+            webdriver.find_element(
+                By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
+            ).screenshot_as_png
         )
-        _path = os.path.join(NETWORK_PATH, "temp", "captcha_jneafil.png")
-
-        with open(_path, "wb+") as file:
-            file.write(_img.screenshot_as_png)
-
-        captcha_txt = use_truecaptcha(img_path=_path)
+        captcha_txt = use_truecaptcha(img_path=_captcha_file_like)
 
         # enter data into fields and run
         webdriver.find_element(By.ID, "DNI").send_keys(doc_num)

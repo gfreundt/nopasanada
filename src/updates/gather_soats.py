@@ -1,4 +1,3 @@
-import os
 from datetime import datetime as dt
 from copy import deepcopy as copy
 
@@ -6,10 +5,9 @@ from copy import deepcopy as copy
 from src.updates import soat_image_generator
 from src.utils.utils import date_to_db_format, use_truecaptcha
 from src.scrapers import scrape_soat
-from src.utils.constants import NETWORK_PATH
 
 
-def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
+def gather(db_oonn, db_cursor, dash, update_data):
 
     CARD = 5
 
@@ -23,11 +21,6 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
         lastUpdate="Actualizado:",
     )
 
-    # if gui option is typed, initiate canvas
-    if gui_option == "TYPED":
-        pass
-        # canvas = pygameUtils(screen_size=(1050, 130))
-
     scraper = scrape_soat.Soat()
     # iterate on every placa and write to database
     for counter, placa in enumerate(update_data, start=1):
@@ -39,13 +32,9 @@ def gather(db_oonn, db_cursor, dash, update_data, gui_option="SPEECH"):
                 # log action
                 dash.logging(card=CARD, text=f"Procesando: {placa}")
 
-                # grab captcha image from website and save to temp file
-                scraper.get_captcha()
-
-                # use saved temp file and external OCR to solve captcha
-                captcha = use_truecaptcha(
-                    os.path.join(NETWORK_PATH, "temp", "captcha_soat.png")
-                )["result"]
+                # grab captcha image from website and solve
+                captcha_file_like = scraper.get_captcha()
+                captcha = use_truecaptcha(captcha_file_like)["result"]
 
                 # captcha timeout - manual user not there to enter captcha, skip process
                 if captcha == -1:

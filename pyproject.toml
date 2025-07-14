@@ -7,7 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.13.4",
     "dotenv>=0.9.9",
-    "easyocr>=1.7.2",
     "flask>=3.1.0",
     "fpdf>=1.7.2",
     "img2pdf>=0.6.1",

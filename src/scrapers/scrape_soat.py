@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 import time
-import os
+import io
 from src.utils.chromedriver import ChromeUtils
 from src.utils.constants import NETWORK_PATH, HEADLESS
 
@@ -20,12 +20,7 @@ class Soat:
             By.XPATH,
             "/html/body/div[1]/main/article/div/div[2]/div/div[1]/div[2]/form/div[2]/img",
         )
-
-        with open(
-            os.path.join(NETWORK_PATH, "temp", "captcha_soat.png"),
-            "wb+",
-        ) as file:
-            file.write(_img.screenshot_as_png)
+        return io.BytesIO(_img.screenshot_as_png)
 
     def browser(self, placa=None, captcha_txt=None):
 

@@ -1,13 +1,13 @@
 import time
 import io
-import urllib
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoAlertPresentException
-from PIL import Image
 from src.utils.chromedriver import ChromeUtils
+from src.utils.utils import use_truecaptcha
 
 
-def browser(ocr, placa):
+def browser(placa):
+
     webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
     webdriver.get("https://rec.mtc.gob.pe/Citv/ArConsultaCitv")
     time.sleep(2)
@@ -20,18 +20,10 @@ def browser(ocr, placa):
             if retry_captcha:
                 webdriver.refresh()
                 time.sleep(1)
-            # captura captcha image from webpage store in variable
-            _captcha_img_url = webdriver.find_element(
-                By.ID, "imgCaptcha"
-            ).get_attribute("src")
-            _img = Image.open(
-                io.BytesIO(urllib.request.urlopen(_captcha_img_url).read())
-            )
-            # convert image to text using OCR
-            _captcha = ocr.readtext(_img, text_threshold=0.5)
-            captcha_txt = (
-                _captcha[0][1] if len(_captcha) > 0 and len(_captcha[0]) > 0 else ""
-            )
+            # captura captcha image from webpage, store in variable
+            _captcha_img = webdriver.find_element(By.ID, "imgCaptcha")
+            _img = io.BytesIO(_captcha_img.screenshot_as_png)
+            captcha_txt = use_truecaptcha(_img)["result"]
             retry_captcha = True
 
         # enter data into fields and run

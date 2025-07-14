@@ -1,6 +1,4 @@
 from datetime import datetime as dt
-import easyocr
-import logging
 
 # local imports
 from src.scrapers import scrape_satimp
@@ -20,10 +18,6 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start local OCR
-    logging.basicConfig(level=logging.ERROR)
-    ocr = easyocr.Reader(["es"], gpu=True)
-
     # iterate on all records that require updating and get scraper results
     for counter, (id_member, doc_tipo, doc_num) in enumerate(update_data, start=1):
 
@@ -35,9 +29,7 @@ def gather(db_cursor, dash, update_data):
                 dash.logging(card=CARD, text=f"Procesando: {doc_tipo} {doc_num}")
 
                 # send request to scraper
-                new_records = scrape_satimp.browser(
-                    ocr, doc_tipo=doc_tipo, doc_num=doc_num
-                )
+                new_records = scrape_satimp.browser(doc_tipo=doc_tipo, doc_num=doc_num)
 
                 # if no error in scrape, delete any prior satimp data of this member in both tables
                 db_cursor.executescript(
@@ -101,13 +93,13 @@ def gather(db_cursor, dash, update_data):
             except KeyboardInterrupt:
                 quit()
 
-            except Exception:
-                retry_attempts += 1
-                dash.logging(
-                    card=CARD,
-                    status=2,
-                    text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
-                )
+            # except Exception:
+            #     retry_attempts += 1
+            #     dash.logging(
+            #         card=CARD,
+            #         status=2,
+            #         text=f"|ADVERTENCIA| Reintentando [{retry_attempts}/3]: {doc_tipo} {doc_num}",
+            #     )
 
         # if code gets here, means scraping has encountred three consecutive errors, skip record
         dash.logging(

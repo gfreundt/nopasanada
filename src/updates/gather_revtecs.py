@@ -1,6 +1,4 @@
 from datetime import datetime as dt
-import easyocr
-import logging
 
 # local imports
 from src.utils.utils import date_to_db_format
@@ -21,10 +19,6 @@ def gather(db_cursor, dash, update_data):
         lastUpdate="Actualizado:",
     )
 
-    # start OCR with no log to console
-    logging.getLogger("easyocr").setLevel(logging.ERROR)
-    ocr = easyocr.Reader(["es"], gpu=False)
-
     # iterate on all records that require updating and get scraper results
     for counter, placa in enumerate(update_data, start=1):
 
@@ -36,7 +30,7 @@ def gather(db_cursor, dash, update_data):
                 dash.logging(card=CARD, text=f"Procesando: {placa}")
 
                 # send request to scraper
-                revtec_response = scrape_revtec.browser(ocr=ocr, placa=placa)
+                revtec_response = scrape_revtec.browser(placa=placa)
 
                 # webpage is down: stop gathering and show error in dashboard
                 if revtec_response == 404:
