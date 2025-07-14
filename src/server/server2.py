@@ -42,9 +42,8 @@ class Server:
         self.app.run(
             debug=False,
             threaded=True,
-            host="0.0.0.0",
             port=5000,
-        )
+        )  # host="0.0.0.0",
 
     def run_in_background(self):
         flask_thread = threading.Thread(target=self.run, daemon=True)
