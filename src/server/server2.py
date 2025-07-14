@@ -43,7 +43,7 @@ class Server:
             debug=False,
             threaded=True,
             port=5000,
-            host="127.0.0.53",
+            host="0.0.0.0",
         )
 
     def run_in_background(self):
