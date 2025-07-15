@@ -17,6 +17,11 @@ def get_data(self):
         return jsonify(self.data)
 
 
+def registros(self):
+    nopasanada(dash=None, db=self.db, cmds=["data"])
+    return redirect(url_for("dashboard"))
+
+
 def launch_gather_comm(self):
     nopasanada(self, self.db, cmds=["update-threads", "comms"])
     return redirect(url_for("dashboard"))
@@ -114,7 +119,3 @@ def update_kpis(self):
         )
     except ConnectionError:
         self.data.update({"truecaptcha_balance": "N/A"})
-
-
-def registros(self):
-    nopasanada(dash=None, db=self.db, cmds=["data"])

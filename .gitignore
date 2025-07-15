@@ -8,10 +8,11 @@ static/temp_img.png
 outbound/
 static/captcha_sunarp.png
 static/sunarp_temp.jpg
-erase.html
-erase.py
 kpvn.png
 test.png
 data/members.db-journal
 data/members.db
 data/
+src/chromedriver*
+erase*
+test.py

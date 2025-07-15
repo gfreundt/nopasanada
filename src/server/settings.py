@@ -16,6 +16,12 @@ def set_routes(self):
     self.app.add_url_rule("/wvpeagu2d27l6v7b", "dashboard", self.dash)
     self.app.add_url_rule("/data", "get_data", self.get_data)
     self.app.add_url_rule(
+        "/registros",
+        endpoint="registros",
+        view_func=self.registros,
+        methods=["POST"],
+    )
+    self.app.add_url_rule(
         "/crear_mensajes",
         endpoint="crear_mensajes",
         view_func=self.launch_gather_comm,
