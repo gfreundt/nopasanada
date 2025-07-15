@@ -5,11 +5,13 @@ from PIL import Image
 import io
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
-from src.utils.constants import NETWORK_PATH
+from src.utils.constants import NETWORK_PATH, HEADLESS
 
 
 def browser(doc_num):
-    webdriver = ChromeUtils().init_driver(headless=True, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(
+        headless=HEADLESS["jneafil"], verbose=False, maximized=True
+    )
     webdriver.get("https://sroppublico.jne.gob.pe/Consulta/Afiliado")
     time.sleep(1.5)
 
@@ -23,14 +25,16 @@ def browser(doc_num):
                 By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/div[1]/img"
             ).screenshot_as_png
         )
-        captcha_txt = use_truecaptcha(img_path=_captcha_file_like)
+        captcha_txt = use_truecaptcha(image=_captcha_file_like)["result"]
+
+        print(captcha_txt)
 
         # enter data into fields and run
         webdriver.find_element(By.ID, "DNI").send_keys(doc_num)
         time.sleep(0.5)
         webdriver.find_element(
             By.XPATH, "/html/body/div[1]/form/div/div[2]/div/div/div/input"
-        ).send_keys(captcha_txt["result"])
+        ).send_keys(captcha_txt)
         time.sleep(0.5)
         webdriver.find_element(
             By.XPATH, "/html/body/div[1]/form/div/div[3]/button"
@@ -56,17 +60,14 @@ def browser(doc_num):
         return ""
 
     else:
-        # store in memory buffer
-        _img_buffer = BytesIO()
-        _img_buffer.write(webdriver.get_screenshot_as_png())
 
-        # crop image
-        img = Image.open(_img_buffer)
-        _img_cropped = img.crop((61, 514, 1814, 1700))
-
-        # save cropped image
+        # grab image of JNE affiliation and save in data folder
+        _img = webdriver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div")
         _filename = f"JNE_Afil_{doc_num}.png"
-        _img_cropped.save(os.path.join(NETWORK_PATH, "data", "images", _filename))
+        _img.screenshot_as_png(os.path.join(NETWORK_PATH, "data", "images", _filename))
+
+        # _img = Image.open(io.BytesIO(_img.screenshot_as_png))
+        # _img.save(os.path.join(NETWORK_PATH, "data", "images", _filename))
 
         # close webdrive
         webdriver.quit()

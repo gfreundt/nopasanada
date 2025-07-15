@@ -61,7 +61,7 @@ def main():
 
     # print update data and end
     if "DATA" in sys.argv:
-        nopasanada(dash=None, db=db, cmds=[])
+        nopasanada(dash=None, db=db, cmds=["data"])
         return
 
     # run server in background (port 5000)

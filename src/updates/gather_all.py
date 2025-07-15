@@ -14,6 +14,7 @@ from src.updates import (
     gather_sunats,
     gather_jneafil,
     gather_jnemulta,
+    gather_osipteles,
 )
 
 
@@ -36,7 +37,8 @@ def gather_no_threads(db_conn, db_cursor, dash, all_updates):
     # # # in development
     # gather_sunats.gather(db_cursor, dash, all_updates["sunats"])
     # gather_jnemulta.gather(db_cursor, dash, all_updates["jnemultas"])
-    gather_jneafil.gather(db_cursor, dash, all_updates["jneafils"])
+    # gather_jneafil.gather(db_cursor, dash, all_updates["jneafils"])
+    gather_osipteles.gather(db_cursor, dash, all_updates["osipteles"])
 
     # commit all changes to database
     db_conn.commit()
@@ -120,6 +122,12 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
         Thread(
             target=gather_jneafil.gather,
             args=(db_cursor, dash, all_updates["jneafils"]),
+        )
+    )
+    threads.append(
+        Thread(
+            target=gather_osipteles,
+            args=(db_cursor, dash, all_updates["osipteles"]),
         )
     )
 

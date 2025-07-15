@@ -5,7 +5,7 @@ import os
 # local imports
 from src.server.validation import FormValidate
 from src.utils.utils import get_local_ip
-from src.utils.constants import NETWORK_PATH
+from src.utils.constants import NETWORK_PATH, DASHBOARD_URL
 from src.server import settings
 from src.server import dashboard, ui, redir
 
@@ -38,7 +38,7 @@ class Server:
 
     # starting server
     def run(self):
-        print(f" > SERVER RUNNING ON: http://{get_local_ip()}:5000")
+        print(f" > DASHBOARD RUNNING ON: http://{get_local_ip()}:5000/{DASHBOARD_URL}")
         self.app.run(
             debug=False,
             threaded=True,
@@ -100,6 +100,9 @@ class Server:
 
     def get_data(self):
         return dashboard.get_data(self)
+
+    def registros(self):
+        return dashboard.registros(self)
 
     def launch_gather_comm(self):
         return dashboard.launch_gather_comm(self)

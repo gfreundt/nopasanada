@@ -6,12 +6,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
+from src.utils.constants import HEADLESS
 
 
 def browser(doc_num):
 
     webdriver = ChromeUtils().init_driver(
-        headless=False, verbose=False, maximized=False
+        headless=HEADLESS["brevete"], verbose=False, maximized=False
     )
     url = "https://licencias.mtc.gob.pe/#/index"
 

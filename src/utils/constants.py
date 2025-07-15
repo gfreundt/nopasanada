@@ -35,5 +35,14 @@ MONTHS_3_LETTERS = (
     "Dic",
 )
 
-# scrapers headless
-HEADLESS = {"soat": True}
+# scrapers headless (debugging)
+HEADLESS = {
+    "brevete": True,
+    "satimp": True,
+    "soat": True,
+    "jneafil": True,
+    "jnemulta": False,
+    "osiptel": False,
+}
+
+DASHBOARD_URL = "wvpeagu2d27l6v7b"

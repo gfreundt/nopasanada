@@ -6,7 +6,7 @@ from src.scrapers import scrape_jneafil
 
 def gather(db_cursor, dash, update_data):
 
-    CARD = 9
+    CARD = 11
 
     # log first action
     dash.logging(
@@ -28,12 +28,12 @@ def gather(db_cursor, dash, update_data):
                 dash.logging(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
-                jne_response = scrape_jneafil.browser(doc_num)
+                response = scrape_jneafil.browser(doc_num)
 
                 # update memberLastUpdate table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")
                 db_cursor.execute(
-                    f"UPDATE membersLastUpdate SET LastUpdateJNEAfil = '{_now}' WHERE IdMember_FK = {id_member}"
+                    f"UPDATE membersLastUpdate SET LastUpdateOSIPTEL = '{_now}' WHERE IdMember_FK = {id_member}"
                 )
 
                 # update dashboard with progress and last update timestamp
@@ -44,17 +44,17 @@ def gather(db_cursor, dash, update_data):
                 )
 
                 # add foreign key, True/False flag and current date to scraper response
-                _values = [id_member, bool(jne_response), jne_response, _now]
+                _values = [id_member, response[0], response[1], response[2], _now]
 
                 # delete all old records from member
                 db_cursor.execute(
-                    f"DELETE FROM JNEAfiliacion WHERE IdMember_FK = {id_member}"
+                    f"DELETE FROM osipteles WHERE IdMember_FK = {id_member}"
                 )
 
                 # insert gathered record of member
-                db_cursor.execute(f"INSERT INTO JNEAfiliacion VALUES {tuple(_values)}")
+                db_cursor.execute(f"INSERT INTO osipteles VALUES {tuple(_values)}")
                 dash.logging(
-                    action=f"[ JNE Afil ] {"|".join([str(i) for i in _values])}"
+                    action=f"[ OSIPTEL ] {"|".join([str(i) for i in _values])}"
                 )
 
                 # next record
@@ -73,7 +73,7 @@ def gather(db_cursor, dash, update_data):
     # log last action
     dash.logging(
         card=CARD,
-        title="JNE Afiliacion",
+        title="OSIPTEL",
         progress=100,
         status=3,
         text="Inactivo",

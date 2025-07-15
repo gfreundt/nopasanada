@@ -44,13 +44,25 @@ def log(self):
         if not errors:
             # gather user data header
             self.session["user"] = load_member(
-                db=self.db, correo=form_response["correo"]
+                db=self.db, correo=form_response["correo"].lower()
             )
+            # update last login information
+            self.db.cursor.executescript(
+                f"""    UPDATE members SET LastLoginDatetime = '{dt.now().strftime("%Y-%m-%d %H:%M:%S")}' WHERE Correo = '{self.session['user']['Correo']}';
+                        UPDATE members SET CountFailedLogins = 0 WHERE Correo = '{self.session['user']['Correo']}'
+                 """
+            )
+            # log activity
             self.logging(
                 usuario=f"Login {self.session['user']['CodMember']} | {self.session['user']['NombreCompleto']} | {self.session['user']['DocNum']} | {self.session['user']['Correo']}"
             )
             return redirect("mic")
         else:
+            # add one to failed login counter
+            self.db.cursor.execute(
+                f"UPDATE members SET CountFailedLogins = CountFailedLogins + 1 WHERE Correo = '{form_response['correo']}'"
+            )
+            # log activity
             self.logging(
                 usuario=f"Unsuccesful Login ({form_response['correo']} | {form_response['password']})"
             )

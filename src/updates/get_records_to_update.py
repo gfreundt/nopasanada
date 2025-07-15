@@ -21,6 +21,7 @@ def get_records(db_cursor):
 
     # in development
     updates["jnemultas"] = get_records_jnemultas(db_cursor, HLA=RECENTLY)
+    updates["osipteles"] = get_records_osipteles(db_cursor, HLA=RECENTLY)
 
     # return without any duplicates
     return {i: set(j) for i, j in updates.items()}
@@ -199,6 +200,21 @@ def get_records_jneafils(db_cursor, HLA):
                     NOT IN
                     (SELECT IdMember_FK FROM membersLastUpdate
             		    WHERE LastUpdateJNEAfil >= datetime('now','localtime', '-{HLA} hours'))
+                    AND DocTipo = 'DNI'
+        """
+    )
+    return [(i["IdMember_FK"], i["DocTipo"], i["DocNum"]) for i in db_cursor.fetchall()]
+
+
+def get_records_osipteles(db_cursor, HLA):
+    # condition to update: will get email and no attempt to update in last 48 hours
+    db_cursor.execute(
+        f"""SELECT IdMember_FK, DocTipo, DocNum FROM _necesitan_mensajes_usuarios
+                WHERE
+                    IdMember_FK
+                    NOT IN
+                    (SELECT IdMember_FK FROM membersLastUpdate
+            		    WHERE LastUpdateOSIPTEL >= datetime('now','localtime', '-{HLA} hours'))
                     AND DocTipo = 'DNI'
         """
     )

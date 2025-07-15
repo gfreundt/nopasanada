@@ -65,6 +65,7 @@ def logging(self, kwargs):
         )
         cmd = f"INSERT INTO log VALUES ('USUARIO', '{kwargs["usuario"]}', '{dt.now():%Y-%m-%d %H:%M:%S}')"
         self.db.cursor.execute(cmd)
+        self.db.conn.commit()
 
     # any time there is an action, update kpis
     update_kpis(self)
@@ -113,3 +114,7 @@ def update_kpis(self):
         )
     except ConnectionError:
         self.data.update({"truecaptcha_balance": "N/A"})
+
+
+def registros(self):
+    nopasanada(dash=None, db=self.db, cmds=["data"])

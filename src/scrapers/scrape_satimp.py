@@ -5,10 +5,13 @@ from selenium.webdriver.support.ui import Select
 
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
+from src.utils.constants import HEADLESS
 
 
 def browser(doc_num, doc_tipo):
-    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(
+        headless=HEADLESS["satimp"], verbose=False, maximized=True
+    )
     webdriver.get("https://www.sat.gob.pe/WebSitev8/IncioOV2.aspx")
     # navigate once to Tributo Detalles page with internal URL
     _target = (

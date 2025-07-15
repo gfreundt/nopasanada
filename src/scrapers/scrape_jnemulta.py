@@ -4,10 +4,13 @@ import time
 import io
 from src.utils.chromedriver import ChromeUtils
 from src.utils.utils import use_truecaptcha
+from src.utils.constants import HEADLESS
 
 
 def browser(doc_num):
-    webdriver = ChromeUtils().init_driver(headless=False, verbose=False, maximized=True)
+    webdriver = ChromeUtils().init_driver(
+        headless=HEADLESS["jnemulta"], verbose=False, maximized=True
+    )
     webdriver.get("https://sroppublico.jne.gob.pe/Consulta/Afiliado")
     time.sleep(1.5)
 

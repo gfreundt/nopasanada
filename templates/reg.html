@@ -71,7 +71,8 @@ Crear Nuevo Usuario
                     <!-- Campo de correo -->
                     <div class="form-group justify-content-between align-items-center form-floating mb-3">
                         <input type="text" class="form-control {% if errors.get('correo') %} is-invalid {% endif %}"
-                            id="correo" name="correo" value="{{ user.get('correo', '') }}" , placeholder="empty">
+                            id="correo" name="correo" value="{{ user.get('correo', '') }}" placeholder="empty"
+                            oninput="this.value = this.value.toLowerCase()">>
                         <label for="correo" class="form-label">
                             Correo
                         </label>

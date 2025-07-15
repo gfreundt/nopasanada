@@ -14,8 +14,8 @@ def nopasanada(dash, db, cmds):
     Valid cmds: 'update', 'update-threads', 'comms', 'send'
     """
 
-    # scrape information on records that need to be updated
-    if "update-threads" in cmds:
+    # determine records that need to be updated
+    if "update-threads" in cmds or "data" in cmds:
         # update tables: users that require monthly message and users that require alert
         get_recipients.need_alert(db.cursor)
         get_recipients.need_message(db.cursor)
@@ -26,6 +26,8 @@ def nopasanada(dash, db, cmds):
         pprint(all_updates)
         pprint([f"{i}: {len(all_updates[i])}" for i in all_updates])
 
+    # scrape information on records that need to be updated
+    if "update-threads" in cmds:
         gather_all.gather_threads(db.conn, db.cursor, dash, all_updates)
 
         # after update re-run alerts in case old information has been updated and alert no longer necessary
