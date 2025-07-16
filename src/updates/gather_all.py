@@ -126,7 +126,7 @@ def gather_threads(db_conn, db_cursor, dash, all_updates):
     )
     threads.append(
         Thread(
-            target=gather_osipteles,
+            target=gather_osipteles.gather,
             args=(db_cursor, dash, all_updates["osipteles"]),
         )
     )
