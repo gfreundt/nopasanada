@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 
 # local imports
-from src.scrapers import scrape_jneafil
+from src.scrapers import scrape_osiptel
 
 
 def gather(db_cursor, dash, update_data):
@@ -28,7 +28,7 @@ def gather(db_cursor, dash, update_data):
                 dash.logging(card=CARD, text=f"Procesando: {doc_num}")
 
                 # send request to scraper
-                response = scrape_jneafil.browser(doc_num)
+                response = scrape_osiptel.browser(doc_num)
 
                 # update memberLastUpdate table with last update information
                 _now = dt.now().strftime("%Y-%m-%d")
